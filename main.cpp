@@ -101,17 +101,17 @@ int main(void)
 
 	if (!glfwInit())
 		exit(EXIT_FAILURE);
-	window = glfwCreateWindow(640, 480, "ZPG", NULL, NULL);
+	window = glfwCreateWindow(640, 480, "ZPG", NULL, NULL); //poseldni paramtery jsou monitor a share kontext
 	if (!window)
 	{
 		glfwTerminate();
 		exit(EXIT_FAILURE);
 	}
-	glfwMakeContextCurrent(window);
-	glfwSwapInterval(1);
+	glfwMakeContextCurrent(window); //opengl volani budou nyni aktivni na tomto okne
+	glfwSwapInterval(1); //nastavi v sync s monitorem obnovovaci frekvenci
 
 	windowState state = { 0,1,0,0,0,0,0,1};
-	glfwSetWindowUserPointer(window, &state);
+	glfwSetWindowUserPointer(window, &state); //ulozeni ukazatele na tento state do okna, lze vybrat z callbacku
 
 	// Sets the key callback
 	//na zaklade se to ma tocit
@@ -130,22 +130,23 @@ int main(void)
 
 
 	int width, height;
-	glfwGetFramebufferSize(window, &width, &height);
+	glfwGetFramebufferSize(window, &width, &height); //zisk aktualni veliksoti framebufferu v pixelech
 	float ratio = width / (float)height;
-	glViewport(0, 0, width, height);
+	glViewport(0, 0, width, height); //urceni vykreslovaci oblasti
 
 
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(-ratio, ratio, -1.f, 1.f, 1.f, -1.f);
+	glMatrixMode(GL_PROJECTION); //mod prace s projekcni matici
+	glLoadIdentity(); //resetovani aktualni matice, vycisteni transformaci
+	glOrtho(-ratio, ratio, -1.f, 1.f, 1.f, -1.f); //nastaveni ortogonalni projekce, prvni parametry definuji svisle ohraniceni po x
+	//dalsi jsou bottom a top, a near a far, promitaci plocha z=0
 	
 
 	while (!glfwWindowShouldClose(window))
 	{
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT); //vycisti buffer
 
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
+		glMatrixMode(GL_MODELVIEW); //prepnti na modelview matiic
+		glLoadIdentity(); //loadne matici
 
 		
 
@@ -168,7 +169,7 @@ int main(void)
 		//vykresleni fixni pipeline, nebudeme moct pouzivat
 		//fixni pipleine krok za krokem, nahrazeni shadery
 		//moderni openGl, programovatelna pipeline
-		glBegin(GL_QUADS);
+		glBegin(GL_QUADS); //zacatek a konec vykresleni 4uhelniku
 		glColor3f(1.f, 0.f, 0.f);
 		glVertex3f(-0.6f, -0.4f, 0.f);
 
@@ -187,7 +188,7 @@ int main(void)
 		glEnd();
 		glfwSwapBuffers(window); //pro vykresleni, swap bufferu, rychlejsi vykreslovani
 
-		glfwPollEvents();
+		glfwPollEvents(); //zpracovani vstupu
 	}
 	glfwDestroyWindow(window);
 	glfwTerminate();
