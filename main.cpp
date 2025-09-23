@@ -27,18 +27,54 @@ float points[] = {
    -0.5f, -0.5f, 0.0f
 };
 
-const char* vertex_shader =
+const char* vertex_shader = //program bezici pro kazdy vrchol
 "#version 330\n"
-"layout(location=0) in vec3 vp;"
+"layout(location=0) in vec3 vp;" //vtupni atribut vrcholu, tento atribut je propojen s prvnim atributem vao
 "void main () {"
-"     gl_Position = vec4 (vp, 1.0);"
+"     gl_Position = vec4 (vp, 1.0);" //prevod na homogenni souradnici
 "}";
 
-const char* fragment_shader =
+const char* fragment_shader = //pro kazdy fragment trojuhelniku
 "#version 330\n"
+"out vec4 fragColor;" //vystupni barva fragmentu
+"void main () {"
+"     fragColor = vec4 (0.5, 0.0, 0.5, 1.0);" //nastaveni barvy
+"}";
+
+
+struct Vertex {
+	glm::vec4 pos;
+	glm::vec4 color;
+};
+
+const Vertex b[] = {
+	// první trojúhelník
+	{ { -0.5f, -0.5f, 0, 1 }, { 1, 0, 0, 1 } }, // levý dolní - červená
+	{ { -0.5f,  0.5f, 0, 1 }, { 1, 1, 0, 1 } }, // levý horní - žlutá
+	{ {  0.5f,  0.5f, 0, 1 }, { 0, 0, 1, 1 } }, // pravý horní - modrá
+
+	// druhý trojúhelník
+	{ { -0.5f, -0.5f, 0, 1 }, { 1, 0, 0, 1 } }, // levý dolní - červená
+	{ {  0.5f,  0.5f, 0, 1 }, { 0, 0, 1, 1 } }, // pravý horní - modrá
+	{ {  0.5f, -0.5f, 0, 1 }, { 0, 1, 0, 1 } }  // pravý dolní - zelená
+};
+
+const char* vertex_shader2 = //program bezici pro kazdy vrchol
+"#version 330\n"
+"layout(location = 0) in vec4 vp;"   //vtupni atribut vrcholu, tento atribut je propojen s prvnim atributem vao
+"layout(location = 1) in vec4 color;" // barva vrcholu
 "out vec4 fragColor;"
 "void main () {"
-"     fragColor = vec4 (0.5, 0.0, 0.5, 1.0);"
+"    gl_Position = vp;" //prevod na homogenni souradnici
+"	 fragColor = color;"	
+"}";
+
+const char* fragment_shader2 = //pro kazdy fragment trojuhelniku
+"#version 330\n"
+"in vec4 fragColor;" //vystupni barva fragmentu
+"out vec4 outColor;"
+"void main () {"
+"     outColor = fragColor;" //nastaveni barvy
 "}";
 
 static void error_callback(int error, const char* description) { fputs(description, stderr); }
@@ -59,6 +95,8 @@ glm::mat4 View = glm::lookAt(
 glm::mat4 Model = glm::mat4(1.0f);
 
 
+//vao je definice objektu
+//vbo jak to cist
 
 
 int main(void)
@@ -83,12 +121,12 @@ int main(void)
 		exit(EXIT_FAILURE);
 	}
 
-	glfwMakeContextCurrent(window);
-	glfwSwapInterval(1);
+	glfwMakeContextCurrent(window); //vykreslujeme do prave tohot okna
+	glfwSwapInterval(1); //zpanuti vsync
 
 	// start GLEW extension handler
-	glewExperimental = GL_TRUE;
-	glewInit();
+	glewExperimental = GL_TRUE; //umozneni glew pouzivat vsehcny dostupne moderni rozsireni
+	glewInit(); //inicializace glew
 
 
 	// get version info
@@ -102,30 +140,49 @@ int main(void)
 	printf("Using GLFW %i.%i.%i\n", major, minor, revision);
 
 	int width, height;
-	glfwGetFramebufferSize(window, &width, &height);
-	float ratio = width / (float)height;
-	glViewport(0, 0, width, height);
+	glfwGetFramebufferSize(window, &width, &height); //skutecna velikost framebufferu (pocet pixelu) okna
+	float ratio = width / (float)height; //ratio obrazovky
+	glViewport(0, 0, width, height); //kam a jak velkou cast okna vykreslit
 
 	//vertex buffer object (VBO)
-	GLuint VBO = 0;
-	glGenBuffers(1, &VBO); // generate the VBO
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
+	GLuint VBO = 0; //identifikator peo buffer na GPU
+	glGenBuffers(1, &VBO); // vytvoreni VBO
+	glBindBuffer(GL_ARRAY_BUFFER, VBO); //aktivace bufferu jako vertex buffer, veschny dalsi operace se dejou na nem
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW); //nakopirovani datdo GPU pameti, static rika ze data staticka
+	glBufferData(GL_ARRAY_BUFFER, sizeof(b), b, GL_STATIC_DRAW);
 
 	//Vertex Array Object (VAO)
-	GLuint VAO = 0;
+	GLuint VAO = 0; 
 	glGenVertexArrays(1, &VAO); //generate the VAO
-	glBindVertexArray(VAO); //bind the VAO
-	glEnableVertexAttribArray(0); //enable vertex attributes
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+	glBindVertexArray(VAO); //bind the VAO, aktivace
+	glEnableVertexAttribArray(0); //povoluje artibut na locatin 0, souradnice vrcholu
+	glBindBuffer(GL_ARRAY_BUFFER, VBO); //atribut 0 bude cist data z VBO
+	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL); //0 laylout location, pocet slozek, false ne normalizace, 0 krok mezi vrcholy
+	glVertexAttribPointer(
+		0,                          // location = 0
+		4,                          // x,y,z,w
+		GL_FLOAT, GL_FALSE,
+		sizeof(b[0]),               // stride = velikost jedné položky (pozice+barva)
+		(GLvoid*)0                  // offset = začátek
+	);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(
+		1,                          // location = 1
+		4,                          // r,g,b,a
+		GL_FLOAT, GL_FALSE,
+		sizeof(b[0]),               // stride
+		(GLvoid*)offsetof(Vertex, color) // offset na barvu
+	);
+
 
 	//create and compile shaders
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertex_shader, NULL);
+	//glShaderSource(vertexShader, 1, &vertex_shader, NULL);
+	glShaderSource(vertexShader, 1, &vertex_shader2, NULL);
 	glCompileShader(vertexShader);
 	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragment_shader, NULL);
+	//glShaderSource(fragmentShader, 1, &fragment_shader, NULL);
+	glShaderSource(fragmentShader, 1, &fragment_shader2, NULL);
 	glCompileShader(fragmentShader);
 	GLuint shaderProgram = glCreateProgram();
 	glAttachShader(shaderProgram, fragmentShader);
@@ -151,7 +208,7 @@ int main(void)
 		glUseProgram(shaderProgram);
 		glBindVertexArray(VAO);
 		// draw triangles
-		glDrawArrays(GL_TRIANGLES, 0, 3); //mode,first,count
+		glDrawArrays(GL_TRIANGLES, 0, 6); //mode,first,count
 		// update other events like input handling
 		glfwPollEvents();
 		// put the stuff we’ve been drawing onto the display
