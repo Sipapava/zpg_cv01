@@ -1,5 +1,6 @@
-﻿//Include GLFW  
-#include <GLFW/glfw3.h>  
+﻿#define GLEW_STATIC
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 
 //Include GLM  
 //Include GLM  
@@ -20,61 +21,28 @@
 //byla varianta s globalni promennou
 //bool rotate = false;
 
-struct windowState {
-	int rotate;
-	int direction;
-	float actualTime;
-	float lastTime;
-	float diff;
-	float timer;
-	int degree;
-	int speed;
+float points[] = {
+	0.0f, 0.5f, 0.0f,
+	0.5f, -0.5f, 0.0f,
+   -0.5f, -0.5f, 0.0f
 };
+
+const char* vertex_shader =
+"#version 330\n"
+"layout(location=0) in vec3 vp;"
+"void main () {"
+"     gl_Position = vec4 (vp, 1.0);"
+"}";
+
+const char* fragment_shader =
+"#version 330\n"
+"out vec4 fragColor;"
+"void main () {"
+"     fragColor = vec4 (0.5, 0.0, 0.5, 1.0);"
+"}";
 
 static void error_callback(int error, const char* description) { fputs(description, stderr); }
 
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-	windowState* state = (windowState*)glfwGetWindowUserPointer(window);
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-		glfwSetWindowShouldClose(window, GL_TRUE);
-		printf("key_callback [%d,%d,%d,%d] \n", key, scancode, action, mods);
-	}
-
-	else if (key == GLFW_KEY_W && action == GLFW_PRESS) {
-		state->speed += 1;
-	}
-	else if (key == GLFW_KEY_S && action == GLFW_PRESS) {
-		if (state->speed > 0) {
-			state->speed -= 1;
-		}
-		
-	}
-
-	
-}
-
-static void window_focus_callback(GLFWwindow* window, int focused) { printf("window_focus_callback \n"); }
-
-static void window_iconify_callback(GLFWwindow* window, int iconified) { printf("window_iconify_callback \n"); }
-
-static void window_size_callback(GLFWwindow* window, int width, int height) {
-	printf("resize %d, %d \n", width, height);
-	glViewport(0, 0, width, height);
-}
-
-static void cursor_callback(GLFWwindow* window, double x, double y) { printf("cursor_callback \n"); }
-
-static void button_callback(GLFWwindow* window, int button, int action, int mode) { //funkce registrovaen na callbacku, z GLFW musi mit pevne danou strukturu, jmeno uz libovolne
-	if (action == GLFW_PRESS) {
-		windowState* state = (windowState*)glfwGetWindowUserPointer(window);
-		printf("button_callback [%d,%d,%d]\n", button, action, mode);
-		state->rotate = 1;
-		state->direction = -(state->direction);
-	}
-
-
-}
 
 //GLM test
 
@@ -96,101 +64,102 @@ glm::mat4 Model = glm::mat4(1.0f);
 int main(void)
 {
 	GLFWwindow* window;
-	
 	glfwSetErrorCallback(error_callback);
-
-	if (!glfwInit())
+	if (!glfwInit()) {
+		fprintf(stderr, "ERROR: could not start GLFW3\n");
 		exit(EXIT_FAILURE);
-	window = glfwCreateWindow(640, 480, "ZPG", NULL, NULL); //poseldni paramtery jsou monitor a share kontext
-	if (!window)
-	{
+	}
+
+	/* //inicializace konkretni verze
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+	glfwWindowHint(GLFW_OPENGL_PROFILE,
+	GLFW_OPENGL_CORE_PROFILE);  //*/
+
+	window = glfwCreateWindow(800, 600, "ZPG", NULL, NULL);
+	if (!window) {
 		glfwTerminate();
 		exit(EXIT_FAILURE);
 	}
-	glfwMakeContextCurrent(window); //opengl volani budou nyni aktivni na tomto okne
-	glfwSwapInterval(1); //nastavi v sync s monitorem obnovovaci frekvenci
 
-	windowState state = { 0,1,0,0,0,0,0,1};
-	glfwSetWindowUserPointer(window, &state); //ulozeni ukazatele na tento state do okna, lze vybrat z callbacku
+	glfwMakeContextCurrent(window);
+	glfwSwapInterval(1);
 
-	// Sets the key callback
-	//na zaklade se to ma tocit
+	// start GLEW extension handler
+	glewExperimental = GL_TRUE;
+	glewInit();
 
-	glfwSetKeyCallback(window, key_callback);
 
-	glfwSetCursorPosCallback(window, cursor_callback);
-
-	glfwSetMouseButtonCallback(window, button_callback); //api funkce GLFW
-
-	glfwSetWindowFocusCallback(window, window_focus_callback);
-
-	glfwSetWindowIconifyCallback(window, window_iconify_callback);
-
-	glfwSetWindowSizeCallback(window, window_size_callback);
-
+	// get version info
+	printf("OpenGL Version: %s\n", glGetString(GL_VERSION));
+	printf("Using GLEW %s\n", glewGetString(GLEW_VERSION));
+	printf("Vendor %s\n", glGetString(GL_VENDOR));
+	printf("Renderer %s\n", glGetString(GL_RENDERER));
+	printf("GLSL %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
+	int major, minor, revision;
+	glfwGetVersion(&major, &minor, &revision);
+	printf("Using GLFW %i.%i.%i\n", major, minor, revision);
 
 	int width, height;
-	glfwGetFramebufferSize(window, &width, &height); //zisk aktualni veliksoti framebufferu v pixelech
+	glfwGetFramebufferSize(window, &width, &height);
 	float ratio = width / (float)height;
-	glViewport(0, 0, width, height); //urceni vykreslovaci oblasti
+	glViewport(0, 0, width, height);
 
+	//vertex buffer object (VBO)
+	GLuint VBO = 0;
+	glGenBuffers(1, &VBO); // generate the VBO
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
 
-	glMatrixMode(GL_PROJECTION); //mod prace s projekcni matici
-	glLoadIdentity(); //resetovani aktualni matice, vycisteni transformaci
-	glOrtho(-ratio, ratio, -1.f, 1.f, 1.f, -1.f); //nastaveni ortogonalni projekce, prvni parametry definuji svisle ohraniceni po x
-	//dalsi jsou bottom a top, a near a far, promitaci plocha z=0
-	
+	//Vertex Array Object (VAO)
+	GLuint VAO = 0;
+	glGenVertexArrays(1, &VAO); //generate the VAO
+	glBindVertexArray(VAO); //bind the VAO
+	glEnableVertexAttribArray(0); //enable vertex attributes
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
-	while (!glfwWindowShouldClose(window))
+	//create and compile shaders
+	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vertexShader, 1, &vertex_shader, NULL);
+	glCompileShader(vertexShader);
+	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragmentShader, 1, &fragment_shader, NULL);
+	glCompileShader(fragmentShader);
+	GLuint shaderProgram = glCreateProgram();
+	glAttachShader(shaderProgram, fragmentShader);
+	glAttachShader(shaderProgram, vertexShader);
+	glLinkProgram(shaderProgram);
+
+	GLint status;
+	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &status);
+	if (status == GL_FALSE)
 	{
-		glClear(GL_COLOR_BUFFER_BIT); //vycisti buffer
-
-		glMatrixMode(GL_MODELVIEW); //prepnti na modelview matiic
-		glLoadIdentity(); //loadne matici
-
-		
-
-		//toto ma rotovat 
-		if (state.rotate == 1) {
-			state.actualTime = (float)glfwGetTime();
-			state.diff = state.actualTime - state.lastTime;
-			state.lastTime = state.actualTime;
-			state.timer += state.diff;
-		}
-
-		if (state.timer >= 0.005) {
-			state.degree += (state.direction * state.speed);
-			state.timer = 0;
-			glTranslatef(-0.6f, 0.4f, 0.f);
-			glRotatef((state.degree), 0.f, 0.f, 1.f);
-			glTranslatef(0.6f, -0.4f, 0.f);
-		}
-		
-		//vykresleni fixni pipeline, nebudeme moct pouzivat
-		//fixni pipleine krok za krokem, nahrazeni shadery
-		//moderni openGl, programovatelna pipeline
-		glBegin(GL_QUADS); //zacatek a konec vykresleni 4uhelniku
-		glColor3f(1.f, 0.f, 0.f);
-		glVertex3f(-0.6f, -0.4f, 0.f);
-
-		glColor3f(0.f, 1.f, 0.f); //set bravy
-		glVertex3f(0.6f, -0.4f, 0.f); //nastaveni vrcholu
-
-
-
-		glColor3f(1.f, 1.f, 0.f);
-		glVertex3f(0.6f, 0.4f, 0.f);
-
-		glColor3f(0.f, 0.f, 1.f);
-		glVertex3f(-0.6f, 0.4f, 0.f);
-
-
-		glEnd();
-		glfwSwapBuffers(window); //pro vykresleni, swap bufferu, rychlejsi vykreslovani
-
-		glfwPollEvents(); //zpracovani vstupu
+		GLint infoLogLength;
+		glGetProgramiv(shaderProgram, GL_INFO_LOG_LENGTH, &infoLogLength);
+		GLchar* strInfoLog = new GLchar[infoLogLength + 1];
+		glGetProgramInfoLog(shaderProgram, infoLogLength, NULL, strInfoLog);
+		fprintf(stderr, "Linker failure: %s\n", strInfoLog);
+		delete[] strInfoLog;
 	}
+
+
+	while (!glfwWindowShouldClose(window)) {
+		// clear color and depth buffer
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glUseProgram(shaderProgram);
+		glBindVertexArray(VAO);
+		// draw triangles
+		glDrawArrays(GL_TRIANGLES, 0, 3); //mode,first,count
+		// update other events like input handling
+		glfwPollEvents();
+		// put the stuff we’ve been drawing onto the display
+		glfwSwapBuffers(window);
+	}
+
 	glfwDestroyWindow(window);
+
 	glfwTerminate();
 	exit(EXIT_SUCCESS);
 }
