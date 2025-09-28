@@ -24,7 +24,7 @@ public:
     Scene* getScene(size_t index);
 
     bool initialize();
-    void run(size_t sceneIndex);
+    void run(int sceneId);
 
 private:
     static void error_callback(int error, const char* description);

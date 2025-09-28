@@ -1,7 +1,7 @@
 #include "Model.h"
 
-Model::Model(const Vertex* vertices, size_t count)
-    : points(vertices), vertexCount(count)
+Model::Model(const Vertex* vertices, size_t count,bool color,std::string type)
+    : points(vertices), vertexCount(count), type(type)
 {
     // Vertex Buffer Object (VBO)
     glGenBuffers(1, &VBO);
@@ -17,21 +17,22 @@ Model::Model(const Vertex* vertices, size_t count)
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glVertexAttribPointer(
         0,
-        4,
+        4, 
         GL_FLOAT, GL_FALSE,
         sizeof(Vertex),
         (GLvoid*)offsetof(Vertex, pos)
     );
 
-    // Atribut barvy (location = 1)
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(
-        1,
-        4,
-        GL_FLOAT, GL_FALSE,
-        sizeof(Vertex),
-        (GLvoid*)offsetof(Vertex, color)
-    );
+    if(color){
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(
+            1,
+            4,
+            GL_FLOAT, GL_FALSE,
+            sizeof(Vertex), //pocet bajtu celeho vertexu, o kolik skocit na dalsi
+            (GLvoid*)offsetof(Vertex, color) //offsefof vrati pocet bajru od zacatku struktury k poli
+        );
+    }
 }
 
 Model::~Model() {
@@ -41,5 +42,12 @@ Model::~Model() {
 
 void Model::Draw() {
     glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(vertexCount)); //mozna prepsat
+    if (type.compare("triangles") == 0) {
+        glDrawArrays(GL_TRIANGLES, 0,vertexCount); //size_t nevadi?
+    }
+    else if (type.compare("lines") == 0)
+    {
+        glDrawArrays(GL_LINE_LOOP, 0, vertexCount);
+    }
 }
+    

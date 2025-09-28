@@ -1,7 +1,7 @@
 #include "app.h"
 
 App::~App() {
-    // uvolníme scény
+    
     for (auto scene : scenes) {
         delete scene;
     }
@@ -73,22 +73,35 @@ bool App::initialize() {
     return true;
 }
 
-void App::run(size_t sceneIndex) {
-    if (sceneIndex >= scenes.size() || !window) return;
+void App::run(int sceneId) {
+    if (!window || scenes.empty()) return;
 
-    Scene* scene = scenes[sceneIndex];
+   
+    Scene* scene = nullptr;
+    for (auto s : scenes) {
+        if (s->getId() == sceneId) {
+            scene = s;
+            break;
+        }
+    }
 
-    while (!glfwWindowShouldClose(window)) {
+    if (!scene) {
+        fprintf(stderr, "Scene with ID %d not found!\n", sceneId);
+        return;
+    }
+
+    
+    while (window && !glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // vykreslení celé scény
+        
         scene->draw();
 
         glfwPollEvents();
         glfwSwapBuffers(window);
     }
-    
 }
+
 
 void App::error_callback(int error, const char* description) {
     fprintf(stderr, "Error: %s\n", description);

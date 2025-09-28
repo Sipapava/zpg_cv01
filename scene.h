@@ -5,13 +5,24 @@
 
 class Scene {
 private:
-    ShaderProgram* shaderProgram;                 // shader, který používá scéna
-    std::vector<DrawableObject*> drawableObjects; // ukazatele na objekty
+    std::vector<ShaderProgram*> shaderPrograms;   
+    std::vector<DrawableObject*> drawableObjects; 
+
+    int id;                     
+    static int nextId;
 
 public:
-    Scene(ShaderProgram* shader);
+    Scene();
     ~Scene();
+
+    void addShaderProgram(ShaderProgram* sp);  
+    //void deleteShaderProgram(ShaderProgram* sp);
 
     void addDrawableObject(DrawableObject* obj);
     void draw();
+    int getId() const { return id; } 
+
+    DrawableObject* CreateDrawableObject(Model* m, ShaderProgram* sp);
+    Model* CreateModel(const Vertex* vertices, size_t count,bool color,std::string type);
+    bool prepareTestSceneCv02();
 };

@@ -5,10 +5,10 @@
 
 class ShaderProgram {
 private:
-    Shader* shader;          // pointer na Shader s texty
-    GLuint vertexShader;     // ID vertex shaderu
-    GLuint fragmentShader;   // ID fragment shaderu
-    GLuint shaderProgram;    // ID shader programu
+    Shader* shader;          
+    GLuint vertexShader;     
+    GLuint fragmentShader;   
+    GLuint shaderProgram;    
 
 public:
     ShaderProgram(Shader* shaderObj);

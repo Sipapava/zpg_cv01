@@ -1,6 +1,6 @@
 #pragma once
 
-#include <glm/vec4.hpp>
+#include <glm/glm.hpp>
 
 struct Vertex {
     glm::vec4 pos;
