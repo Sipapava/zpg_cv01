@@ -140,6 +140,7 @@
     <ClCompile Include="shaderProgram.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Models\Models\tree.h" />
     <ClInclude Include="app.h" />
     <ClInclude Include="circleBuild.h" />
     <ClInclude Include="drawableObject.h" />

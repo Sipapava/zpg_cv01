@@ -35,6 +35,7 @@ ShaderProgram::ShaderProgram(Shader* shaderObj)
         glGetProgramInfoLog(shaderProgram, infoLogLength, NULL, strInfoLog);
         fprintf(stderr, "Shader Program linker failure: %s\n", strInfoLog);
         delete[] strInfoLog;
+        //pridat return na false;
     }
 }
 
@@ -42,9 +43,20 @@ ShaderProgram::~ShaderProgram() {
     delete shader;
 }
 
-bool ShaderProgram::setShaderProgram() {
+bool ShaderProgram::setShaderProgram() { //upravit setter
     if (shaderProgram != 0) {
-        glUseProgram(shaderProgram);
+       
+            glUseProgram(shaderProgram);
+            
+        return true;
+    }
+    return false;
+}
+
+bool ShaderProgram::setUniform(const glm::mat4& matrix) {
+    GLint id = glGetUniformLocation(this->shaderProgram, "modelMatrix"); //PRIDANO
+    if (id >= 0) { //PRIDANO
+        glUniformMatrix4fv(id, 1, GL_FALSE, glm::value_ptr(matrix));//PRIDANO
         return true;
     }
     return false;

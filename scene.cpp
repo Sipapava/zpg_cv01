@@ -2,6 +2,7 @@
 #include <algorithm> 
 #include "circleBuild.h"
 
+
 int Scene::nextId = 0;
 Scene::Scene() {
     id = nextId++;
@@ -143,8 +144,11 @@ bool Scene::prepareTestSceneCv02() {
         "layout(location = 0) in vec4 vp;"   //vtupni atribut vrcholu, tento atribut je propojen s prvnim atributem vao
         "layout(location = 1) in vec4 color;" // barva vrcholu
         "out vec4 fragColor;"
+
+        "uniform mat4 modelMatrix;" //PRIDANO
+
         "void main () {"
-        "    gl_Position = vp;" //prevod na homogenni souradnici
+        "    gl_Position = modelMatrix * vp;" //prevod na homogenni souradnici,PRIDANO
         "	 fragColor = color;"
         "}";
 
@@ -175,14 +179,24 @@ bool Scene::prepareTestSceneCv02() {
 
     DrawableObject* obj_trojuhe = new DrawableObject(model_trojuhe, shaderProgram1);
     DrawableObject* obj_kruh = new DrawableObject(model_kruh, shaderProgram);
+    //tady pridano
+    float angle = 1.0;
+    
+    
+    glm::mat4 M = glm::mat4(1.0f);
+    M = glm::rotate(glm::mat4(1.0f),angle, glm::vec3(0, 1, 0));
+    shaderProgram->setShaderProgram();
+    int d = shaderProgram->setUniform(M);
+    std::cout << d;
+    //az po sem
     DrawableObject* obj_linie = new DrawableObject(model_linie, shaderProgram);
+    
 
-
-    this->addShaderProgram(shaderProgram);
-    this->addShaderProgram(shaderProgram1);
-    this->addDrawableObject(obj_krychle);
-    this->addDrawableObject(obj_trojuhe);
-    this->addDrawableObject(obj_kruh);
+    //this->addShaderProgram(shaderProgram);
+    //this->addShaderProgram(shaderProgram1);
+    //this->addDrawableObject(obj_krychle);
+    //this->addDrawableObject(obj_trojuhe);
+    //this->addDrawableObject(obj_kruh);
     this->addDrawableObject(obj_linie);
 
     return true;

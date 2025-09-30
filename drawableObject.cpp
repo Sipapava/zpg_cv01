@@ -17,5 +17,6 @@ void DrawableObject::draw() {
     }
     if (model) {
         model->Draw(); // bindne VAO a vykreslí
+       
     }
 }

@@ -54,3 +54,14 @@ std::vector<Vertex> buildCircle(float radius, int vCount)
 }
 
 
+std::vector<Vertex> fromFloat(const float* objM) {
+
+    std::vector<Vertex> vertices;
+    Vertex center;
+
+    int iterMax = sizeof(objM) / sizeof(objM[0]);
+    
+    for (int i = 0; i < iterMax;i++) {
+        int x;int y;int z;
+    }
+}

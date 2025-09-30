@@ -4,5 +4,5 @@
 
 struct Vertex {
     glm::vec4 pos;
-    glm::vec4 color;
+    glm::vec4 color; //pridat treti atribut pro normalu
 };
