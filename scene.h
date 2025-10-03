@@ -9,6 +9,7 @@ class Scene {
 private:
     std::vector<ShaderProgram*> shaderPrograms;   
     std::vector<DrawableObject*> drawableObjects; 
+    //pridat vectoru modelu
 
     int id;                     
     static int nextId;

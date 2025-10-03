@@ -132,23 +132,27 @@
   <ItemGroup>
     <ClCompile Include="app.cpp" />
     <ClCompile Include="circleBuild.cpp" />
+    <ClCompile Include="complexTransformation.cpp" />
     <ClCompile Include="drawableObject.cpp" />
+    <ClCompile Include="elementarTransformation.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="model.cpp" />
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="shaderProgram.cpp" />
+    <ClCompile Include="transformation.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Models\Models\tree.h" />
     <ClInclude Include="app.h" />
     <ClInclude Include="circleBuild.h" />
+    <ClInclude Include="complexTransformation.h" />
     <ClInclude Include="drawableObject.h" />
     <ClInclude Include="model.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="shaderProgram.h" />
     <ClInclude Include="transformation.h" />
+    <ClInclude Include="elementarTransformation.h" />
     <ClInclude Include="vertex.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

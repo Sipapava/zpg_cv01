@@ -54,14 +54,19 @@ std::vector<Vertex> buildCircle(float radius, int vCount)
 }
 
 
-std::vector<Vertex> fromFloat(const float* objM) {
-
+std::vector<Vertex> FromFloat(const float* data, size_t size) {
     std::vector<Vertex> vertices;
-    Vertex center;
 
-    int iterMax = sizeof(objM) / sizeof(objM[0]);
-    
-    for (int i = 0; i < iterMax;i++) {
-        int x;int y;int z;
+    if (size % 6 != 0) {
+        //throw std::runtime_error("Data size is not multiple of 6!");
     }
+
+    for (size_t i = 0; i < size; i += 6) {
+        Vertex v;
+        v.pos = glm::vec4(data[i], data[i + 1], data[i + 2], 1.0f);
+        v.color = glm::vec4(data[i + 3], data[i + 4], data[i + 5], 1.0f);
+        vertices.push_back(v);
+    }
+
+    return vertices;
 }

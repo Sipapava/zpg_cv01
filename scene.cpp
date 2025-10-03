@@ -1,6 +1,7 @@
 #include "Scene.h"
 #include <algorithm> 
 #include "circleBuild.h"
+#include "tree.h"
 
 
 int Scene::nextId = 0;
@@ -51,6 +52,8 @@ bool Scene::prepareTestSceneCv02() {
     
 
     std::vector<Vertex> circle = buildCircle(0.5f, 60);
+    const int treeSize = sizeof(tree) / sizeof(tree[0]);
+    std::vector<Vertex> treeV = FromFloat(tree,treeSize);
 
     const Vertex linie[] = {
         
@@ -125,6 +128,7 @@ bool Scene::prepareTestSceneCv02() {
 
 
 
+
     const char* vertex_shader = //program bezici pro kazdy vrchol
         "#version 330\n"
         "layout(location=0) in vec3 vp;" //vtupni atribut vrcholu, tento atribut je propojen s prvnim atributem vao
@@ -173,23 +177,32 @@ bool Scene::prepareTestSceneCv02() {
     Model* model_kruh = new Model(circle.data(), circle.size(), true, "triangles");
     Model* model_linie = new Model(linie, sizeof(linie) / sizeof(Vertex), true, "lines");
     
-
+    Model* model_strom = new Model(treeV.data(), treeV.size(), true, "triangles");
+    
     // drawable object
     DrawableObject* obj_krychle = new DrawableObject(model_krychle, shaderProgram);
 
     DrawableObject* obj_trojuhe = new DrawableObject(model_trojuhe, shaderProgram1);
     DrawableObject* obj_kruh = new DrawableObject(model_kruh, shaderProgram);
+    DrawableObject* objtree = new DrawableObject(model_strom, shaderProgram);
     //tady pridano
-    float angle = 1.0;
+    float angle = 60.0;
     
-    
+    /*
     glm::mat4 M = glm::mat4(1.0f);
-    M = glm::rotate(glm::mat4(1.0f),angle, glm::vec3(0, 1, 0));
+    //M = glm::rotate(glm::mat4(1.0f),angle, glm::vec3(0, 1, 0));
+    M = glm::scale(glm::mat4(1.0f), glm::vec3(0.5f));
     shaderProgram->setShaderProgram();
     int d = shaderProgram->setUniform(M);
     std::cout << d;
     //az po sem
-    DrawableObject* obj_linie = new DrawableObject(model_linie, shaderProgram);
+    */
+    //DrawableObject* obj_linie = new DrawableObject(model_linie, shaderProgram);
+   
+    //obj_linie->MoveTo(0, 0.5, 0);
+    //obj_linie->Resize(1, 0.5, 1);
+    //obj_linie->Rotate(angle, 0, 0, 1);
+    //obj_linie->MoveTo(0, 0.5, 0);
     
 
     //this->addShaderProgram(shaderProgram);
@@ -197,7 +210,9 @@ bool Scene::prepareTestSceneCv02() {
     //this->addDrawableObject(obj_krychle);
     //this->addDrawableObject(obj_trojuhe);
     //this->addDrawableObject(obj_kruh);
-    this->addDrawableObject(obj_linie);
+    //this->addDrawableObject(obj_linie);
+    objtree->Resize(0.1, 0.1, 0.1);
+    this->addDrawableObject(objtree);
 
     return true;
 

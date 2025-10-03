@@ -51,3 +51,13 @@ void Model::Draw() {
     }
 }
     
+glm::vec3 Model::ComputeInitialCenter() const {
+    if (vertexCount == 0) return glm::vec3(0.0f);
+
+    glm::vec3 sum(0.0f);
+    for (size_t i = 0; i < vertexCount; ++i) {
+        sum += glm::vec3(points[i].pos); // vezmeme x,y,z, ignorujeme w
+    }
+
+    return sum / static_cast<float>(vertexCount);
+}
