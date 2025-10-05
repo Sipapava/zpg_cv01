@@ -16,11 +16,8 @@ public:
     ShaderProgram(Shader* shaderObj);
     ~ShaderProgram();
     bool setUniform(const glm::mat4& matrix);
-    //setUnifrom metoda pretizena,string name,glm3 vector
-    //udela se GLint id - glunfirm
-    //kotnrola cisla
-    //pak gl uniforMatrix4v4g
-    //vzdy tam musi prijit alespon jendotkova matice
+    bool setUniform(const glm::mat4& matrix,const char* spMatrix); 
+  
 
     bool setShaderProgram();
 };

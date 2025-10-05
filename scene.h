@@ -10,6 +10,7 @@ private:
     std::vector<ShaderProgram*> shaderPrograms;   
     std::vector<DrawableObject*> drawableObjects; 
     //pridat vectoru modelu
+    std::vector<Model*> models;
 
     int id;                     
     static int nextId;
@@ -22,10 +23,13 @@ public:
     //void deleteShaderProgram(ShaderProgram* sp);
 
     void addDrawableObject(DrawableObject* obj);
+    void addModel(Model* m);
     void draw();
     int getId() const { return id; } 
 
     DrawableObject* CreateDrawableObject(Model* m, ShaderProgram* sp);
     Model* CreateModel(const Vertex* vertices, size_t count,bool color,std::string type);
-    bool prepareTestSceneCv02();
+    bool prepareTestSceneCv03T1();
+    bool prepareTestSceneCv03T2();
+    bool prepareTestSceneCv03T3();
 };

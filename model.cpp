@@ -56,7 +56,7 @@ glm::vec3 Model::ComputeInitialCenter() const {
 
     glm::vec3 sum(0.0f);
     for (size_t i = 0; i < vertexCount; ++i) {
-        sum += glm::vec3(points[i].pos); // vezmeme x,y,z, ignorujeme w
+        sum += glm::vec3(points[i].pos); 
     }
 
     return sum / static_cast<float>(vertexCount);

@@ -18,6 +18,7 @@ void App::addScene(Scene* scene) {
     scenes.push_back(scene);
 }
 
+
 void App::deleteScene(size_t index) {
     if (index < scenes.size()) {
         delete scenes[index];
@@ -28,6 +29,10 @@ void App::deleteScene(size_t index) {
 Scene* App::getScene(size_t index) {
     if (index < scenes.size()) return scenes[index];
     return nullptr;
+}
+
+int App::getSceneIndex() {
+    return sceneIndex;
 }
 
 bool App::initialize() {
@@ -51,6 +56,10 @@ bool App::initialize() {
         fprintf(stderr, "ERROR: could not start GLEW\n");
         return false;
     }
+
+    // --- TADY nastavíme callback a ukazatel na "this" ---
+    glfwSetWindowUserPointer(window, this);
+    glfwSetKeyCallback(window, key_callback);
 
     // info o systému
     printf("OpenGL Version: %s\n", glGetString(GL_VERSION));
@@ -106,4 +115,33 @@ void App::run(int sceneId) {
 
 void App::error_callback(int error, const char* description) {
     fprintf(stderr, "Error: %s\n", description);
+}
+
+
+void App::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    if (glfwGetWindowUserPointer(window)) {
+        App* app = static_cast<App*>(glfwGetWindowUserPointer(window)); //vrati obecny ukazatel
+        app->onKey(key, scancode, action, mods);
+    }
+}
+
+
+
+void App::onKey(int key, int scancode, int action, int mods) {
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
+    }
+    if (key == GLFW_KEY_D && action == GLFW_PRESS) {
+        sceneIndex++;
+        int pos = sceneIndex % scenes.size();
+        std::cout << "Scena prepnuta dopredu! "<< pos <<" "<<sceneIndex << std::endl;
+        this->run(pos);
+
+    }
+    else if (key == GLFW_KEY_A && action == GLFW_PRESS) {
+        sceneIndex--;
+        int pos = sceneIndex % scenes.size();
+        std::cout << "Scena prepnuta dozadu!" << pos <<" "<< sceneIndex << std::endl;
+        this->run(pos);
+    }
 }

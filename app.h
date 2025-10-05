@@ -14,6 +14,7 @@ class App {
 private:
     std::vector<Scene*> scenes;
     GLFWwindow* window = nullptr;
+    int sceneIndex = 0;
 
 public:
     App() = default;
@@ -22,9 +23,15 @@ public:
     void addScene(Scene* scene);
     void deleteScene(size_t index);
     Scene* getScene(size_t index);
+    int getSceneIndex();
 
     bool initialize();
     void run(int sceneId);
+
+    void onKey(int key, int scancode, int action, int mods);
+    static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+
+
 
 private:
     static void error_callback(int error, const char* description);

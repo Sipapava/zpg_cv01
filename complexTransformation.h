@@ -9,5 +9,5 @@ public:
     ~complexTransformation();
     void Add(Transformation * t) override;
     //delete with id
-    glm::mat4 apply(const glm::mat4& matrix) const override;
+    glm::mat4 apply(const glm::mat4& matrix) override;
 };

@@ -16,7 +16,7 @@ public:
     virtual void Add(Transformation* t) {
         throw std::runtime_error("Cannot add to a leaf Transformation");
     };
-    virtual glm::mat4 apply(const glm::mat4& matrix) const = 0;
+    virtual glm::mat4 apply(const glm::mat4& matrix) = 0;
 
     int getId() const { return id; }
 };

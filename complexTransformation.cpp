@@ -1,7 +1,7 @@
 #include "complexTransformation.h"
 
 
-glm::mat4 complexTransformation::apply(const glm::mat4& matrix) const {
+glm::mat4 complexTransformation::apply(const glm::mat4& matrix) {
     glm::mat4 result = matrix;
     for (auto it = transformations.rbegin(); it != transformations.rend(); ++it) {
         result = (*it)->apply(result);

@@ -154,6 +154,7 @@
     <ClInclude Include="transformation.h" />
     <ClInclude Include="elementarTransformation.h" />
     <ClInclude Include="vertex.h" />
+    <ClInclude Include="vertexDef.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

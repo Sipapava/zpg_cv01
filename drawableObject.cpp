@@ -9,59 +9,72 @@ DrawableObject::DrawableObject(Model* m, ShaderProgram* sp)
     transformation = complexTrans;
     id = nextId++;
     position = model->ComputeInitialCenter();
+    rotation[0] = 0; rotation[1] = 0; rotation[2] = 0;
+    rotationAxis = { 0,0,0 };
     
 }
 
 DrawableObject::~DrawableObject() {
-    delete model;
+    //delete model; zodpovednost prebrala scena
     delete transformation;
 }
+
+void DrawableObject::SetRotateAnimation(float addAngle, const glm::vec3& axis) {
+    transformation->Add(new Translation(-position));
+    transformation->Add(new RotationDynamic(0.0f, axis, addAngle));
+    transformation->Add(new Translation(+position));
+};
+
+//stop?
+
+void DrawableObject::Update() {
+    //prazdna
+
+};
 
 void DrawableObject::draw() {
     if (shaderProgram) {
       bool x =  shaderProgram->setShaderProgram(); // aktivuje shader
     }
-    //vytvorim ejednotkovou matici kterou vlozime od apply;
-    //pak se zavola matice a  vykreslise, setUniform s matici volame tady
+    
 
     glm::mat4 I = glm::mat4(1.0f);
     glm::mat4 M = transformation->apply(I);
-    int d = shaderProgram->setUniform(M);
+    int ready = shaderProgram->setUniform(M);
 
-    if (model) {
+    if (model && ready) {
         model->Draw(); // bindne VAO a vykreslí
        
     }
 }
 
-//void MoveTo(x,y,z); jen prida matici rotace do transformation
-//void rotate je kolem vlastni osy
-//void resize?
-//musi mit delete na transoformation!
+
 
 void DrawableObject::MoveTo(float x, float y, float z) {
-    // spoèítáme posun relativní k aktuální pozici
+    
     glm::vec3 delta = glm::vec3(x, y, z) - position;
 
-    // vytvoøíme translaci o rozdíl
     transformation->Add(new Translation(delta));
 
-    // aktualizujeme støed objektu
+
     position = glm::vec3(x, y, z);
 }
 
 void DrawableObject::Resize(float x, float y, float z) {
-    transformation->Add(new Scale(glm::vec3(x, y, z)));;
+    
+    transformation->Add(new Translation(-position));
+    transformation->Add(new Scale(glm::vec3(x, y, z)));
+    transformation->Add(new Translation(position));
 }
 
 void DrawableObject::Rotate(float angle, float xA, float yA, float zA) {
-    // krok 1: posunout støed objektu do poèátku
+    
     transformation->Add(new Translation(-position));
 
-    // krok 2: aplikovat rotaci kolem zadané osy
+    
     transformation->Add(new Rotation(angle, glm::vec3(xA, yA, zA)));
 
-    // krok 3: posunout objekt zpìt na pùvodní pozici
+   
     transformation->Add(new Translation(+position));
 }
 

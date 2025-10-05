@@ -54,10 +54,21 @@ bool ShaderProgram::setShaderProgram() { //upravit setter
 }
 
 bool ShaderProgram::setUniform(const glm::mat4& matrix) {
-    GLint id = glGetUniformLocation(this->shaderProgram, "modelMatrix"); //PRIDANO
-    if (id >= 0) { //PRIDANO
-        glUniformMatrix4fv(id, 1, GL_FALSE, glm::value_ptr(matrix));//PRIDANO
+    GLint id = glGetUniformLocation(shaderProgram, "modelMatrix"); 
+    if (id >= 0) { 
+        glUniformMatrix4fv(id, 1, GL_FALSE, glm::value_ptr(matrix));
         return true;
     }
     return false;
 }
+
+bool ShaderProgram::setUniform(const glm::mat4& matrix, const char* spMatrix) {
+    GLint id = glGetUniformLocation(shaderProgram, spMatrix); 
+    if (id >= 0) { 
+        glUniformMatrix4fv(id, 1, GL_FALSE, glm::value_ptr(matrix));
+        return true;
+    }
+    return false;
+}
+
+

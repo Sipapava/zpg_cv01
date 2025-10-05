@@ -2,7 +2,10 @@
 #include <algorithm> 
 #include "circleBuild.h"
 #include "tree.h"
-
+#include "vertexDef.h"
+#include "bushes.h"
+#include "sphere.h"
+//remake create and add methods fro DO and Shaders
 
 int Scene::nextId = 0;
 Scene::Scene() {
@@ -21,12 +24,20 @@ Scene::~Scene() {
         delete sp;
     }
     shaderPrograms.clear();
+
+    for (auto m : models) {
+        delete m;
+    }
+    models.clear();
 }
 
 void Scene::addShaderProgram(ShaderProgram* sp) {
     shaderPrograms.push_back(sp);
 }
 
+void Scene::addModel(Model* m) {
+    models.push_back(m);
+}
 
 
 DrawableObject* Scene::CreateDrawableObject(Model* m, ShaderProgram* sp) {
@@ -44,179 +55,141 @@ void Scene::addDrawableObject(DrawableObject* obj) {
 void Scene::draw() {
     // iterace pres shadery?
     for (auto obj : drawableObjects) {
+        obj->Update();
         obj->draw();
     }
 }
 
-bool Scene::prepareTestSceneCv02() {
+bool Scene::prepareTestSceneCv03T1() {
     
 
-    std::vector<Vertex> circle = buildCircle(0.5f, 60);
-    const int treeSize = sizeof(tree) / sizeof(tree[0]);
-    std::vector<Vertex> treeV = FromFloat(tree,treeSize);
-
-    const Vertex linie[] = {
-        
-        { { -0.9f, -0.5f, 0, 1 }, { 1, 0, 0, 1 } }, // - èervená
-        { { -0.9f,  -0.3f, 0, 1 }, { 1, 1, 0, 1 } }, // - žlutá
-        { {  -0.5f,  -0.3f, 0, 1 }, { 0, 0, 1, 1 } }, //  - modrá
-
-    };
-
-    const Vertex a[] = {
-        
-        { { -1.0f,  0.6f, 0, 1 } }, 
-        { { -1.0f,  1.0f, 0, 1 } }, 
-        { { -0.6f,  1.0f, 0, 1 } }, 
-    };
-
-    const Vertex c[] = {
-        
-        { { 0.7f,  0.7f,  0.1f, 1 }, { 1, 0, 1, 1 } },
-        { { 0.9f,  0.7f,  0.1f, 1 }, { 1, 0, 1, 1 } },
-        { { 0.9f,  0.9f,  0.1f, 1 }, { 1, 0, 1, 1 } },
-
-        { { 0.7f,  0.7f,  0.1f, 1 }, { 1, 0, 1, 1 } },
-        { { 0.9f,  0.9f,  0.1f, 1 }, { 1, 0, 1, 1 } },
-        { { 0.7f,  0.9f,  0.1f, 1 }, { 1, 0, 1, 1 } },
-
-        
-        { { 0.7f,  0.7f, -0.1f, 1 }, { 1, 0, 1, 1 } },
-        { { 0.9f,  0.7f, -0.1f, 1 }, { 1, 0, 1, 1 } },
-        { { 0.9f,  0.9f, -0.1f, 1 }, { 1, 0, 1, 1 } },
-
-        { { 0.7f,  0.7f, -0.1f, 1 }, { 1, 0, 1, 1 } },
-        { { 0.9f,  0.9f, -0.1f, 1 }, { 1, 0, 1, 1 } },
-        { { 0.7f,  0.9f, -0.1f, 1 }, { 1, 0, 1, 1 } },
-
-        
-        { { 0.7f,  0.7f, -0.1f, 1 }, { 1, 0, 1, 1 } },
-        { { 0.7f,  0.7f,  0.1f, 1 }, { 1, 0, 1, 1 } },
-        { { 0.7f,  0.9f,  0.1f, 1 }, { 1, 0, 1, 1 } },
-
-        { { 0.7f,  0.7f, -0.1f, 1 }, { 1, 0, 1, 1 } },
-        { { 0.7f,  0.9f,  0.1f, 1 }, { 1, 0, 1, 1 } },
-        { { 0.7f,  0.9f, -0.1f, 1 }, { 1, 0, 1, 1 } },
-
-        
-        { { 0.9f,  0.7f, -0.1f, 1 }, { 1, 0, 1, 1 } },
-        { { 0.9f,  0.7f,  0.1f, 1 }, { 1, 0, 1, 1 } },
-        { { 0.9f,  0.9f,  0.1f, 1 }, { 1, 0, 1, 1 } },
-
-        { { 0.9f,  0.7f, -0.1f, 1 }, { 1, 0, 1, 1 } },
-        { { 0.9f,  0.9f,  0.1f, 1 }, { 1, 0, 1, 1 } },
-        { { 0.9f,  0.9f, -0.1f, 1 }, { 1, 0, 1, 1 } },
-
-        
-        { { 0.7f,  0.9f, -0.1f, 1 }, { 1, 0, 1, 1 } },
-        { { 0.7f,  0.9f,  0.1f, 1 }, { 1, 0, 1, 1 } },
-        { { 0.9f,  0.9f,  0.1f, 1 }, { 1, 0, 1, 1 } },
-
-        { { 0.7f,  0.9f, -0.1f, 1 }, { 1, 0, 1, 1 } },
-        { { 0.9f,  0.9f,  0.1f, 1 }, { 1, 0, 1, 1 } },
-        { { 0.9f,  0.9f, -0.1f, 1 }, { 1, 0, 1, 1 } },
-
-        
-        { { 0.7f,  0.7f, -0.1f, 1 }, { 1, 0, 1, 1 } },
-        { { 0.7f,  0.7f,  0.1f, 1 }, { 1, 0, 1, 1 } },
-        { { 0.9f,  0.7f,  0.1f, 1 }, { 1, 0, 1, 1 } },
-
-        { { 0.7f,  0.7f, -0.1f, 1 }, { 1, 0, 1, 1 } },
-        { { 0.9f,  0.7f,  0.1f, 1 }, { 1, 0, 1, 1 } },
-        { { 0.9f,  0.7f, -0.1f, 1 }, { 1, 0, 1, 1 } }
-    };
-
-
-
-
-    const char* vertex_shader = //program bezici pro kazdy vrchol
-        "#version 330\n"
-        "layout(location=0) in vec3 vp;" //vtupni atribut vrcholu, tento atribut je propojen s prvnim atributem vao
-        "void main () {"
-        "     gl_Position = vec4 (vp, 1.0);" //prevod na homogenni souradnici
-        "}";
-
-    const char* fragment_shader = //pro kazdy fragment trojuhelniku
-        "#version 330\n"
-        "out vec4 fragColor;" //vystupni barva fragmentu
-        "void main () {"
-        "     fragColor = vec4 (0.5, 0.0, 0.5, 1.0);" //nastaveni barvy
-        "}";
-
-    const char* vertex_shader_color = //program bezici pro kazdy vrchol
-        "#version 330\n"
-        "layout(location = 0) in vec4 vp;"   //vtupni atribut vrcholu, tento atribut je propojen s prvnim atributem vao
-        "layout(location = 1) in vec4 color;" // barva vrcholu
-        "out vec4 fragColor;"
-
-        "uniform mat4 modelMatrix;" //PRIDANO
-
-        "void main () {"
-        "    gl_Position = modelMatrix * vp;" //prevod na homogenni souradnici,PRIDANO
-        "	 fragColor = color;"
-        "}";
-
-    const char* fragment_shader_color = //pro kazdy fragment trojuhelniku
-        "#version 330\n"
-        "in vec4 fragColor;" //vystupni barva fragmentu
-        "out vec4 outColor;"
-        "void main () {"
-        "     outColor = fragColor;" //nastaveni barvy
-        "}";
+    std::vector<Vertex> circle = buildCircle(0.1f, 30);
+    
 
         
     Shader* shader = new Shader(vertex_shader_color, fragment_shader_color);
     ShaderProgram* shaderProgram = new ShaderProgram(shader);
 
-    Shader* shader1 = new Shader(vertex_shader, fragment_shader);
-    ShaderProgram* shaderProgram1 = new ShaderProgram(shader1);
+    Model* model_kruh = new Model(circle.data(), circle.size(), true, "triangles");
 
     // vytvoøení modelu z dat
-    Model* model_krychle = new Model(c, sizeof(c) / sizeof(Vertex), true,"triangles");
-    Model* model_trojuhe = new Model(a, sizeof(a) / sizeof(Vertex), false,"triangles");
-    Model* model_kruh = new Model(circle.data(), circle.size(), true, "triangles");
-    Model* model_linie = new Model(linie, sizeof(linie) / sizeof(Vertex), true, "lines");
+   // Model* model_krychle = new Model(c, sizeof(c) / sizeof(Vertex), true,"triangles");
     
-    Model* model_strom = new Model(treeV.data(), treeV.size(), true, "triangles");
-    
-    // drawable object
-    DrawableObject* obj_krychle = new DrawableObject(model_krychle, shaderProgram);
+    DrawableObject* obj_kruh1 = new DrawableObject(model_kruh, shaderProgram);
+    obj_kruh1->MoveTo(0, 0.5, 0);
 
-    DrawableObject* obj_trojuhe = new DrawableObject(model_trojuhe, shaderProgram1);
-    DrawableObject* obj_kruh = new DrawableObject(model_kruh, shaderProgram);
-    DrawableObject* objtree = new DrawableObject(model_strom, shaderProgram);
-    //tady pridano
-    float angle = 60.0;
-    
-    /*
-    glm::mat4 M = glm::mat4(1.0f);
-    //M = glm::rotate(glm::mat4(1.0f),angle, glm::vec3(0, 1, 0));
-    M = glm::scale(glm::mat4(1.0f), glm::vec3(0.5f));
-    shaderProgram->setShaderProgram();
-    int d = shaderProgram->setUniform(M);
-    std::cout << d;
-    //az po sem
-    */
-    //DrawableObject* obj_linie = new DrawableObject(model_linie, shaderProgram);
-   
-    //obj_linie->MoveTo(0, 0.5, 0);
-    //obj_linie->Resize(1, 0.5, 1);
-    //obj_linie->Rotate(angle, 0, 0, 1);
-    //obj_linie->MoveTo(0, 0.5, 0);
-    
+    DrawableObject* obj_kruh2 = new DrawableObject(model_kruh, shaderProgram);
+    obj_kruh2->MoveTo(-0.5, 0, 0);
 
-    //this->addShaderProgram(shaderProgram);
-    //this->addShaderProgram(shaderProgram1);
-    //this->addDrawableObject(obj_krychle);
-    //this->addDrawableObject(obj_trojuhe);
-    //this->addDrawableObject(obj_kruh);
-    //this->addDrawableObject(obj_linie);
-    objtree->Resize(0.1, 0.1, 0.1);
-    this->addDrawableObject(objtree);
+    DrawableObject* obj_kruh3 = new DrawableObject(model_kruh, shaderProgram);
+    obj_kruh3->MoveTo(0.5, 0, 0);
+
+    DrawableObject* obj_kruh4 = new DrawableObject(model_kruh, shaderProgram);
+    obj_kruh4->MoveTo(0, -0.5, 0);
+
+    this->addModel(model_kruh);
+    this->addDrawableObject(obj_kruh1);
+    this->addDrawableObject(obj_kruh2);
+    this->addDrawableObject(obj_kruh3);
+    this->addDrawableObject(obj_kruh4);
 
     return true;
 
 }
+
+bool Scene::prepareTestSceneCv03T2() {
+    const Vertex simpleT[] = {
+
+        { { -0.8f, -0.5f, 0, 1 }, { 1, 0, 0, 1 } }, // - èervená
+        { { -0.8f,  -0.3f, 0, 1 }, { 1, 1, 0, 1 } }, // - žlutá
+        { {  -0.3f,  -0.3f, 0, 1 }, { 0, 0, 1, 1 } }, //  - modrá
+
+    };
+
+    Shader* shader = new Shader(vertex_shader_color, fragment_shader_color);
+    ShaderProgram* shaderProgram = new ShaderProgram(shader);
+    Model* model_trojuhe = new Model(simpleT, sizeof(simpleT) / sizeof(Vertex), true, "triangles");
+    DrawableObject* obj_trojuhe = new DrawableObject(model_trojuhe, shaderProgram);
+    obj_trojuhe->SetRotateAnimation(glm::radians(1.0f), glm::vec3(0, 0, 1));
+
+    this->addModel(model_trojuhe);
+    this->addDrawableObject(obj_trojuhe);
+    return true;
+}
+
+bool Scene::prepareTestSceneCv03T3() {
+    // --- Vertex data ---
+    const int treeSize = sizeof(tree) / sizeof(tree[0]);
+    std::vector<Vertex> treeV = FromFloat(tree, treeSize);
+
+    const int sphereSize = sizeof(sphere) / sizeof(sphere[0]);
+    std::vector<Vertex> sphereV = FromFloat(sphere, sphereSize);
+
+    const int bushSize = sizeof(bushes) / sizeof(bushes[0]);
+    std::vector<Vertex> bushV = FromFloat(bushes, bushSize);
+
+    // --- Shadery ---
+    Shader* shaderColor = new Shader(vertex_shader_color, fragment_shader_color);
+    ShaderProgram* shaderProgramColor = new ShaderProgram(shaderColor);
+    addShaderProgram(shaderProgramColor);
+
+    Shader* shaderBasic = new Shader(vertex_shader, fragment_shader);
+    ShaderProgram* shaderProgramBasic = new ShaderProgram(shaderBasic);
+    addShaderProgram(shaderProgramBasic);
+
+    // --- Modely ---
+    Model* sphereModel = new Model(sphereV.data(), sphereV.size(), true, "triangles");
+    Model* treeModel = new Model(treeV.data(), treeV.size(), true, "triangles");
+    Model* bushModel = new Model(bushV.data(), bushV.size(), true, "triangles");
+
+    addModel(sphereModel);
+    addModel(treeModel);
+    addModel(bushModel);
+
+    
+    std::vector<glm::vec3> sunPositions = { {-0.8f, 0.8f, 0.0f}, {0.8f, 0.8f, 0.0f} };
+    for (auto& pos : sunPositions) {
+        DrawableObject* sun = CreateDrawableObject(sphereModel, shaderProgramColor);
+        sun->Resize(0.1f, 0.1f, 0.1f);
+        sun->MoveTo(pos.x, pos.y, pos.z); 
+        sun->SetRotateAnimation(glm::radians(1.0f), glm::vec3(0, 0.5, 0.5));
+        addDrawableObject(sun);
+    }
+
+    
+    for (int i = 0; i < 8; ++i) {
+        DrawableObject* treeObj = CreateDrawableObject(treeModel, shaderProgramColor);
+
+        float x = -0.7f + i * 0.2f; 
+        float y = -0.3f;            
+        float z = 0.0f;             
+
+        treeObj->Resize(0.1f, 0.1f, 0.1f);
+        treeObj->MoveTo(x, y, z);
+        addDrawableObject(treeObj);
+    }
+
+    
+    for (int i = 0; i < 10; ++i) {
+        DrawableObject* bushObj = CreateDrawableObject(bushModel, shaderProgramColor);
+
+        float x = -0.9f + (i % 5) * 0.45f;      
+        float y = -0.7f + (i / 5) * -0.2f;      
+        float z = 0.0f;                          
+
+        bushObj->Resize(0.3f, 0.3f, 0.3f);
+        bushObj->MoveTo(x, y, z);
+        addDrawableObject(bushObj);
+    }
+
+
+
+
+    
+    return true;
+    
+}
+
 
 
 
