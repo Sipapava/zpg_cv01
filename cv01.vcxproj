@@ -131,6 +131,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="app.cpp" />
+    <ClCompile Include="camera.cpp" />
     <ClCompile Include="circleBuild.cpp" />
     <ClCompile Include="complexTransformation.cpp" />
     <ClCompile Include="drawableObject.cpp" />
@@ -144,6 +145,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="app.h" />
+    <ClInclude Include="camera.h" />
     <ClInclude Include="circleBuild.h" />
     <ClInclude Include="complexTransformation.h" />
     <ClInclude Include="drawableObject.h" />

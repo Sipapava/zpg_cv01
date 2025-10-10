@@ -10,6 +10,7 @@
 int Scene::nextId = 0;
 Scene::Scene() {
     id = nextId++;
+    camera = nullptr;
 }
 
 Scene::~Scene() {
@@ -63,57 +64,13 @@ void Scene::draw() {
 bool Scene::prepareTestSceneCv03T1() {
     
 
-    std::vector<Vertex> circle = buildCircle(0.1f, 30);
-    
-
-        
-    Shader* shader = new Shader(vertex_shader_color, fragment_shader_color);
-    ShaderProgram* shaderProgram = new ShaderProgram(shader);
-
-    Model* model_kruh = new Model(circle.data(), circle.size(), true, "triangles");
-
-    // vytvoøení modelu z dat
-   // Model* model_krychle = new Model(c, sizeof(c) / sizeof(Vertex), true,"triangles");
-    
-    DrawableObject* obj_kruh1 = new DrawableObject(model_kruh, shaderProgram);
-    obj_kruh1->MoveTo(0, 0.5, 0);
-
-    DrawableObject* obj_kruh2 = new DrawableObject(model_kruh, shaderProgram);
-    obj_kruh2->MoveTo(-0.5, 0, 0);
-
-    DrawableObject* obj_kruh3 = new DrawableObject(model_kruh, shaderProgram);
-    obj_kruh3->MoveTo(0.5, 0, 0);
-
-    DrawableObject* obj_kruh4 = new DrawableObject(model_kruh, shaderProgram);
-    obj_kruh4->MoveTo(0, -0.5, 0);
-
-    this->addModel(model_kruh);
-    this->addDrawableObject(obj_kruh1);
-    this->addDrawableObject(obj_kruh2);
-    this->addDrawableObject(obj_kruh3);
-    this->addDrawableObject(obj_kruh4);
 
     return true;
 
 }
 
 bool Scene::prepareTestSceneCv03T2() {
-    const Vertex simpleT[] = {
-
-        { { -0.8f, -0.5f, 0, 1 }, { 1, 0, 0, 1 } }, // - èervená
-        { { -0.8f,  -0.3f, 0, 1 }, { 1, 1, 0, 1 } }, // - žlutá
-        { {  -0.3f,  -0.3f, 0, 1 }, { 0, 0, 1, 1 } }, //  - modrá
-
-    };
-
-    Shader* shader = new Shader(vertex_shader_color, fragment_shader_color);
-    ShaderProgram* shaderProgram = new ShaderProgram(shader);
-    Model* model_trojuhe = new Model(simpleT, sizeof(simpleT) / sizeof(Vertex), true, "triangles");
-    DrawableObject* obj_trojuhe = new DrawableObject(model_trojuhe, shaderProgram);
-    obj_trojuhe->SetRotateAnimation(glm::radians(1.0f), glm::vec3(0, 0, 1));
-
-    this->addModel(model_trojuhe);
-    this->addDrawableObject(obj_trojuhe);
+    
     return true;
 }
 
@@ -129,12 +86,14 @@ bool Scene::prepareTestSceneCv03T3() {
     std::vector<Vertex> bushV = FromFloat(bushes, bushSize);
 
     // --- Shadery ---
+    Camera* camera = new Camera();
+    camera = camera;
     Shader* shaderColor = new Shader(vertex_shader_color, fragment_shader_color);
-    ShaderProgram* shaderProgramColor = new ShaderProgram(shaderColor);
+    ShaderProgram* shaderProgramColor = new ShaderProgram(shaderColor,camera);
     addShaderProgram(shaderProgramColor);
 
     Shader* shaderBasic = new Shader(vertex_shader, fragment_shader);
-    ShaderProgram* shaderProgramBasic = new ShaderProgram(shaderBasic);
+    ShaderProgram* shaderProgramBasic = new ShaderProgram(shaderBasic,camera);
     addShaderProgram(shaderProgramBasic);
 
     // --- Modely ---

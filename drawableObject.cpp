@@ -37,12 +37,13 @@ void DrawableObject::draw() {
       bool x =  shaderProgram->setShaderProgram(); // aktivuje shader
     }
     
+    shaderProgram->ProjectionApply();
 
     glm::mat4 I = glm::mat4(1.0f);
     glm::mat4 M = transformation->apply(I);
     int ready = shaderProgram->setUniform(M);
 
-    if (model && ready) {
+    if (model && ready) { //pridat if na projection
         model->Draw(); // bindne VAO a vykreslí
        
     }

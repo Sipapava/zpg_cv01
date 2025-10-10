@@ -19,17 +19,17 @@ int main(void)
     }
 
     
-    Scene* scene1 = new Scene();
-    Scene* scene2 = new Scene();
+    //Scene* scene1 = new Scene();
+    //Scene* scene2 = new Scene();
     Scene* scene3 = new Scene();
    
-    app.addScene(scene1);
-    app.addScene(scene2);
+    //app.addScene(scene1);
+    //app.addScene(scene2);
     app.addScene(scene3);
-    bool t = scene1->prepareTestSceneCv03T1();
-    bool p = scene2->prepareTestSceneCv03T2();
+   // bool t = scene1->prepareTestSceneCv03T1();
+   // bool p = scene2->prepareTestSceneCv03T2();
     bool z = scene3->prepareTestSceneCv03T3();
-    if (t && p && z) {
+    if ( z) {
         app.run(0);
     }
 

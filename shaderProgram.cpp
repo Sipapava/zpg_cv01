@@ -1,10 +1,11 @@
 #include "ShaderProgram.h"
 #include <cstdio>
 
-ShaderProgram::ShaderProgram(Shader* shaderObj)
-    : shader(shaderObj), vertexShader(0), fragmentShader(0), shaderProgram(0)
+ShaderProgram::ShaderProgram(Shader* shaderObj, Camera* camera)
+    : shader(shaderObj), vertexShader(0), fragmentShader(0), shaderProgram(0),camera(camera)
 {
-    
+    updateCamera = false;
+
     vertexShader = glCreateShader(GL_VERTEX_SHADER);
     const char* vertexSource = shader->getVertexShader();
     glShaderSource(vertexShader, 1, &vertexSource, NULL);
@@ -71,4 +72,18 @@ bool ShaderProgram::setUniform(const glm::mat4& matrix, const char* spMatrix) {
     return false;
 }
 
+void ShaderProgram::UpdateCamera() {
+    updateCamera = false;
+    //nastaveni atributu
+}; //
+void ShaderProgram::ProjectionApply() {
 
+    if (!updateCamera) {
+        glm::mat4 Mv = camera->getViewMatrix();
+        glm::mat4 Mp = camera->getProjectionMatrix();
+        //caera.Get Mtri//
+        this->setUniform(Mv,"viewMatrix");
+        this->setUniform(Mp,"projectMatrix");
+        updateCamera = true;
+    }
+}

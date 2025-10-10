@@ -4,12 +4,13 @@
 #include "drawableObject.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
-
+#include "camera.h"
 class Scene {
 private:
+    Camera* camera;
     std::vector<ShaderProgram*> shaderPrograms;   
     std::vector<DrawableObject*> drawableObjects; 
-    //pridat vectoru modelu
+    
     std::vector<Model*> models;
 
     int id;                     
@@ -32,4 +33,5 @@ public:
     bool prepareTestSceneCv03T1();
     bool prepareTestSceneCv03T2();
     bool prepareTestSceneCv03T3();
+    //bude metodat na fill Camera with Shaders ktera se zavola po vytvoreni a pridani shadery z Sceny, musime pak osetri i mazani shaderu;
 };
