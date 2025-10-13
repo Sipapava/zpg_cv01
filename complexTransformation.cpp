@@ -24,9 +24,7 @@ complexTransformation::~complexTransformation() {
 
 /*
 void complexTransformation::removeById(int removeId) {
-    auto it = std::remove_if(transformations.begin(), transformations.end(),
-        [removeId](Transformation* t) { return t->getId() == removeId; });
-    transformations.erase(it, transformations.end());
+    
 }
 
 */

@@ -1,4 +1,7 @@
 #include "app.h"
+App::App() {
+    controller = nullptr;
+}
 
 App::~App() {
     
@@ -6,6 +9,7 @@ App::~App() {
         delete scene;
     }
     scenes.clear();
+    delete controller;
 
     if (window) {
         glfwDestroyWindow(window);
@@ -17,6 +21,13 @@ App::~App() {
 void App::addScene(Scene* scene) {
     scenes.push_back(scene);
 }
+
+bool App::prepareController() {
+    Scene* scene = scenes[sceneIndex];
+    controller = new Controller(scene->getCamera());
+    return true;
+}
+
 
 
 void App::deleteScene(size_t index) {
@@ -57,9 +68,11 @@ bool App::initialize() {
         return false;
     }
 
-    // --- TADY nastavíme callback a ukazatel na "this" ---
+    
     glfwSetWindowUserPointer(window, this);
     glfwSetKeyCallback(window, key_callback);
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
+    glfwSetCursorPosCallback(window, cursor_pos_callback);
 
     // info o systému
     printf("OpenGL Version: %s\n", glGetString(GL_VERSION));
@@ -104,7 +117,7 @@ void App::run(int sceneId) {
     while (window && !glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        
+        controller->Update();
         scene->draw();
 
         glfwPollEvents();
@@ -125,23 +138,56 @@ void App::key_callback(GLFWwindow* window, int key, int scancode, int action, in
     }
 }
 
+void App::cursor_pos_callback(GLFWwindow* window, double xpos, double ypos) {
+    if (glfwGetWindowUserPointer(window)) {
+        App* app = static_cast<App*>(glfwGetWindowUserPointer(window));
+        app->onMouseMove(xpos, ypos);
+    }
+}
+
+void App::mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+    if (glfwGetWindowUserPointer(window)) {
+        App* app = static_cast<App*>(glfwGetWindowUserPointer(window));
+        app->onMouseButton(button, action, mods);
+    }
+}
+
+
 
 
 void App::onKey(int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GLFW_TRUE);
     }
-    if (key == GLFW_KEY_D && action == GLFW_PRESS) {
+    //PRI ZMENE SCENY PRIRADIT JINOU KAMERU
+    if (key == GLFW_KEY_H && action == GLFW_PRESS) {
         sceneIndex++;
         int pos = sceneIndex % scenes.size();
         std::cout << "Scena prepnuta dopredu! "<< pos <<" "<<sceneIndex << std::endl;
         this->run(pos);
 
     }
-    else if (key == GLFW_KEY_A && action == GLFW_PRESS) {
+    else if (key == GLFW_KEY_J && action == GLFW_PRESS) {
         sceneIndex--;
         int pos = sceneIndex % scenes.size();
         std::cout << "Scena prepnuta dozadu!" << pos <<" "<< sceneIndex << std::endl;
         this->run(pos);
     }
+    else {
+        controller->keyboardMovement(key, scancode, action, mods);
+    }
+    
+
+
+
+}
+
+void App::onMouseButton(int button, int action, int mods) {
+    controller->mousePress(button, action, mods);
+}
+
+void App::onMouseMove(double xpos, double ypos) {
+   
+    controller->mouseMovement(xpos, ypos);
+   
 }

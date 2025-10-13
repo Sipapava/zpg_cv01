@@ -3,7 +3,7 @@
 
 Translation::Translation(const glm::vec3 offset) : Transformation(), offset(offset) {}
 
-glm::mat4 Translation::apply(const glm::mat4& matrix) { //nemeni objekt ktery funkci vola proto const 
+glm::mat4 Translation::apply(const glm::mat4& matrix) {  
     return glm::translate(matrix, offset);
 }
 

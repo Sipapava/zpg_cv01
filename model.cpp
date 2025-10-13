@@ -43,7 +43,7 @@ Model::~Model() {
 void Model::Draw() {
     glBindVertexArray(VAO);
     if (type.compare("triangles") == 0) {
-        glDrawArrays(GL_TRIANGLES, 0,vertexCount); //size_t nevadi?
+        glDrawArrays(GL_TRIANGLES, 0,vertexCount); 
     }
     else if (type.compare("lines") == 0)
     {

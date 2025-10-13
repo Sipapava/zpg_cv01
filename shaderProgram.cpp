@@ -4,7 +4,7 @@
 ShaderProgram::ShaderProgram(Shader* shaderObj, Camera* camera)
     : shader(shaderObj), vertexShader(0), fragmentShader(0), shaderProgram(0),camera(camera)
 {
-    updateCamera = false;
+    updatedCamera = false;
 
     vertexShader = glCreateShader(GL_VERTEX_SHADER);
     const char* vertexSource = shader->getVertexShader();
@@ -44,7 +44,7 @@ ShaderProgram::~ShaderProgram() {
     delete shader;
 }
 
-bool ShaderProgram::setShaderProgram() { //upravit setter
+bool ShaderProgram::setShaderProgram() { 
     if (shaderProgram != 0) {
        
             glUseProgram(shaderProgram);
@@ -73,17 +73,17 @@ bool ShaderProgram::setUniform(const glm::mat4& matrix, const char* spMatrix) {
 }
 
 void ShaderProgram::UpdateCamera() {
-    updateCamera = false;
-    //nastaveni atributu
-}; //
+    updatedCamera = false;
+    
+}; 
 void ShaderProgram::ProjectionApply() {
 
-    if (!updateCamera) {
+    if (!updatedCamera) {
         glm::mat4 Mv = camera->getViewMatrix();
         glm::mat4 Mp = camera->getProjectionMatrix();
-        //caera.Get Mtri//
+        
         this->setUniform(Mv,"viewMatrix");
         this->setUniform(Mp,"projectMatrix");
-        updateCamera = true;
+        updatedCamera = true;
     }
 }

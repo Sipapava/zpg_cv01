@@ -25,7 +25,7 @@ void DrawableObject::SetRotateAnimation(float addAngle, const glm::vec3& axis) {
     transformation->Add(new Translation(+position));
 };
 
-//stop?
+
 
 void DrawableObject::Update() {
     //prazdna

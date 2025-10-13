@@ -134,6 +134,7 @@
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="circleBuild.cpp" />
     <ClCompile Include="complexTransformation.cpp" />
+    <ClCompile Include="controller.cpp" />
     <ClCompile Include="drawableObject.cpp" />
     <ClCompile Include="elementarTransformation.cpp" />
     <ClCompile Include="main.cpp" />
@@ -148,6 +149,7 @@
     <ClInclude Include="camera.h" />
     <ClInclude Include="circleBuild.h" />
     <ClInclude Include="complexTransformation.h" />
+    <ClInclude Include="controller.h" />
     <ClInclude Include="drawableObject.h" />
     <ClInclude Include="model.h" />
     <ClInclude Include="scene.h" />
@@ -156,7 +158,7 @@
     <ClInclude Include="transformation.h" />
     <ClInclude Include="elementarTransformation.h" />
     <ClInclude Include="vertex.h" />
-    <ClInclude Include="vertexDef.h" />
+    <ClInclude Include="shaderDef.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

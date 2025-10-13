@@ -5,7 +5,7 @@
 class ShaderProgram;
 class Camera {
 private:
-    std::vector<ShaderProgram*> shaderPrograms;
+    std::vector<ShaderProgram*>* shaderPrograms;
     glm::vec3 position;
     glm::vec3 target;
     glm::vec3 up;
@@ -13,16 +13,19 @@ private:
     float aspect;
     float nearPlane;
     float farPlane;
+    
 
    
 public:
-    Camera();
+    Camera(std::vector<ShaderProgram*>* shaderprograms);
     ~Camera();
     void Update();
     glm::mat4 getViewMatrix();
     glm::mat4 getProjectionMatrix();
-    //v konstruktoru vychozi pohled nastavime
-    //controller kdyz se pohne zavola setter na atributy, ty ze zmeni a udela se prislusny notify
-    //notify metoda()
-        //zavola SetUniform na mych novych projektivni a view matici
+    void adjustTarget(double xOffsetMouse, double yOffsetMouse);
+    void moveForward();
+    void moveBackward();
+    void moveLeft();
+    void moveRight();
+
 };
