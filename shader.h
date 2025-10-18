@@ -1,16 +1,22 @@
 #pragma once
+#define GLEW_STATIC
+#include <GL/glew.h>
+#include "Shader.h"
+#include "glm/glm.hpp"
+#include <iostream>
+#include <fstream>
+#include <stdio.h>
 
 class Shader {
 private:
-    const char* vertexShader;
-    const char* fragmentShader;
+    GLuint shaderID;
 
 public:
-    
-    Shader(const char* vertex, const char* fragment);
+    Shader();
+    ~Shader();
+    void createShader(GLenum shaderType, const char* shaderCode);
+    void createShaderFromFile(GLenum shaderType, const char* shaderFile);
 
-
-    const char* getVertexShader() const;
-    const char* getFragmentShader() const;
+    void attachShader(GLuint idShaderProgram);
 };
 

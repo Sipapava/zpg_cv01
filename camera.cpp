@@ -2,7 +2,7 @@
 
 #include <glm/gtc/constants.hpp>
 
-Camera::Camera(std::vector<ShaderProgram*>* shaderprograms) : shaderPrograms(shaderprograms) {
+Camera::Camera(std::vector<ShaderProgram*>* shaderprograms) {
   
     position = glm::vec3(0.0f, 0.5f, -2.0f);
     target = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -24,12 +24,16 @@ glm::mat4 Camera::getProjectionMatrix() {
     return  glm::perspective(glm::radians(fov), aspect, nearPlane, farPlane);
 }
 
-void Camera::Update() {
-    
-    for (auto sp : *shaderPrograms) {
-        sp->UpdateCamera();
-    }
+void Camera::UpdateMatrix() { //PLUS vector of position
+    glm::mat4 Mp = this->getProjectionMatrix();
+    glm::mat4 Mv = this->getViewMatrix();
+
+    this->NotifyObservers(position,"cameraPos");
+    this->NotifyObservers(Mv, Mp);
 }
+
+
+
 
 //kamera jde dopredu vzdy relativne k eyeTargetu
 
@@ -39,14 +43,15 @@ void Camera::moveForward() {
     glm::vec3 direction = glm::normalize(target - position); //spocita vektor smer a notmalizuje na jendotku
     position += direction * CAMERA_SPEED; //jen pricteme k position a vynasobime pohybem
     target += direction * CAMERA_SPEED;
-    this->Update();
+    this->UpdateMatrix();
+    //update ShaderbytuMelobyt
 }
 
 void Camera::moveBackward() {
     glm::vec3 direction = glm::normalize(target - position);
     position -= direction * CAMERA_SPEED;
     target -= direction * CAMERA_SPEED;
-    this->Update();
+    this->UpdateMatrix();
 }
 
 void Camera::moveLeft() {
@@ -54,7 +59,7 @@ void Camera::moveLeft() {
     glm::vec3 right = glm::normalize(glm::cross(direction,up));
     position -= right * CAMERA_SPEED;
     target -= right * CAMERA_SPEED;
-    this->Update();
+    this->UpdateMatrix();
 }
 
 void Camera::moveRight() {
@@ -62,7 +67,7 @@ void Camera::moveRight() {
     glm::vec3 right = glm::normalize(glm::cross(direction,up)); 
     position += right * CAMERA_SPEED;
     target += right * CAMERA_SPEED;
-    this->Update();
+    this->UpdateMatrix();
 }
 
 
@@ -73,14 +78,14 @@ void Camera::adjustTarget(double xOffsetMouse, double yOffsetMouse) {
     yOffsetMouse *= sensitivity;
 
     
-    glm::vec3 forward = glm::normalize(target - position);
+    glm::vec3 forward = glm::normalize(target - position); //direction
     float alfa = glm::degrees(asin(forward.y));
     float fi = glm::degrees(atan2(forward.z, forward.x));
     //atan2 rozlisi pravou a levou pulku x osy, vraci rozsah (-180 - 180)
 
     
     fi += (float)xOffsetMouse;
-    alfa += (float)yOffsetMouse;
+    alfa -= (float)yOffsetMouse; //minus dat
 
     
     if (fi > 179.9f)  fi = -179.9f; //omezeni navratovych hodnot gon. funkci
@@ -97,7 +102,7 @@ void Camera::adjustTarget(double xOffsetMouse, double yOffsetMouse) {
     direction.z = sin(glm::radians(fi)) * cos(glm::radians(alfa));
 
     target = position + glm::normalize(direction);
-    this->Update();
+    this->UpdateMatrix();
 }
 
 

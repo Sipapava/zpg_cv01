@@ -54,6 +54,15 @@
     <ClCompile Include="controller.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Subject.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Subject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Light.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="vertex.h">
@@ -98,5 +107,34 @@
     <ClInclude Include="controller.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Observer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Light.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="fragment_shader_am.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="vertex_shader_am.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="fragment_shader_ph.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="vertex_shader_ph.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="fragment_shader_blph.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="vertex_shader_con.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="fragment_shader_con.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

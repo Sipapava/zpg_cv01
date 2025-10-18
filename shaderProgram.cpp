@@ -1,29 +1,23 @@
 #include "ShaderProgram.h"
 #include <cstdio>
 
-ShaderProgram::ShaderProgram(Shader* shaderObj, Camera* camera)
-    : shader(shaderObj), vertexShader(0), fragmentShader(0), shaderProgram(0),camera(camera)
+ShaderProgram::ShaderProgram(Shader* vertex,Shader* fragment) //musi dostat fragment a vertex
+    : vertexShader(vertex), fragmentShader(fragment), shaderProgram(0)
 {
     updatedCamera = false;
+    updatedLight = false;
+    view  = glm::mat4(1.0f);
+    projection = glm::mat4(1.0f);
+    cameraPos = glm::vec3(0.0f, 0.5f, -2.0f);
 
-    vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    const char* vertexSource = shader->getVertexShader();
-    glShaderSource(vertexShader, 1, &vertexSource, NULL);
-    glCompileShader(vertexShader);
-
-    
-    
-    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    const char* fragmentSource = shader->getFragmentShader();
-    glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
-    glCompileShader(fragmentShader);
+    // Shadery vytvarime venku
 
    
 
     
     shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
+    vertexShader->attachShader(shaderProgram);
+    fragmentShader->attachShader(shaderProgram);
     glLinkProgram(shaderProgram);
 
     
@@ -41,7 +35,8 @@ ShaderProgram::ShaderProgram(Shader* shaderObj, Camera* camera)
 }
 
 ShaderProgram::~ShaderProgram() {
-    delete shader;
+    delete vertexShader;
+    delete fragmentShader;
 }
 
 bool ShaderProgram::setShaderProgram() { 
@@ -72,18 +67,98 @@ bool ShaderProgram::setUniform(const glm::mat4& matrix, const char* spMatrix) {
     return false;
 }
 
-void ShaderProgram::UpdateCamera() {
+
+bool ShaderProgram::setUniform3(const glm::vec3& cameraPos) {
+    GLint id = glGetUniformLocation(shaderProgram, "cameraPos");
+    if (id >= 0) {
+        glUniform3fv(id, 1, glm::value_ptr(cameraPos));
+       
+        return true;
+    }
+    return false;
+}
+
+bool ShaderProgram::setUniform3(const glm::vec3& vector, const char* spVector) {
+    GLint id = glGetUniformLocation(shaderProgram, spVector);
+    if (id >= 0) {
+        glUniform3fv(id, 1, glm::value_ptr(vector)); 
+      
+        return true;
+    }
+    return false;
+}
+
+
+bool ShaderProgram::setUniform4(const glm::vec4& vector, const char* spVector) {
+    GLint id = glGetUniformLocation(shaderProgram, spVector);
+    if (id >= 0) {
+        glUniform4fv(id, 1, glm::value_ptr(vector));
+        
+        return true;
+    }
+    return false;
+}
+
+bool ShaderProgram::setUniformFloat(float value, const char* name) {
+    GLint id = glGetUniformLocation(shaderProgram, name);
+    if (id >= 0) {
+        glUniform1f(id, value);
+       
+        return true;
+    }
+    return false;
+}
+
+
+//nova metoda setUniform por svetlo
+void ShaderProgram::Notify(const glm::mat4& view, const glm::mat4& projection) {
     updatedCamera = false;
+    this->projection = projection;
+    this->view = view;
     
 }; 
+
+
+void ShaderProgram::Notify(const glm::vec3& vector,std::string type) { //pridame string
+    if (type.compare("cameraPos") == 0) {
+        updatedCamera = false;
+        this->cameraPos = vector;
+    }
+    
+
+}
+
+void ShaderProgram::Notify(const glm::vec3& position, const glm::vec4& color, float intesnity, float shiness) {
+    updatedLight = false;
+    this->positionLight = position;
+    this->colorLight = color;
+    this->specularIntesity = intesnity;
+    this->shiness = shiness;
+}
+
+
+
+void ShaderProgram::LightApply() {
+
+    if (!updatedLight) {
+       
+        this->setUniform3(positionLight,"lightPosition");
+        this->setUniform4(colorLight,"lightColor");
+        this->setUniformFloat(specularIntesity, "specularIntensity");
+        this->setUniformFloat(shiness, "shiness");
+        updatedLight = true;
+    }
+}
+
+
 void ShaderProgram::ProjectionApply() {
 
     if (!updatedCamera) {
-        glm::mat4 Mv = camera->getViewMatrix();
-        glm::mat4 Mp = camera->getProjectionMatrix();
         
-        this->setUniform(Mv,"viewMatrix");
-        this->setUniform(Mp,"projectMatrix");
+        this->setUniform3(cameraPos);
+       
+        this->setUniform(view,"viewMatrix");
+        this->setUniform(projection,"projectMatrix");
         updatedCamera = true;
     }
 }

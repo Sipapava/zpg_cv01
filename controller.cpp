@@ -16,6 +16,7 @@ bool Controller::setCamera(Camera* camera) {
     if (this->camera) {
         return true;
     }
+    return false;
     
 }
 void Controller::keyboardMovement(int key, int scancode, int action, int mods) {

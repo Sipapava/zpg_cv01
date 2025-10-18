@@ -164,6 +164,7 @@ void App::onKey(int key, int scancode, int action, int mods) {
         sceneIndex++;
         int pos = sceneIndex % scenes.size();
         std::cout << "Scena prepnuta dopredu! "<< pos <<" "<<sceneIndex << std::endl;
+        this->controller->setCamera(scenes[pos]->getCamera());
         this->run(pos);
 
     }
@@ -171,6 +172,7 @@ void App::onKey(int key, int scancode, int action, int mods) {
         sceneIndex--;
         int pos = sceneIndex % scenes.size();
         std::cout << "Scena prepnuta dozadu!" << pos <<" "<< sceneIndex << std::endl;
+        this->controller->setCamera(scenes[pos]->getCamera());
         this->run(pos);
     }
     else {

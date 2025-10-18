@@ -1,11 +1,14 @@
 #pragma once
 #include "shaderProgram.h"
 #include<vector>
+#include "Subject.h"
+#include "Observer.h"
+#include "glm/glm.hpp"
 
-class ShaderProgram;
-class Camera {
+
+class Camera : public Subject {
 private:
-    std::vector<ShaderProgram*>* shaderPrograms;
+    
     glm::vec3 position;
     glm::vec3 target;
     glm::vec3 up;
@@ -19,7 +22,8 @@ private:
 public:
     Camera(std::vector<ShaderProgram*>* shaderprograms);
     ~Camera();
-    void Update();
+    void UpdateMatrix();
+    
     glm::mat4 getViewMatrix();
     glm::mat4 getProjectionMatrix();
     void adjustTarget(double xOffsetMouse, double yOffsetMouse);

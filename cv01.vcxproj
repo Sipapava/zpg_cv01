@@ -137,11 +137,14 @@
     <ClCompile Include="controller.cpp" />
     <ClCompile Include="drawableObject.cpp" />
     <ClCompile Include="elementarTransformation.cpp" />
+    <ClCompile Include="Light.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="model.cpp" />
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="shaderProgram.cpp" />
+    <ClCompile Include="Subject.cpp" />
+    <ClCompile Include="Subject.h" />
     <ClCompile Include="transformation.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -151,7 +154,9 @@
     <ClInclude Include="complexTransformation.h" />
     <ClInclude Include="controller.h" />
     <ClInclude Include="drawableObject.h" />
+    <ClInclude Include="Light.h" />
     <ClInclude Include="model.h" />
+    <ClInclude Include="Observer.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="shaderProgram.h" />
@@ -159,6 +164,15 @@
     <ClInclude Include="elementarTransformation.h" />
     <ClInclude Include="vertex.h" />
     <ClInclude Include="shaderDef.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="fragment_shader_am.glsl" />
+    <None Include="fragment_shader_blph.glsl" />
+    <None Include="fragment_shader_con.glsl" />
+    <None Include="fragment_shader_ph.glsl" />
+    <None Include="vertex_shader_con.glsl" />
+    <None Include="vertex_shader_ph.glsl" />
+    <None Include="vertex_shader_am.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

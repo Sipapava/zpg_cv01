@@ -1,26 +1,44 @@
 #include "Shader.h"
 
 
+Shader::Shader() {
+    shaderID = 0;
+};
+Shader::~Shader() {};
 
-Shader::Shader(const char* vertex, const char* fragment)
-    : vertexShader(vertex), fragmentShader(fragment) {}
+void Shader::createShader(GLenum shaderType, const char* shaderCode)
+     {
 
+    // Creates an empty shader
+    shaderID = glCreateShader(shaderType);
+    // Sets the source code of the shader.
+    glShaderSource(shaderID, 1, &shaderCode, NULL);
+    // Compiles the shader source code
+    glCompileShader(shaderID);
 
-
-
-const char* Shader::getVertexShader() const {
-    return vertexShader;
 }
 
-const char* Shader::getFragmentShader() const {
-    return fragmentShader;
+
+
+void Shader::createShaderFromFile(GLenum shaderType, const char* shaderFile)
+{
+    //Loading the contents of a file into a variable
+    std::ifstream file(shaderFile);
+    if (!file.is_open())
+    {
+        std::cout << "Unable to open file " << shaderFile << std::endl;
+        exit(-1);
+    }
+    std::string shaderCode((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+
+    this->createShader(shaderType, shaderCode.c_str());
+
 }
 
-
-
-
-
-
-
+void Shader::attachShader(GLuint idShaderProgram)
+{
+    //Attaches the shader to the shaderProgram
+    glAttachShader(idShaderProgram, shaderID);
+}
 
 

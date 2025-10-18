@@ -20,9 +20,9 @@ DrawableObject::~DrawableObject() {
 }
 
 void DrawableObject::SetRotateAnimation(float addAngle, const glm::vec3& axis) {
-    transformation->Add(new Translation(-position));
+    
     transformation->Add(new RotationDynamic(0.0f, axis, addAngle));
-    transformation->Add(new Translation(+position));
+   
 };
 
 
@@ -38,6 +38,7 @@ void DrawableObject::draw() {
     }
     
     shaderProgram->ProjectionApply();
+    shaderProgram->LightApply();
 
     glm::mat4 I = glm::mat4(1.0f);
     glm::mat4 M = transformation->apply(I);
@@ -53,29 +54,28 @@ void DrawableObject::draw() {
 
 void DrawableObject::MoveTo(float x, float y, float z) {
     
-    glm::vec3 delta = glm::vec3(x, y, z) - position;
+    glm::vec3 delta = glm::vec3(x, y, z);
 
     transformation->Add(new Translation(delta));
 
 
-    position = glm::vec3(x, y, z);
+    
 }
 
 void DrawableObject::Resize(float x, float y, float z) {
     
-    transformation->Add(new Translation(-position));
+    
     transformation->Add(new Scale(glm::vec3(x, y, z)));
-    transformation->Add(new Translation(position));
+   
 }
 
 void DrawableObject::Rotate(float angle, float xA, float yA, float zA) {
     
-    transformation->Add(new Translation(-position));
+   
 
     
     transformation->Add(new Rotation(angle, glm::vec3(xA, yA, zA)));
 
    
-    transformation->Add(new Translation(+position));
 }
 
