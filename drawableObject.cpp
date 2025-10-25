@@ -53,29 +53,19 @@ void DrawableObject::draw() {
 
 
 void DrawableObject::MoveTo(float x, float y, float z) {
-    
-    glm::vec3 delta = glm::vec3(x, y, z);
+	glm::vec3 delta = glm::vec3(x, y, z);
+	transformation->Add(new Translation(delta));
 
-    transformation->Add(new Translation(delta));
-
-
-    
 }
 
 void DrawableObject::Resize(float x, float y, float z) {
-    
-    
-    transformation->Add(new Scale(glm::vec3(x, y, z)));
-   
+	transformation->Add(new Scale(glm::vec3(x, y, z)));
+
 }
 
 void DrawableObject::Rotate(float angle, float xA, float yA, float zA) {
-    
-   
+	transformation->Add(new Rotation(angle, glm::vec3(xA, yA, zA)));
 
-    
-    transformation->Add(new Rotation(angle, glm::vec3(xA, yA, zA)));
 
-   
 }
 

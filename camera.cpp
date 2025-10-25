@@ -24,13 +24,18 @@ glm::mat4 Camera::getProjectionMatrix() {
     return  glm::perspective(glm::radians(fov), aspect, nearPlane, farPlane);
 }
 
-void Camera::UpdateMatrix() { //PLUS vector of position
+void Camera::UpdateMatrix() {
     glm::mat4 Mp = this->getProjectionMatrix();
     glm::mat4 Mv = this->getViewMatrix();
 
-    this->NotifyObservers(position,"cameraPos");
-    this->NotifyObservers(Mv, Mp);
+    // Posíláme pozici kamery
+    NotifyObservers(NotifyType::CameraPos, &position);
+
+    // Posíláme view a projection matice
+    CameraData camData{ Mv, Mp };
+    NotifyObservers(NotifyType::CameraMatrix, &camData);
 }
+
 
 
 

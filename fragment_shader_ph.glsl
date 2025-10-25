@@ -19,7 +19,8 @@ void main()
     vec3 viewDir = normalize(cameraPos - worldPosition.xyz);
     vec3 reflectDir = reflect(-normalize(lightToVector), normalize(worldNormal));
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
-    vec4 specular = spec * vec4(1.0, 1.0, 1.0, 1.0); //jeste intezita by tu mohla byt
+    vec4 specular = spec * vec4(1.0, 1.0, 1.0, 1.0);
+    
 
     outColor = ambient + diffuse + specular;
 }

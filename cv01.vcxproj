@@ -140,6 +140,7 @@
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="model.cpp" />
+    <ClCompile Include="notifyType.h" />
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="shaderProgram.cpp" />
@@ -163,7 +164,6 @@
     <ClInclude Include="transformation.h" />
     <ClInclude Include="elementarTransformation.h" />
     <ClInclude Include="vertex.h" />
-    <ClInclude Include="shaderDef.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="fragment_shader_am.glsl" />

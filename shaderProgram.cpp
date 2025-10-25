@@ -108,47 +108,139 @@ bool ShaderProgram::setUniformFloat(float value, const char* name) {
     }
     return false;
 }
-
-
-//nova metoda setUniform por svetlo
-void ShaderProgram::Notify(const glm::mat4& view, const glm::mat4& projection) {
-    updatedCamera = false;
-    this->projection = projection;
-    this->view = view;
-    
-}; 
-
-
-void ShaderProgram::Notify(const glm::vec3& vector,std::string type) { //pridame string
-    if (type.compare("cameraPos") == 0) {
-        updatedCamera = false;
-        this->cameraPos = vector;
+bool ShaderProgram::setUniformInt(int value, const char* name) {
+    GLint id = glGetUniformLocation(shaderProgram, name);
+    if (id >= 0) {
+        glUniform1i(id, value);  // <-- pro int
+        return true;
     }
-    
-
-}
-
-void ShaderProgram::Notify(const glm::vec3& position, const glm::vec4& color, float intesnity, float shiness) {
-    updatedLight = false;
-    this->positionLight = position;
-    this->colorLight = color;
-    this->specularIntesity = intesnity;
-    this->shiness = shiness;
+    return false;
 }
 
 
+void ShaderProgram::Notify(NotifyType type, void* data) {
+    switch (type) {
+    case NotifyType::CameraMatrix: {
+        CameraData* cam = static_cast<CameraData*>(data);
+        this->view = cam->view;
+        this->projection = cam->projection;
+        updatedCamera = false;
+        break;
+    }
+    case NotifyType::CameraPos: {
+        glm::vec3* camPos = static_cast<glm::vec3*>(data);
+        this->cameraPos = *camPos;
+        updatedCamera = false;
+        break;
+    }
+    case NotifyType::LightChange: {
+        LightData* light = static_cast<LightData*>(data);
+        int id = light->id; // pøedpokládáme, že LightData obsahuje id svìtla
+        if (lightIdToIndex.find(id) != lightIdToIndex.end()) {
+            int index = lightIdToIndex[id];
+            lightsSlots[index].data = *light;
+            lightsSlots[index].updated = false;
+        }
+        break;
+    }
+    case NotifyType::SpRegisterLight: {
+        Light* light = static_cast<Light*>(data);
+        int id = light->GetId();
+
+        if (nextFreeLightIndex < 5) {
+            lightIdToIndex[id] = nextFreeLightIndex;
+
+            ShaderLightSlot slot;
+            slot.data = light->getLightData(); // metoda, která vrací LightData
+            slot.updated = false;
+
+            lightsSlots.push_back(slot);
+            ++nextFreeLightIndex;
+        }
+        break;
+    }
+
+    case NotifyType::SpUnfollowLight: {
+        Light* light = static_cast<Light*>(data);
+        int id = light->GetId();
+
+        auto it = lightIdToIndex.find(id);
+        if (it != lightIdToIndex.end()) {
+            int index = it->second;
+
+            lightsSlots[index].updated = false;
+            lightsSlots[index].data = LightData(); // vynulujeme, toto dfachat nebude
+
+            lightIdToIndex.erase(it);
+        }
+        break;
+    }
+    default:
+        break;
+    }
+}
+
+
+
+
+
+
+
+#include <iostream> // nezapomeò pøidat
 
 void ShaderProgram::LightApply() {
+    bool anyUp = false;
+    for (size_t i = 0; i < lightsSlots.size(); ++i) {
+        ShaderLightSlot& slot = lightsSlots[i];
 
-    if (!updatedLight) {
-       
-        this->setUniform3(positionLight,"lightPosition");
-        this->setUniform4(colorLight,"lightColor");
-        this->setUniformFloat(specularIntesity, "specularIntensity");
-        this->setUniformFloat(shiness, "shiness");
-        updatedLight = true;
+        if (!slot.updated) {
+            int id = slot.data.id;
+
+            // najdeme index v poli uniformù podle id
+            auto it = lightIdToIndex.find(id);
+            if (it == lightIdToIndex.end()) {
+                std::cout << "[LightApply] Light ID " << id << " not found in map!\n";
+                continue; // bezpeènost
+            }
+
+            int indexInShader = it->second;
+
+            // debug print
+            std::cout << "[LightApply] Updating Light ID: " << id
+                << " at shader index: " << indexInShader << "\n";
+            std::cout << "    Position: (" << slot.data.position.x << ", "
+                << slot.data.position.y << ", " << slot.data.position.z << ")\n";
+            std::cout << "    Color: (" << slot.data.color.r << ", "
+                << slot.data.color.g << ", " << slot.data.color.b << ", "
+                << slot.data.color.a << ")\n";
+            std::cout << "    Intensity: " << slot.data.intensity
+                << ", Shininess: " << slot.data.shininess << "\n";
+
+            // pøipravíme názvy uniformù s indexem
+            std::string posName = "lights[" + std::to_string(indexInShader) + "].lightPosition";
+            std::string diffuseName = "lights[" + std::to_string(indexInShader) + "].lightColor";
+            std::string specularName = "lights[" + std::to_string(indexInShader) + "].specularIntensity";
+            std::string shininessName = "lights[" + std::to_string(indexInShader) + "].shiness";
+
+            // aplikujeme hodnoty z lightsSlots
+            setUniform3(slot.data.position, posName.c_str());
+            setUniform4(slot.data.color, diffuseName.c_str());
+            setUniformFloat(slot.data.intensity, specularName.c_str());
+            setUniformFloat(slot.data.shininess, shininessName.c_str());
+
+            // nastavíme updated = true
+            slot.updated = true;
+            anyUp = true;
+        }
+    }
+
+    if (anyUp) {
+        setUniformInt(static_cast<int>(lightsSlots.size()), "numberOfLights");
+        std::cout << "[LightApply] numberOfLights updated to: " << lightsSlots.size() << "\n";
     }
 }
+
+
 
 
 void ShaderProgram::ProjectionApply() {

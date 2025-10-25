@@ -16,5 +16,5 @@ void main()
     gl_Position = projectMatrix * viewMatrix * modelMatrix * vp;
     fragColor = color;
     worldPosition = modelMatrix * vp;
-    worldNormal = color.xyz; // next lesson
+    worldNormal = normalize(transpose(inverse(mat3(modelMatrix))) * color.xyz);
 }

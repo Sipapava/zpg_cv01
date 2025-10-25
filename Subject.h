@@ -1,22 +1,30 @@
 #pragma once
 #include "observer.h"
 #include <vector>
-#include "glm/glm.hpp"
-#include <stdio.h>
-#include <string>
+#include "notifyType.h"
+#include <algorithm> // pro std::remove
+
 class Subject {
 protected:
-	std::vector<Observer*> observers;
-public:
-	virtual ~Subject() = default; 
-	virtual void AddObserver(Observer* o);
-	virtual void RemoveObserver(Observer* o);
-	virtual void NotifyObservers(const glm::mat4& matrix1, const glm::mat4& matrix2);
-	virtual void NotifyObservers(const glm::vec3& vector, std::string type);
-	virtual void NotifyObservers(const glm::vec3& position, const glm::vec4& color, float intesnity, float shiness);
+    std::vector<Observer*> observers;
 
+public:
+    virtual ~Subject() = default;
+
+    virtual void AddObserver(Observer* o);
+    virtual void RemoveObserver(Observer* o);
+
+protected:
+    // univerzální notify
+    void NotifyObservers(NotifyType type, void* data);
+    void NotifyObserver(Observer* o, NotifyType type, void* data);
 };
+
 
 //rotace udelat ttridu co dedi z rotate bude se to jmenvat treba rotace kolem obecneho bodu
 //ta orovede translaci ritaci a translaci
 //bude to tedz jeden objekt transformation
+
+
+//notify by mel but obecny to znaema predame enum a subject, a on si pak pozna co to je a udelame chovani
+//jaky je rozdil mezi C++ a osttanimi progra, jazyky z poheldu dedicnosti, v C++ je vicenasobna dedicnost

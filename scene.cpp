@@ -2,7 +2,7 @@
 #include <algorithm> 
 #include "circleBuild.h"
 #include "tree.h"
-#include "shaderDef.h"
+
 #include "bushes.h"
 #include "sphere.h"
 //remake create and add methods for DrObj and Shaders
@@ -81,10 +81,10 @@ bool Scene::prepareTestSceneCv05T1() {
 
 
     const Vertex troVertices[] = {
-        // vrcholy trojúhelníku (x,y,z,w) + normála (x,y,z,w)
-        {{-0.5f, 0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f, 1.0f}},  // levý spodní
-        {{ 0.5f, 0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f, 1.0f}},  // pravý spodní
-        {{ 0.0f, 0.5f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f, 1.0f}}   // horní
+        
+        {{-0.5f, 0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f, 1.0f}},  
+        {{ 0.5f, 0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f, 1.0f}},  
+        {{ 0.0f, 0.5f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f, 1.0f}}   
     };
 
 
@@ -99,17 +99,19 @@ bool Scene::prepareTestSceneCv05T1() {
 
     this->camera = this->CreateCamera();
 
-    //vyrobime fragment shader
-    //vyrobime vertex shader
-    //shader program bere oba
-    Light* l = this->CreateLight(glm::vec3(0.0f, 0.5f, 1.0f), glm::vec4(1.0, 1.0, 1.0, 1.0), 1.0f, 32);
+    
+    Light* l = this->CreateLight(glm::vec3(0.0f, 0.5f, 1.0f), glm::vec4(1.0, 1.0, 1.0, 1.0), 0.5f, 32);
+    Light* f = this->CreateLight(glm::vec3(0.3f, 0.2f, 0.5f), glm::vec4(1.0, 1.0, 0.0, 1.0), 1.0f, 8);
     ShaderProgram* shaderProgramColor = new ShaderProgram(vr, fr);
     addShaderProgram(shaderProgramColor);
     AddLight(l);
+    AddLight(f);
     camera->AddObserver(shaderProgramColor);
     l->AddObserver(shaderProgramColor);
+    f->AddObserver(shaderProgramColor);
     camera->UpdateMatrix();
     l->UpdateLightsShaderPro();
+    f->UpdateLightsShaderPro();
 
 
 
@@ -141,10 +143,8 @@ bool Scene::prepareTestSceneCv05T2() {
 
     this->camera = this->CreateCamera();
 
-    //vyrobime fragment shader
-    //vyrobime vertex shader
-    //shader program bere oba
-    Light* l = this->CreateLight(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec4(1.0, 1.0, 1.0, 1.0), 1.0f, 32);
+    
+    Light* l = this->CreateLight(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec4(1.0, 1.0, 1.0, 1.0), 0.5f, 32);
     ShaderProgram* shaderProgramBl = new ShaderProgram(vr1, fr1);
     
     addShaderProgram(shaderProgramBl);
@@ -222,10 +222,8 @@ bool Scene::prepareTestSceneCv05T3() {
 
     this->camera = this->CreateCamera();
 
-    //vyrobime fragment shader
-    //vyrobime vertex shader
-    //shader program bere oba
-    Light* l = this->CreateLight(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec4(1.0, 1.0, 1.0, 1.0), 1.0f, 32);
+    
+    Light* l = this->CreateLight(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec4(1.0, 1.0, 1.0, 1.0), 0.5f, 32);
     ShaderProgram* shaderProgramCon = new ShaderProgram(vr1, fr1);
     ShaderProgram* shaderProgramAm = new ShaderProgram(vr2, fr2);
     ShaderProgram* shaderProgramBl = new ShaderProgram(vr3, fr3);
@@ -259,7 +257,7 @@ bool Scene::prepareTestSceneCv05T3() {
     std::vector<glm::vec3> sunPositions = { {-0.5f, 0.0f, 0.0f}, {0.5f, 0.0f, 0.0f},{0.0f,0.5f,0.0f},{0.0f,-0.5f,0.0f} };
     for (auto& pos : sunPositions) {
         DrawableObject* sun = CreateDrawableObject(sphereModel, this->getShaderProgram(i));
-        sun->Resize(0.2f, 0.2f, 0.2f);
+        sun->Resize(0.1f, 0.1f, 0.1f);
         sun->MoveTo(pos.x, pos.y, pos.z); 
         //sun->SetRotateAnimation(glm::radians(1.0f), glm::vec3(0, 0.5, 0.5));
         addDrawableObject(sun);
