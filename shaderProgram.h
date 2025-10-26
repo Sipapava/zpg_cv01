@@ -10,16 +10,7 @@
 #include "Light.h"
 
 
-//v shaderu musim eaktualizovat normalu a viewPos pro ten phonguv model
-//normla z ertex do framnet shaderu
-//podle barvy se da zjisti problem
-//proste fragColor = neco;
-//normala vuci kladne kdyz zaporna muzu zahoit
-//if svetlo z druhe strany bacha, odlesk, cosinus zaporny ne
-//duha viz prednaska
-//pokud se mi lambert toci tak normala bude asi problem, takze se bude svetlo tocit
-//mesic kolem zeme bude problem
-//transformaci pro zemi rozsirime o transformaci o mesic,compositem by to melo jit
+
 class ShaderProgram : public Observer {
 private:
     bool updatedCamera; //nastaveno na false ve vychozim,
@@ -28,17 +19,14 @@ private:
     glm::mat4 projection;
     glm::vec3 cameraPos;
 
-    //glm::vec3 positionLight;
-    //glm::vec4 colorLight;
-    //float specularIntesity;
-    //float shiness;
+    
     std::vector<ShaderLightSlot> lightsSlots;
 
-    std::unordered_map<int, int> lightIdToIndex; // LightID -> pozice v poli uniformù
+    std::unordered_map<int, int> lightIdToIndex;
     int nextFreeLightIndex = 0;
          
-    Shader* vertexShader;     //nebude muset drzet
-    Shader* fragmentShader;  //nebude muset drzet 
+    Shader* vertexShader;     
+    Shader* fragmentShader;  
     GLuint shaderProgram;    
 
 public:

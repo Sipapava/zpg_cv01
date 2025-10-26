@@ -73,6 +73,8 @@ bool App::initialize() {
     glfwSetKeyCallback(window, key_callback);
     glfwSetMouseButtonCallback(window, mouse_button_callback);
     glfwSetCursorPosCallback(window, cursor_pos_callback);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
 
     // info o systému
     printf("OpenGL Version: %s\n", glGetString(GL_VERSION));
@@ -99,18 +101,7 @@ void App::run(int sceneId) {
     if (!window || scenes.empty()) return;
 
    
-    Scene* scene = nullptr;
-    for (auto s : scenes) {
-        if (s->getId() == sceneId) {
-            scene = s;
-            break;
-        }
-    }
-
-    if (!scene) {
-        fprintf(stderr, "Scene with ID %d not found!\n", sceneId);
-        return;
-    }
+    sceneIndex = sceneId;
 
     glEnable(GL_DEPTH_TEST);
 
@@ -118,12 +109,16 @@ void App::run(int sceneId) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         controller->Update();
+
+        
+        Scene* scene = scenes[sceneIndex];
         scene->draw();
 
         glfwPollEvents();
         glfwSwapBuffers(window);
     }
 }
+
 
 
 void App::error_callback(int error, const char* description) {
@@ -152,37 +147,55 @@ void App::mouse_button_callback(GLFWwindow* window, int button, int action, int 
     }
 }
 
+void App::framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+    if (glfwGetWindowUserPointer(window)) {
+        App* app = static_cast<App*>(glfwGetWindowUserPointer(window));
+        app->onResize(width, height);
+        
+    }
+}
 
 
+void App::onResize(int width, int height) {
+    
+    if (height == 0) height = 1;
+    glViewport(0, 0, width, height);
+    controller->updateWindowSize(width, height);
+}
 
 void App::onKey(int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GLFW_TRUE);
     }
-    
+
+
     if (key == GLFW_KEY_H && action == GLFW_PRESS) {
+        int count = static_cast<int>(scenes.size());
         sceneIndex++;
-        int pos = sceneIndex % scenes.size();
-        std::cout << "Scena prepnuta dopredu! "<< pos <<" "<<sceneIndex << std::endl;
-        this->controller->setCamera(scenes[pos]->getCamera());
-        this->run(pos);
+        if (sceneIndex >= count) {
+            sceneIndex = 0;
+        }
+        this->controller->setCamera(scenes[sceneIndex]->getCamera());
 
     }
     else if (key == GLFW_KEY_J && action == GLFW_PRESS) {
+        int count = static_cast<int>(scenes.size());
         sceneIndex--;
-        int pos = sceneIndex % scenes.size();
-        std::cout << "Scena prepnuta dozadu!" << pos <<" "<< sceneIndex << std::endl;
-        this->controller->setCamera(scenes[pos]->getCamera());
-        this->run(pos);
+        if (sceneIndex < 0) {
+            sceneIndex = count - 1;
+        }
+        this->controller->setCamera(scenes[sceneIndex]->getCamera());
     }
     else {
         controller->keyboardMovement(key, scancode, action, mods);
     }
-    
-
 
 
 }
+
+
+
+
 
 void App::onMouseButton(int button, int action, int mods) {
     controller->mousePress(button, action, mods);

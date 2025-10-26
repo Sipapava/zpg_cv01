@@ -31,5 +31,6 @@ public:
     void moveBackward();
     void moveLeft();
     void moveRight();
+    void setAspect(float aspect);
 
 };

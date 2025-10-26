@@ -61,8 +61,8 @@ void Scene::addDrawableObject(DrawableObject* obj) {
     drawableObjects.push_back(obj);
 }
 
-Light* Scene::CreateLight(const glm::vec3& position, const glm::vec4& color, float intensity, float shiness) {
-    return new Light(position, color, intensity, shiness);
+Light* Scene::CreateLight(const glm::vec3& position, const glm::vec4& colorSpecular, float intesnity, float shiness, const glm::vec4& colorDiffuse, float attenuation) {
+    return new Light(position, colorSpecular, intesnity, shiness,colorDiffuse,attenuation);
 }
 
 void Scene::AddLight(Light* l) {
@@ -70,63 +70,28 @@ void Scene::AddLight(Light* l) {
 }
 
 void Scene::draw() {
-    // iterace pres shadery?
+    // Nejprve aktualizuj všechna svìtla (napø. dynamické transformace)
+    for (auto light : lights) {
+        if (light) {
+            light->Update();
+        }
+    }
+
+    // Poté aktualizuj a vykresli všechny kreslitelné objekty
     for (auto obj : drawableObjects) {
-        obj->Update();
-        obj->draw();
+        if (obj) {
+            obj->Update();
+            obj->draw();
+        }
     }
 }
+
 
 bool Scene::prepareTestSceneCv05T1() {
 
 
-    const Vertex troVertices[] = {
-        
-        {{-0.5f, 0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f, 1.0f}},  
-        {{ 0.5f, 0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f, 1.0f}},  
-        {{ 0.0f, 0.5f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f, 1.0f}}   
-    };
-
-
-    Shader* vr = new Shader();
-    Shader* fr = new Shader();
-    vr->createShaderFromFile(GL_VERTEX_SHADER, "vertex_shader_ph.glsl");
-    fr->createShaderFromFile(GL_FRAGMENT_SHADER, "fragment_shader_blph.glsl");
-
    
-
-
-
-    this->camera = this->CreateCamera();
-
-    
-    Light* l = this->CreateLight(glm::vec3(0.0f, 0.5f, 1.0f), glm::vec4(1.0, 1.0, 1.0, 1.0), 0.5f, 32);
-    Light* f = this->CreateLight(glm::vec3(0.3f, 0.2f, 0.5f), glm::vec4(1.0, 1.0, 0.0, 1.0), 1.0f, 8);
-    ShaderProgram* shaderProgramColor = new ShaderProgram(vr, fr);
-    addShaderProgram(shaderProgramColor);
-    AddLight(l);
-    AddLight(f);
-    camera->AddObserver(shaderProgramColor);
-    l->AddObserver(shaderProgramColor);
-    f->AddObserver(shaderProgramColor);
-    camera->UpdateMatrix();
-    l->UpdateLightsShaderPro();
-    f->UpdateLightsShaderPro();
-
-
-
-
-    Model* planeModel = new Model(troVertices, sizeof(troVertices) / sizeof(Vertex), true, "triangles");
-    addModel(planeModel);
-
-    DrawableObject* bushPlane = CreateDrawableObject(planeModel, shaderProgramColor);
-    addDrawableObject(bushPlane);
-
-
-
-
     return true;
-
 }
 
 bool Scene::prepareTestSceneCv05T2() {
@@ -144,12 +109,13 @@ bool Scene::prepareTestSceneCv05T2() {
     this->camera = this->CreateCamera();
 
     
-    Light* l = this->CreateLight(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec4(1.0, 1.0, 1.0, 1.0), 0.5f, 32);
+    Light* l = this->CreateLight(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec4(1.0, 1.0, 1.0, 1.0), 0.5f, 32, glm::vec4(0.385, 0.647, 0.812, 1.0), 2.5);
+  
     ShaderProgram* shaderProgramBl = new ShaderProgram(vr1, fr1);
     
     addShaderProgram(shaderProgramBl);
    
-    AddLight(l);
+   AddLight(l);
     camera->AddObserver(shaderProgramBl);
     l->AddObserver(shaderProgramBl);
 
@@ -200,8 +166,8 @@ bool Scene::prepareTestSceneCv05T3() {
 
     Shader* vr2 = new Shader();
     Shader* fr2 = new Shader();
-    vr2->createShaderFromFile(GL_VERTEX_SHADER, "vertex_shader_am.glsl");
-    fr2->createShaderFromFile(GL_FRAGMENT_SHADER, "fragment_shader_am.glsl");
+    vr2->createShaderFromFile(GL_VERTEX_SHADER, "vertex_shader_lam.glsl");
+    fr2->createShaderFromFile(GL_FRAGMENT_SHADER, "fragment_shader_lam.glsl");
 
     Shader* vr3 = new Shader();
     Shader* fr3 = new Shader();
@@ -218,12 +184,12 @@ bool Scene::prepareTestSceneCv05T3() {
     const int sphereSize = sizeof(sphere) / sizeof(sphere[0]);
     std::vector<Vertex> sphereV = FromFloat(sphere, sphereSize);
 
-    
+
 
     this->camera = this->CreateCamera();
 
-    
-    Light* l = this->CreateLight(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec4(1.0, 1.0, 1.0, 1.0), 0.5f, 32);
+
+    Light* l = this->CreateLight(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec4(1.0, 1.0, 1.0, 1.0), 0.5f, 32, glm::vec4(0.385, 0.647, 0.812, 1.0), 0.001);
     ShaderProgram* shaderProgramCon = new ShaderProgram(vr1, fr1);
     ShaderProgram* shaderProgramAm = new ShaderProgram(vr2, fr2);
     ShaderProgram* shaderProgramBl = new ShaderProgram(vr3, fr3);
@@ -238,9 +204,10 @@ bool Scene::prepareTestSceneCv05T3() {
     camera->AddObserver(shaderProgramBl);
     camera->AddObserver(shaderProgramBlPh);
 
-
-    l->AddObserver(shaderProgramBl);
+   
+   l->AddObserver(shaderProgramBl);
     l->AddObserver(shaderProgramBlPh);
+    l->AddObserver(shaderProgramAm);
     camera->UpdateMatrix();
     l->UpdateLightsShaderPro();
 
@@ -296,14 +263,49 @@ bool Scene::prepareTestSceneCv05T4(){
     fr->createShaderFromFile(GL_FRAGMENT_SHADER, "fragment_shader_blph.glsl");
     this->camera = this->CreateCamera();
 
-    Light* l = this->CreateLight(glm::vec3(0.0f, 2.f, 0.0f), glm::vec4(1.0, 1.0, 1.0, 1.0), 0.6f, 32);
+    
+    Light* l1 = this->CreateLight(glm::vec3(0.0f, 0.0f, 0.0f),   
+        glm::vec4(1.0, 1.0, 1.0, 1.0), 
+        0.6f,                           
+        32.0f,                          
+        glm::vec4(0.8, 0.75, 0.3, 1.0), 
+        5.0f);                        
+
+    Light* l2 = this->CreateLight(glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec4(1.0, 1.0, 1.0, 1.0),
+        0.6f,
+        32.0f,
+        glm::vec4(0.95, 0.55, 0.15, 1.0),
+        5.f);
+
+    Light* l3 = this->CreateLight(glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec4(1.0, 1.0, 1.0, 1.0),
+        0.6f,
+        32.0f,
+        glm::vec4(1.0, 1.0, 0.7, 1.0),
+        5.f);
+
+    l1->MoveTo(-0.8f, 0.5f, 0.0);
+    l2->MoveTo(0.8f, 0.4f, 0.0f);
+    l3->MoveTo( 0.0f, 0.3f, 0.7f);
+ 
     ShaderProgram* shaderProgramColor = new ShaderProgram(vr, fr);
     addShaderProgram(shaderProgramColor);
-    AddLight(l);
+
+    AddLight(l1);
+    AddLight(l2);
+    AddLight(l3);
+
     camera->AddObserver(shaderProgramColor);
-    l->AddObserver(shaderProgramColor);
+    l1->AddObserver(shaderProgramColor);
+    l2->AddObserver(shaderProgramColor);
+    l3->AddObserver(shaderProgramColor);
+
+   
     camera->UpdateMatrix();
-    l->UpdateLightsShaderPro();
+    l1->UpdateLightsShaderPro();
+    l2->UpdateLightsShaderPro();
+    l3->UpdateLightsShaderPro();
 
 
     Model* planeModel = new Model(planeVertices, sizeof(planeVertices) / sizeof(Vertex), true, "triangles");

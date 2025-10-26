@@ -28,15 +28,20 @@ void Camera::UpdateMatrix() {
     glm::mat4 Mp = this->getProjectionMatrix();
     glm::mat4 Mv = this->getViewMatrix();
 
-    // Posíláme pozici kamery
+  
     NotifyObservers(NotifyType::CameraPos, &position);
 
-    // Posíláme view a projection matice
+ 
     CameraData camData{ Mv, Mp };
     NotifyObservers(NotifyType::CameraMatrix, &camData);
 }
 
 
+void Camera::setAspect(float aspect) {
+    this->aspect = aspect;
+    this->UpdateMatrix();
+
+}
 
 
 
@@ -49,7 +54,7 @@ void Camera::moveForward() {
     position += direction * CAMERA_SPEED; //jen pricteme k position a vynasobime pohybem
     target += direction * CAMERA_SPEED;
     this->UpdateMatrix();
-    //update ShaderbytuMelobyt
+   
 }
 
 void Camera::moveBackward() {

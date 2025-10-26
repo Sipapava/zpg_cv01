@@ -19,6 +19,13 @@ bool Controller::setCamera(Camera* camera) {
     return false;
     
 }
+void Controller::updateWindowSize(int width, int height) {
+    if (height == 0) height = 1; 
+
+    float aspect = static_cast<float>(width) / static_cast<float>(height);
+
+    this->camera->setAspect(aspect);
+}
 void Controller::keyboardMovement(int key, int scancode, int action, int mods) {
    
     if (action == GLFW_PRESS) {

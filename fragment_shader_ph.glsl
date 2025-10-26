@@ -7,20 +7,50 @@ out vec4 outColor;
 
 uniform vec3 cameraPos;
 
+#define MAX_LIGHTS 5
+struct Light {
+    vec3 lightPosition;
+    vec4 lightColor;
+    float specularIntensity;
+    float shiness;
+    float attenuation;
+    vec4 diffuseColor;
+};
+
+uniform Light lights[MAX_LIGHTS];
+uniform int numberOfLights;
+
 void main()
 {
-    vec3 lightPosition = vec3(0.0, 0.0, 0.0); // Point Light position
-    vec3 lightToVector = lightPosition - worldPosition.xyz;
-
-    float dotProduct = max(dot(normalize(lightToVector), normalize(worldNormal)), 0.0);
-    vec4 diffuse = dotProduct * vec4(0.385, 0.647, 0.812, 1.0);
-    vec4 ambient = vec4(0.1, 0.1, 0.1, 1.0);
-
-    vec3 viewDir = normalize(cameraPos - worldPosition.xyz);
-    vec3 reflectDir = reflect(-normalize(lightToVector), normalize(worldNormal));
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
-    vec4 specular = spec * vec4(1.0, 1.0, 1.0, 1.0);
     
+    vec4 ambient = vec4(0.1, 0.1, 0.1, 1.0);
+    vec4 finalColor = ambient;
 
-    outColor = ambient + diffuse + specular;
+    
+    for (int i = 0; i < numberOfLights && i < MAX_LIGHTS; ++i) {
+         vec3 worldPos3 = vec3(
+            worldPosition.x / worldPosition.w,
+            worldPosition.y / worldPosition.w,
+            worldPosition.z / worldPosition.w);
+        vec3 lightToVector = lights[i].lightPosition - worldPos3;
+        float distance = length(lightToVector);
+        vec3 lightDir = normalize(lightToVector);
+
+        
+        float att = 1.0 / (1.0 + (lights[i].attenuation * distance) + (lights[i].attenuation * distance * distance));
+
+       
+        float dotProduct = max(dot(lightDir, normalize(worldNormal)), 0.0);
+        vec4 diffuse = dotProduct * lights[i].diffuseColor * att;
+
+       
+        vec3 viewDir = normalize(cameraPos - worldPosition.xyz);
+        vec3 reflectDir = reflect(-lightDir, normalize(worldNormal));
+        float spec = pow(max(dot(viewDir, reflectDir), 0.0), lights[i].shiness);
+        vec4 specular = lights[i].specularIntensity * spec * lights[i].lightColor * att;
+
+        finalColor += diffuse + specular;
+    }
+
+    outColor = finalColor;
 }

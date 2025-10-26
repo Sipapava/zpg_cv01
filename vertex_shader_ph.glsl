@@ -1,7 +1,7 @@
 #version 330 core
 
 layout(location = 0) in vec4 vp;
-layout(location = 1) in vec4 color;
+layout(location = 1) in vec4 normal;
 
 out vec4 fragColor;
 out vec4 worldPosition;
@@ -14,7 +14,10 @@ uniform mat4 viewMatrix;
 void main()
 {
     gl_Position = projectMatrix * viewMatrix * modelMatrix * vp;
-    fragColor = color;
+    fragColor = normal;
     worldPosition = modelMatrix * vp;
-    worldNormal = normalize(transpose(inverse(mat3(modelMatrix))) * color.xyz);
+    vec3 n = vec3(normal.x / normal.w,
+              normal.y / normal.w,
+              normal.z / normal.w);
+    worldNormal = normalize(transpose(inverse(mat3(modelMatrix))) * n);
 }

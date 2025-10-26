@@ -19,4 +19,5 @@ public:
 	void mousePress(int button, int action, int mods);
 	bool setCamera(Camera* camera);
 	void Update();
+	void updateWindowSize(int width, int height);
 };

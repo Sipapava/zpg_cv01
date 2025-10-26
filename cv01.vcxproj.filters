@@ -115,10 +115,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="fragment_shader_am.glsl">
+    <None Include="fragment_shader_lam.glsl">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="vertex_shader_am.glsl">
+    <None Include="vertex_shader_lam.glsl">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="fragment_shader_ph.glsl">

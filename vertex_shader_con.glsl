@@ -1,7 +1,7 @@
 #version 330
 
 layout(location = 0) in vec4 vp;
-layout(location = 1) in vec4 color;
+layout(location = 1) in vec4 normal;
 
 out vec4 fragColor;
 
@@ -11,5 +11,5 @@ uniform mat4 viewMatrix;
 
 void main() {
     gl_Position = projectMatrix * viewMatrix * modelMatrix * vp;
-    fragColor = color;
+    fragColor = normal;
 }

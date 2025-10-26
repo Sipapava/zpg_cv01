@@ -111,7 +111,7 @@ bool ShaderProgram::setUniformFloat(float value, const char* name) {
 bool ShaderProgram::setUniformInt(int value, const char* name) {
     GLint id = glGetUniformLocation(shaderProgram, name);
     if (id >= 0) {
-        glUniform1i(id, value);  // <-- pro int
+        glUniform1i(id, value); 
         return true;
     }
     return false;
@@ -135,7 +135,7 @@ void ShaderProgram::Notify(NotifyType type, void* data) {
     }
     case NotifyType::LightChange: {
         LightData* light = static_cast<LightData*>(data);
-        int id = light->id; // pøedpokládáme, že LightData obsahuje id svìtla
+        int id = light->id; 
         if (lightIdToIndex.find(id) != lightIdToIndex.end()) {
             int index = lightIdToIndex[id];
             lightsSlots[index].data = *light;
@@ -151,7 +151,7 @@ void ShaderProgram::Notify(NotifyType type, void* data) {
             lightIdToIndex[id] = nextFreeLightIndex;
 
             ShaderLightSlot slot;
-            slot.data = light->getLightData(); // metoda, která vrací LightData
+            slot.data = light->getLightData(); 
             slot.updated = false;
 
             lightsSlots.push_back(slot);
@@ -169,7 +169,7 @@ void ShaderProgram::Notify(NotifyType type, void* data) {
             int index = it->second;
 
             lightsSlots[index].updated = false;
-            lightsSlots[index].data = LightData(); // vynulujeme, toto dfachat nebude
+            lightsSlots[index].data = LightData(); 
 
             lightIdToIndex.erase(it);
         }
@@ -186,7 +186,7 @@ void ShaderProgram::Notify(NotifyType type, void* data) {
 
 
 
-#include <iostream> // nezapomeò pøidat
+
 
 void ShaderProgram::LightApply() {
     bool anyUp = false;
@@ -196,39 +196,32 @@ void ShaderProgram::LightApply() {
         if (!slot.updated) {
             int id = slot.data.id;
 
-            // najdeme index v poli uniformù podle id
             auto it = lightIdToIndex.find(id);
             if (it == lightIdToIndex.end()) {
-                std::cout << "[LightApply] Light ID " << id << " not found in map!\n";
-                continue; // bezpeènost
+              
+                continue; 
             }
 
             int indexInShader = it->second;
 
-            // debug print
-            std::cout << "[LightApply] Updating Light ID: " << id
-                << " at shader index: " << indexInShader << "\n";
-            std::cout << "    Position: (" << slot.data.position.x << ", "
-                << slot.data.position.y << ", " << slot.data.position.z << ")\n";
-            std::cout << "    Color: (" << slot.data.color.r << ", "
-                << slot.data.color.g << ", " << slot.data.color.b << ", "
-                << slot.data.color.a << ")\n";
-            std::cout << "    Intensity: " << slot.data.intensity
-                << ", Shininess: " << slot.data.shininess << "\n";
 
-            // pøipravíme názvy uniformù s indexem
+         
             std::string posName = "lights[" + std::to_string(indexInShader) + "].lightPosition";
-            std::string diffuseName = "lights[" + std::to_string(indexInShader) + "].lightColor";
+            std::string colorSpecName = "lights[" + std::to_string(indexInShader) + "].lightColor";
             std::string specularName = "lights[" + std::to_string(indexInShader) + "].specularIntensity";
             std::string shininessName = "lights[" + std::to_string(indexInShader) + "].shiness";
+            std::string diffuseColorName = "lights[" + std::to_string(indexInShader) + "].diffuseColor";
+            std::string attenuationName = "lights[" + std::to_string(indexInShader) + "].attenuation";
 
-            // aplikujeme hodnoty z lightsSlots
+            
             setUniform3(slot.data.position, posName.c_str());
-            setUniform4(slot.data.color, diffuseName.c_str());
+            setUniform4(slot.data.colorSpecular, colorSpecName.c_str());
             setUniformFloat(slot.data.intensity, specularName.c_str());
             setUniformFloat(slot.data.shininess, shininessName.c_str());
+            setUniform4(slot.data.diffuseColor, diffuseColorName.c_str());
+            setUniformFloat(slot.data.attenuation, attenuationName.c_str());
 
-            // nastavíme updated = true
+          
             slot.updated = true;
             anyUp = true;
         }
@@ -236,7 +229,7 @@ void ShaderProgram::LightApply() {
 
     if (anyUp) {
         setUniformInt(static_cast<int>(lightsSlots.size()), "numberOfLights");
-        std::cout << "[LightApply] numberOfLights updated to: " << lightsSlots.size() << "\n";
+       
     }
 }
 

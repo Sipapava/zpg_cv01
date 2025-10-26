@@ -18,13 +18,14 @@ struct CameraData {
 struct LightData {
     int id;
     glm::vec3 position;
-    glm::vec4 color;
+    glm::vec4 colorSpecular;
     float intensity;
     float shininess;
+    glm::vec4 diffuseColor;
+    float attenuation;
 };
 
 struct ShaderLightSlot {
-    LightData data;   // vlastní data svìtla
-    bool updated;     // flag, zda bylo zmìnìno a je tøeba aktualizovat shader
+    LightData data;  
+    bool updated;     
 };
-//CameraPosje jen vector 3
