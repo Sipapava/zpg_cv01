@@ -44,6 +44,7 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -130,11 +131,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ambientLight.cpp" />
     <ClCompile Include="app.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="circleBuild.cpp" />
     <ClCompile Include="complexTransformation.cpp" />
     <ClCompile Include="controller.cpp" />
+    <ClCompile Include="directLight.cpp" />
     <ClCompile Include="directLight.h" />
     <ClCompile Include="drawableObject.cpp" />
     <ClCompile Include="elementarTransformation.cpp" />
@@ -142,11 +145,12 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="model.cpp" />
     <ClCompile Include="notifyType.h" />
+    <ClCompile Include="pointLight.cpp" />
+    <ClCompile Include="reflectorLight.cpp" />
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="shaderProgram.cpp" />
-    <ClCompile Include="Subject.cpp" />
-    <ClCompile Include="Subject.h" />
+    <ClCompile Include="subject.cpp" />
     <ClCompile Include="transformation.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -165,6 +169,7 @@
     <ClInclude Include="scene.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="shaderProgram.h" />
+    <ClInclude Include="subject.h" />
     <ClInclude Include="transformation.h" />
     <ClInclude Include="elementarTransformation.h" />
     <ClInclude Include="vertex.h" />

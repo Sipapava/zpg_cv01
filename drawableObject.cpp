@@ -1,3 +1,4 @@
+
 #include "drawableObject.h"
 #include <stdio.h>
 
@@ -8,10 +9,13 @@ DrawableObject::DrawableObject(Model* m, ShaderProgram* sp)
     complexTransformation* complexTrans = new complexTransformation();
     transformation = complexTrans;
     id = nextId++;
-    position = model->ComputeInitialCenter();
+    if (model) {
+        position = model->ComputeInitialCenter();
+    }
+    
     rotation[0] = 0; rotation[1] = 0; rotation[2] = 0;
     rotationAxis = { 0,0,0 };
-    
+
 }
 
 DrawableObject::~DrawableObject() {
@@ -20,10 +24,17 @@ DrawableObject::~DrawableObject() {
 }
 
 void DrawableObject::SetRotateAnimation(float addAngle, const glm::vec3& axis) {
-    
+
     transformation->Add(new RotationDynamic(0.0f, axis, addAngle));
-   
+
 };
+
+void DrawableObject::SetRandomMoveAnimation(float speed, int maxSteps) {
+
+    transformation->Add(new RandomTranslation(speed, maxSteps));
+
+};
+
 
 
 
@@ -34,9 +45,9 @@ void DrawableObject::Update() {
 
 void DrawableObject::draw() {
     if (shaderProgram) {
-      bool x =  shaderProgram->setShaderProgram(); // aktivuje shader
-    }
-    
+        bool x = shaderProgram->setShaderProgram(); // aktivuje shader
+
+        
     shaderProgram->ProjectionApply();
     shaderProgram->LightApply();
 
@@ -46,26 +57,29 @@ void DrawableObject::draw() {
 
     if (model && ready) { //pridat if na projection
         model->Draw(); // bindne VAO a vykreslí
-       
+
     }
+    }
+
 }
 
 
 
 void DrawableObject::MoveTo(float x, float y, float z) {
-	glm::vec3 delta = glm::vec3(x, y, z);
-	transformation->Add(new Translation(delta));
+    glm::vec3 delta = glm::vec3(x, y, z);
+    transformation->Add(new Translation(delta));
 
 }
 
 void DrawableObject::Resize(float x, float y, float z) {
-	transformation->Add(new Scale(glm::vec3(x, y, z)));
+    transformation->Add(new Scale(glm::vec3(x, y, z)));
 
 }
 
 void DrawableObject::Rotate(float angle, float xA, float yA, float zA) {
-	transformation->Add(new Rotation(angle, glm::vec3(xA, yA, zA)));
+    transformation->Add(new Rotation(angle, glm::vec3(xA, yA, zA)));
 
 
 }
+
 

@@ -1,21 +1,21 @@
-#include "Subject.h"
+#include "subject.h"
 
-void Subject::AddObserver(Observer* o) {
+void subject::AddObserver(Observer* o) {
     observers.push_back(o);
 }
 
-void Subject::RemoveObserver(Observer* o) {
+void subject::RemoveObserver(Observer* o) {
     observers.erase(std::remove(observers.begin(), observers.end(), o), observers.end());
 }
 
-void Subject::NotifyObservers(NotifyType type, void* data) {
+void subject::NotifyObservers(NotifyType type, void* data) {
     for (Observer* o : observers) {
         o->Notify(type, data);
     }
 }
 
 
-void Subject::NotifyObserver(Observer* o, NotifyType type, void* data) {
+void subject::NotifyObserver(Observer* o, NotifyType type, void* data) {
     if (o) {
         o->Notify(type, data);
     }

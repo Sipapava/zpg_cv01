@@ -1,16 +1,28 @@
 #include "Light.h"
 
-int Light::nextId = 0;
-Light::Light(const glm::vec3& position, const glm::vec4& colorSpecular, float intesnity,float shiness,const glm::vec4& colorDiffuse,float attenuation, const glm::vec4& ambientColor)
-    : defaultPosition(position), colorSpecular(colorSpecular), specularIntesity(intesnity),shiness(shiness),ambientColor(ambientColor){
 
-    id = nextId++;
-    complexTransformation* complexTrans = new complexTransformation();
-    transformation = complexTrans;
-    this->positionSend = position;
-    this->diffuseColor = colorDiffuse;
-    this->attenuation = attenuation;
+Light::Light(const glm::vec4& colorSpecular, float intensity, float shiness, const glm::vec4& colorDiffuse)
+    : DrawableObject(nullptr, nullptr), // model a shader jsou nullptr
+    colorSpecular(colorSpecular),
+    specularIntesity(intensity),
+    shiness(shiness),
+    diffuseColor(colorDiffuse)
+{
+    // DrawableObject konstruktor už vytvoøí complexTransformation a id
 }
+
+
+Light::Light(Model* m, ShaderProgram* sp,
+    const glm::vec4& colorSpecular, float intensity, float shiness, const glm::vec4& colorDiffuse)
+    : DrawableObject(m, sp),  // pøedáváme model a shader
+    colorSpecular(colorSpecular),
+    specularIntesity(intensity),
+    shiness(shiness),
+    diffuseColor(colorDiffuse)
+{
+    // DrawableObject konstruktor už vytvoøí complexTransformation a id
+}
+
 
 void Light::UpdateLightsShaderPro() {
     LightData lightData = this->getLightData();
@@ -18,25 +30,11 @@ void Light::UpdateLightsShaderPro() {
     NotifyObservers(NotifyType::LightChange, &lightData);
 }
 
-void Light::MoveTo(float x, float y, float z) {
-    glm::vec3 delta = glm::vec3(x, y, z);
-    transformation->Add(new Translation(delta));
 
-}
-
-void Light::Rotate(float angle, float xA, float yA, float zA) {
-    transformation->Add(new Rotation(angle, glm::vec3(xA, yA, zA)));
-
-}
-
-void Light::SetRotateAnimation(float addAngle, const glm::vec3& axis) {
-
-    transformation->Add(new RotationDynamic(0.0f, axis, addAngle));
-
-};
 
 
 void Light::Update() {
+    /*
     glm::mat4 I = glm::mat4(1.0f);
     glm::mat4 M = this->transformation->apply(I);
 
@@ -51,13 +49,14 @@ void Light::Update() {
        
         UpdateLightsShaderPro();
     }
+    */
    
 }
 
 
 void Light::AddObserver(Observer* o) {
     
-    Subject::AddObserver(o);
+    subject::AddObserver(o);
 
     
     NotifyObserver(o, NotifyType::SpRegisterLight, this);
@@ -67,7 +66,7 @@ void Light::AddObserver(Observer* o) {
 
 void Light::RemoveObserver(Observer* o) {
     
-    Subject::RemoveObserver(o);
+    subject::RemoveObserver(o);
 
   
     
@@ -77,6 +76,7 @@ void Light::RemoveObserver(Observer* o) {
 
 LightData Light::getLightData() const {
     LightData data;
+    /*
     data.id = id;               
     data.position = positionSend;   
     data.colorSpecular = colorSpecular;        
@@ -85,5 +85,6 @@ LightData Light::getLightData() const {
     data.diffuseColor = diffuseColor;
     data.attenuation = attenuation;
     data.ambientColor = ambientColor;
+    */
     return data;
 }

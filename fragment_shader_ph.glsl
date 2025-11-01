@@ -9,6 +9,7 @@ uniform vec3 cameraPos;
 
 #define MAX_LIGHTS 5
 struct Light {
+    int type;
     vec3 lightPosition;
     vec4 lightColor;
     float specularIntensity;
@@ -16,8 +17,9 @@ struct Light {
     float attenuation;
     vec4 diffuseColor;
     vec4 ambientColor;
+    vec3 direction;
+    float angleReflector;
 };
-
 uniform Light lights[MAX_LIGHTS];
 uniform int numberOfLights;
 
@@ -29,6 +31,7 @@ void main()
 
     
     for (int i = 0; i < numberOfLights && i < MAX_LIGHTS; ++i) {
+         if(lights[i].type == 3){
           finalColor += lights[i].ambientColor;
          vec3 worldPos3 = vec3(
             worldPosition.x / worldPosition.w,
@@ -52,7 +55,7 @@ void main()
         vec4 specular = lights[i].specularIntensity * spec * lights[i].lightColor * att;
 
         finalColor += diffuse + specular;
-    }
+    }}
 
     outColor = finalColor;
 }

@@ -5,27 +5,30 @@
 #include "elementarTransformation.h"
 #include "complexTransformation.h"
 
+
 class DrawableObject {
-private:
-    int id;                      
+protected:
+    int id;
     static int nextId;
-    Model* model;               
+
+    Model* model;
     ShaderProgram* shaderProgram;
-    
+
     Transformation* transformation;
     glm::vec3 position;
     int rotation[3];
     glm::vec3 rotationAxis;
-    
+
 
 public:
     DrawableObject(Model* m, ShaderProgram* sp);
-    ~DrawableObject(); 
+    virtual ~DrawableObject();
     int getId() const { return id; }
     void MoveTo(float x, float y, float z);
     void Resize(float x, float y, float z);
     void Rotate(float angle, float xA, float yA, float zA);
     void SetRotateAnimation(float addAngle, const glm::vec3& axis);
+    void SetRandomMoveAnimation(float speed, int maxSteps);
 
     void Update();
     void draw();

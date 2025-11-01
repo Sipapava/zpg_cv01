@@ -28,3 +28,37 @@ glm::mat4 RotationDynamic::apply(const glm::mat4& matrix) {
 RotationDynamic::RotationDynamic(float initialAngle, const glm::vec3& axis, float addAngle)
     : Rotation(initialAngle, axis), addAngle(addAngle) {}
 
+
+
+
+glm::vec3 RandomTranslation::randomDirection() {
+   
+    float x = (rand() % 200 - 100) / 100.0f;
+    float y = (rand() % 200 - 100) / 100.0f;
+    float z = (rand() % 200 - 100) / 100.0f;
+    glm::vec3 v(x, y, z);
+    if (v == glm::vec3(0)) v = glm::vec3(1, 0, 0); // vyhnout se nulovému vektoru
+    return glm::normalize(v);
+}
+
+
+RandomTranslation::RandomTranslation(float speed, int maxSteps)
+    : speed(speed), maxSteps(maxSteps), stepsRemaining(0), added(0.0f, 0.0f, 0.0f) {
+   
+    direction = randomDirection();
+    stepsRemaining = maxSteps;
+   
+}
+
+glm::mat4 RandomTranslation::apply(const glm::mat4& matrix) {
+    if (stepsRemaining <= 0) {
+        direction = randomDirection();
+        stepsRemaining = maxSteps;
+        
+        
+    }
+    added += direction * speed;
+    glm::mat4 result = glm::translate(matrix, added);
+    stepsRemaining--;
+    return result;
+}

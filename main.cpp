@@ -20,23 +20,23 @@ int main(void)
     
    
   
-    Scene* scene3 = new Scene();
+    //Scene* scene3 = new Scene();
     Scene* scene4 = new Scene();
-    Scene* scene2 = new Scene();
+   // Scene* scene2 = new Scene();
    
     
     
-    app.addScene(scene3);
+   // app.addScene(scene3);
     app.addScene(scene4);
-    app.addScene(scene2);
+    //app.addScene(scene2);
    
-    bool z = scene3->prepareTestSceneCv05T3();
+   // bool z = scene3->prepareTestSceneCv05T3();
     bool a = scene4->prepareTestSceneCv05T4();
-    bool b = scene2->prepareTestSceneCv05T2();
+    //bool b = scene2->prepareTestSceneCv05T2();
  
    
     bool d = app.prepareController();
-    if ( z && d && a ) {
+    if (  a) {
         
         app.run(0);
     }

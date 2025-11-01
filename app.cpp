@@ -4,7 +4,8 @@ App::App() {
 }
 
 App::~App() {
-    
+    glfwSetWindowShouldClose(window, GLFW_TRUE);
+
     for (auto scene : scenes) {
         delete scene;
     }

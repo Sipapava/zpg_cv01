@@ -7,7 +7,8 @@
 #include "Observer.h"
 #include <unordered_map>
 #include<string>
-#include "Light.h"
+
+class Light;
 
 
 

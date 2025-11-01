@@ -1,12 +1,12 @@
 #pragma once
 #include "shaderProgram.h"
 #include<vector>
-#include "Subject.h"
+#include "subject.h"
 #include "Observer.h"
 #include "glm/glm.hpp"
 
 
-class Camera : public Subject {
+class Camera : public subject {
 private:
     
     glm::vec3 position;

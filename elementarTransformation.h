@@ -1,6 +1,7 @@
 #pragma once
 #include "transformation.h"
-
+#include <cstdlib> // pro rand() a srand()
+#include <ctime>
 
 class Translation : public Transformation {
 private:
@@ -11,7 +12,20 @@ public:
 };
 
 
+class RandomTranslation : public Transformation {
+private:
+    float speed; //napr. 0.0001f
+    glm::vec3 direction; //nahodne zvoleny smer//
+    int stepsRemaining;
+    int maxSteps;
+    glm::vec3 added;
+    //generator nahodnych cisel
+    glm::vec3 randomDirection();
 
+public:
+    RandomTranslation(float speed, int maxSteps);
+    glm::mat4 apply(const glm::mat4& matrix) override;
+};
 
 
 class Rotation : public Transformation {

@@ -1,4 +1,5 @@
 #include "ShaderProgram.h"
+#include "Light.h" 
 #include <cstdio>
 
 ShaderProgram::ShaderProgram(Shader* vertex,Shader* fragment) //musi dostat fragment a vertex
@@ -145,7 +146,7 @@ void ShaderProgram::Notify(NotifyType type, void* data) {
     }
     case NotifyType::SpRegisterLight: {
         Light* light = static_cast<Light*>(data);
-        int id = light->GetId();
+        int id = light->getId();
 
         if (nextFreeLightIndex < 5) {
             lightIdToIndex[id] = nextFreeLightIndex;
@@ -162,7 +163,7 @@ void ShaderProgram::Notify(NotifyType type, void* data) {
 
     case NotifyType::SpUnfollowLight: {
         Light* light = static_cast<Light*>(data);
-        int id = light->GetId();
+        int id = light->getId();
 
         auto it = lightIdToIndex.find(id);
         if (it != lightIdToIndex.end()) {
@@ -205,7 +206,7 @@ void ShaderProgram::LightApply() {
             int indexInShader = it->second;
 
 
-         
+            std::string typeName = "lights[" + std::to_string(indexInShader) + "].type";
             std::string posName = "lights[" + std::to_string(indexInShader) + "].lightPosition";
             std::string colorSpecName = "lights[" + std::to_string(indexInShader) + "].lightColor";
             std::string specularName = "lights[" + std::to_string(indexInShader) + "].specularIntensity";
@@ -213,6 +214,9 @@ void ShaderProgram::LightApply() {
             std::string diffuseColorName = "lights[" + std::to_string(indexInShader) + "].diffuseColor";
             std::string attenuationName = "lights[" + std::to_string(indexInShader) + "].attenuation";
             std::string ambientName = "lights[" + std::to_string(indexInShader) + "].ambientColor";
+            std::string directionName = "lights[" + std::to_string(indexInShader) + "].direction";
+            std::string angleRName = "lights[" + std::to_string(indexInShader) + "].angleReflector";
+            
 
             
             setUniform3(slot.data.position, posName.c_str());
@@ -222,6 +226,13 @@ void ShaderProgram::LightApply() {
             setUniform4(slot.data.diffuseColor, diffuseColorName.c_str());
             setUniformFloat(slot.data.attenuation, attenuationName.c_str());
             setUniform4(slot.data.ambientColor, ambientName.c_str());
+            std::cout << slot.data.ambientColor[0] << " "
+                << slot.data.ambientColor[1] << " "
+                << slot.data.ambientColor[2] << std::endl;
+            setUniformInt(slot.data.type, typeName.c_str());
+            setUniform3(slot.data.direction, directionName.c_str());
+            setUniformFloat(slot.data.angleReflector, angleRName.c_str());
+
 
           
             slot.updated = true;
