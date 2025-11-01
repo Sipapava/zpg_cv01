@@ -19,10 +19,11 @@ private:
     glm::mat4 projection;
     glm::vec3 cameraPos;
 
-    
+    //buffery na cameru a svetla jsou ok
+    //tahle optimalizace ok
     std::vector<ShaderLightSlot> lightsSlots;
 
-    std::unordered_map<int, int> lightIdToIndex;
+    std::unordered_map<int, int> lightIdToIndex; //index muzeme pripojit ke slotum
     int nextFreeLightIndex = 0;
          
     Shader* vertexShader;     

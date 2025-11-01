@@ -10,6 +10,7 @@ struct Light {
     vec3 lightPosition;
     float attenuation;
     vec4 diffuseColor;
+    vec4 ambientColor;
 };
 
 uniform Light lights[MAX_LIGHTS];
@@ -17,10 +18,11 @@ uniform int numberOfLights;
 
 void main()
 {
-    vec4 ambient = vec4(0.1, 0.1, 0.1, 1.0);
+     vec4 ambientFinal = vec4(0.0);
     vec4 diffuse = vec4(0.0);
 
     for (int i = 0; i < numberOfLights && i < MAX_LIGHTS; ++i) {
+         ambientFinal += lights[i].ambientColor;
          vec3 worldPos3 = vec3(
             worldPosition.x / worldPosition.w,
             worldPosition.y / worldPosition.w,
@@ -36,5 +38,5 @@ void main()
         diffuse += dotProduct * lights[i].diffuseColor * att;
     }
 
-    outColor = ambient + diffuse;
+    outColor = diffuse + ambientFinal;
 }

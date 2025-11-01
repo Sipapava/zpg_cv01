@@ -1,8 +1,8 @@
 #include "Light.h"
 
 int Light::nextId = 0;
-Light::Light(const glm::vec3& position, const glm::vec4& colorSpecular, float intesnity,float shiness,const glm::vec4& colorDiffuse,float attenuation)
-    : defaultPosition(position), colorSpecular(colorSpecular), specularIntesity(intesnity),shiness(shiness){
+Light::Light(const glm::vec3& position, const glm::vec4& colorSpecular, float intesnity,float shiness,const glm::vec4& colorDiffuse,float attenuation, const glm::vec4& ambientColor)
+    : defaultPosition(position), colorSpecular(colorSpecular), specularIntesity(intesnity),shiness(shiness),ambientColor(ambientColor){
 
     id = nextId++;
     complexTransformation* complexTrans = new complexTransformation();
@@ -13,14 +13,7 @@ Light::Light(const glm::vec3& position, const glm::vec4& colorSpecular, float in
 }
 
 void Light::UpdateLightsShaderPro() {
-    LightData lightData;
-    lightData.id = this->id;
-    lightData.position = this->positionSend;          
-    lightData.colorSpecular = this->colorSpecular;              
-    lightData.intensity =this->specularIntesity; 
-    lightData.shininess = this->shiness;
-    lightData.diffuseColor = this->diffuseColor;
-    lightData.attenuation = this->attenuation;
+    LightData lightData = this->getLightData();
 
     NotifyObservers(NotifyType::LightChange, &lightData);
 }
@@ -91,5 +84,6 @@ LightData Light::getLightData() const {
     data.shininess = shiness;   
     data.diffuseColor = diffuseColor;
     data.attenuation = attenuation;
+    data.ambientColor = ambientColor;
     return data;
 }

@@ -54,6 +54,60 @@ Model* Scene::CreateModel(const Vertex* vertices, size_t count,bool color,std::s
     return new Model(vertices, count,color,type);
 }
 
+std::vector<Vertex> Scene::LoadModelFromObjectFile(const char* path) {
+    Assimp::Importer importer;
+    std::vector<Vertex> vertices;
+    // Naètení modelu, triangulace a normaly
+    const aiScene* scene = importer.ReadFile(path,
+        aiProcess_Triangulate |
+        aiProcess_FlipUVs |
+        aiProcess_GenNormals);
+
+    if (!scene || !scene->HasMeshes()) {
+        std::cerr << "Assimp error: " << importer.GetErrorString() << std::endl;
+        return vertices;
+    }
+
+    
+
+    for (unsigned int m = 0; m < scene->mNumMeshes; ++m) {
+        aiMesh* mesh = scene->mMeshes[m];
+
+        for (unsigned int f = 0; f < mesh->mNumFaces; ++f) {
+            aiFace& face = mesh->mFaces[f];
+            // Assimp by mìl mít triangulovan
+            for (unsigned int i = 0; i < face.mNumIndices; ++i) {
+                unsigned int idx = face.mIndices[i];
+                Vertex v;
+                v.pos = glm::vec4(
+                    mesh->mVertices[idx].x,
+                    mesh->mVertices[idx].y,
+                    mesh->mVertices[idx].z,
+                    1.0f
+                );
+
+                if (mesh->HasNormals()) {
+                    v.color = glm::vec4(
+                        mesh->mNormals[idx].x,
+                        mesh->mNormals[idx].y,
+                        mesh->mNormals[idx].z,
+                        1.0f
+                    );
+                }
+                else {
+                    v.color = glm::vec4(0, 0, 0, 0);
+                }
+
+                vertices.push_back(v);
+            }
+        }
+    }
+
+  
+    return vertices;
+
+}
+
 Camera* Scene::CreateCamera() {
     return new Camera(&this->shaderPrograms);
 }
@@ -61,8 +115,8 @@ void Scene::addDrawableObject(DrawableObject* obj) {
     drawableObjects.push_back(obj);
 }
 
-Light* Scene::CreateLight(const glm::vec3& position, const glm::vec4& colorSpecular, float intesnity, float shiness, const glm::vec4& colorDiffuse, float attenuation) {
-    return new Light(position, colorSpecular, intesnity, shiness,colorDiffuse,attenuation);
+Light* Scene::CreateLight(const glm::vec3& position, const glm::vec4& colorSpecular, float intesnity, float shiness, const glm::vec4& colorDiffuse, float attenuation, const glm::vec4& ambientColor) {
+    return new Light(position, colorSpecular, intesnity, shiness,colorDiffuse,attenuation,ambientColor);
 }
 
 void Scene::AddLight(Light* l) {
@@ -109,7 +163,7 @@ bool Scene::prepareTestSceneCv05T2() {
     this->camera = this->CreateCamera();
 
     
-    Light* l = this->CreateLight(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec4(1.0, 1.0, 1.0, 1.0), 0.5f, 32, glm::vec4(0.385, 0.647, 0.812, 1.0), 2.5);
+    Light* l = this->CreateLight(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec4(1.0, 1.0, 1.0, 1.0), 0.5f, 32, glm::vec4(0.385, 0.647, 0.812, 1.0), 2.5, glm::vec4(0.1, 0.1, 0.1, 1.0));
   
     ShaderProgram* shaderProgramBl = new ShaderProgram(vr1, fr1);
     
@@ -189,7 +243,7 @@ bool Scene::prepareTestSceneCv05T3() {
     this->camera = this->CreateCamera();
 
 
-    Light* l = this->CreateLight(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec4(1.0, 1.0, 1.0, 1.0), 0.5f, 32, glm::vec4(0.385, 0.647, 0.812, 1.0), 0.001);
+    Light* l = this->CreateLight(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec4(1.0, 1.0, 1.0, 1.0), 0.5f, 32, glm::vec4(0.385, 0.647, 0.812, 1.0), 0.001, glm::vec4(0.1, 0.1, 0.1, 1.0));
     ShaderProgram* shaderProgramCon = new ShaderProgram(vr1, fr1);
     ShaderProgram* shaderProgramAm = new ShaderProgram(vr2, fr2);
     ShaderProgram* shaderProgramBl = new ShaderProgram(vr3, fr3);
@@ -215,16 +269,18 @@ bool Scene::prepareTestSceneCv05T3() {
    
 
     Model* sphereModel = new Model(sphereV.data(), sphereV.size(), true, "triangles");
-    
+    std::vector<Vertex> form = this->LoadModelFromObjectFile("formula1.obj");
+    Model* formula = new Model(form.data(), form.size(), true, "triangles");
 
     addModel(sphereModel);
+    addModel(formula);
     
 
     int i = 0;
     std::vector<glm::vec3> sunPositions = { {-0.5f, 0.0f, 0.0f}, {0.5f, 0.0f, 0.0f},{0.0f,0.5f,0.0f},{0.0f,-0.5f,0.0f} };
     for (auto& pos : sunPositions) {
-        DrawableObject* sun = CreateDrawableObject(sphereModel, this->getShaderProgram(i));
-        sun->Resize(0.1f, 0.1f, 0.1f);
+        DrawableObject* sun = CreateDrawableObject(formula, this->getShaderProgram(i));
+        sun->Resize(0.01f, 0.01f, 0.01f);
         sun->MoveTo(pos.x, pos.y, pos.z); 
         //sun->SetRotateAnimation(glm::radians(1.0f), glm::vec3(0, 0.5, 0.5));
         addDrawableObject(sun);
@@ -269,21 +325,21 @@ bool Scene::prepareTestSceneCv05T4(){
         0.6f,                           
         32.0f,                          
         glm::vec4(0.8, 0.75, 0.3, 1.0), 
-        5.0f);                        
+        5.0f, glm::vec4(0.1, 0.1, 0.1, 1.0));
 
     Light* l2 = this->CreateLight(glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec4(1.0, 1.0, 1.0, 1.0),
         0.6f,
         32.0f,
         glm::vec4(0.95, 0.55, 0.15, 1.0),
-        5.f);
+        5.f, glm::vec4(0.0, 0.0, 0.0, 1.0));
 
     Light* l3 = this->CreateLight(glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec4(1.0, 1.0, 1.0, 1.0),
         0.6f,
         32.0f,
         glm::vec4(1.0, 1.0, 0.7, 1.0),
-        5.f);
+        5.f, glm::vec4(0.0, 0.0, 0.0, 1.0));
 
     l1->MoveTo(-0.8f, 0.5f, 0.0);
     l2->MoveTo(0.8f, 0.4f, 0.0f);

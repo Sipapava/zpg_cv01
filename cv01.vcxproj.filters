@@ -66,6 +66,9 @@
     <ClCompile Include="notifyType.h">
       <Filter>Header Files</Filter>
     </ClCompile>
+    <ClCompile Include="directLight.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="vertex.h">
@@ -111,6 +114,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Light.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ambientLight.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pointLight.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="reflectorLight.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

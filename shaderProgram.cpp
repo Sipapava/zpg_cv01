@@ -212,6 +212,7 @@ void ShaderProgram::LightApply() {
             std::string shininessName = "lights[" + std::to_string(indexInShader) + "].shiness";
             std::string diffuseColorName = "lights[" + std::to_string(indexInShader) + "].diffuseColor";
             std::string attenuationName = "lights[" + std::to_string(indexInShader) + "].attenuation";
+            std::string ambientName = "lights[" + std::to_string(indexInShader) + "].ambientColor";
 
             
             setUniform3(slot.data.position, posName.c_str());
@@ -220,6 +221,7 @@ void ShaderProgram::LightApply() {
             setUniformFloat(slot.data.shininess, shininessName.c_str());
             setUniform4(slot.data.diffuseColor, diffuseColorName.c_str());
             setUniformFloat(slot.data.attenuation, attenuationName.c_str());
+            setUniform4(slot.data.ambientColor, ambientName.c_str());
 
           
             slot.updated = true;

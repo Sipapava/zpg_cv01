@@ -18,8 +18,7 @@ int main(void)
         return -1;
     }
     
-    
- 
+   
   
     Scene* scene3 = new Scene();
     Scene* scene4 = new Scene();

@@ -22,7 +22,7 @@ bool Controller::setCamera(Camera* camera) {
 void Controller::updateWindowSize(int width, int height) {
     if (height == 0) height = 1; 
 
-    float aspect = static_cast<float>(width) / static_cast<float>(height);
+    float aspect = width / (float)height;;
 
     this->camera->setAspect(aspect);
 }

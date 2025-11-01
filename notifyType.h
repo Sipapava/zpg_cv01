@@ -23,6 +23,7 @@ struct LightData {
     float shininess;
     glm::vec4 diffuseColor;
     float attenuation;
+    glm::vec4 ambientColor;
 };
 
 struct ShaderLightSlot {

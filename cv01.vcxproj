@@ -104,13 +104,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\knihovny\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;..\..\knihovny\glm-master\glm-master;..\..\knihovny\glew-2.1.0-win32\glew-2.1.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\knihovny\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;..\..\knihovny\glm-master\glm-master;..\..\knihovny\glew-2.1.0-win32\glew-2.1.0\include;..\..\knihovny\assimp-5.3.1\assimp-5.3.1\include;..\..\knihovny\assimp-5.3.1\assimp-build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opengl32.lib;glu32.lib;glfw3.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\knihovny\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\lib-vc2022;..\..\knihovny\glew-2.1.0-win32\glew-2.1.0\lib\Release\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glu32.lib;glfw3.lib;glew32s.lib;assimp-vc143-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\knihovny\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\lib-vc2022;..\..\knihovny\glew-2.1.0-win32\glew-2.1.0\lib\Release\x64;..\..\knihovny\assimp-5.3.1\assimp-build\lib\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -135,6 +135,7 @@
     <ClCompile Include="circleBuild.cpp" />
     <ClCompile Include="complexTransformation.cpp" />
     <ClCompile Include="controller.cpp" />
+    <ClCompile Include="directLight.h" />
     <ClCompile Include="drawableObject.cpp" />
     <ClCompile Include="elementarTransformation.cpp" />
     <ClCompile Include="Light.cpp" />
@@ -149,6 +150,7 @@
     <ClCompile Include="transformation.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ambientLight.h" />
     <ClInclude Include="app.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="circleBuild.h" />
@@ -158,6 +160,8 @@
     <ClInclude Include="Light.h" />
     <ClInclude Include="model.h" />
     <ClInclude Include="Observer.h" />
+    <ClInclude Include="pointLight.h" />
+    <ClInclude Include="reflectorLight.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="shaderProgram.h" />
