@@ -5,12 +5,12 @@ directLight::directLight(const glm::vec3& direction,
     const glm::vec4& colorDiffuse,
     float intensity,
     float shininess)
-    : Light(colorSpecular, intensity, shininess, colorDiffuse), // zavolá konstruktor Light
+    : Light(colorSpecular, intensity, shininess, colorDiffuse),
     direction(direction)
 {
-    // tady mùžeš udìlat další inicializace, pokud je potøeba
+   
 }
-
+//kosntruktor po obejkt
 void directLight::Update() {
     /*
     glm::mat4 I = glm::mat4(1.0f);

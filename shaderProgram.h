@@ -16,9 +16,10 @@ class ShaderProgram : public Observer {
 private:
     bool updatedCamera; //nastaveno na false ve vychozim,
     bool updatedLight;
-    glm::mat4 view;
-    glm::mat4 projection;
+    glm::mat4* view;
+    glm::mat4* projection;
     glm::vec3 cameraPos;
+   
 
     //buffery na cameru a svetla jsou ok
     //tahle optimalizace ok
@@ -47,7 +48,8 @@ public:
     void LightApply();
     
 
-    bool setShaderProgram(); 
+    bool setShaderProgram();
+    bool resetShaderProgram();
 };
 
 

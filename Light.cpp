@@ -8,7 +8,7 @@ Light::Light(const glm::vec4& colorSpecular, float intensity, float shiness, con
     shiness(shiness),
     diffuseColor(colorDiffuse)
 {
-    // DrawableObject konstruktor už vytvoøí complexTransformation a id
+    
 }
 
 
@@ -20,7 +20,7 @@ Light::Light(Model* m, ShaderProgram* sp,
     shiness(shiness),
     diffuseColor(colorDiffuse)
 {
-    // DrawableObject konstruktor už vytvoøí complexTransformation a id
+    
 }
 
 

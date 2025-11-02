@@ -16,7 +16,8 @@ private:
     float aspect;
     float nearPlane;
     float farPlane;
-    
+  
+    CameraData camData;
 
    
 public:

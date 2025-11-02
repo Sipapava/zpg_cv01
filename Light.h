@@ -5,12 +5,12 @@
 #include "elementarTransformation.h"
 #include "complexTransformation.h"
 #include "glm/glm.hpp"
+
 #include <iostream>
 
 class Light : public subject, public DrawableObject {
 protected:
-	//glm::vec3 defaultPosition;
-	//glm::vec3 positionSend;
+	
 	
 	glm::vec4 colorSpecular;
 	float specularIntesity;

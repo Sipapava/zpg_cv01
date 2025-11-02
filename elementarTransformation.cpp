@@ -37,7 +37,7 @@ glm::vec3 RandomTranslation::randomDirection() {
     float y = (rand() % 200 - 100) / 100.0f;
     float z = (rand() % 200 - 100) / 100.0f;
     glm::vec3 v(x, y, z);
-    if (v == glm::vec3(0)) v = glm::vec3(1, 0, 0); // vyhnout se nulovému vektoru
+    if (v == glm::vec3(0)) v = glm::vec3(1, 0, 0); 
     return glm::normalize(v);
 }
 

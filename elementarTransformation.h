@@ -14,12 +14,12 @@ public:
 
 class RandomTranslation : public Transformation {
 private:
-    float speed; //napr. 0.0001f
-    glm::vec3 direction; //nahodne zvoleny smer//
+    float speed; 
+    glm::vec3 direction; 
     int stepsRemaining;
     int maxSteps;
     glm::vec3 added;
-    //generator nahodnych cisel
+   
     glm::vec3 randomDirection();
 
 public:

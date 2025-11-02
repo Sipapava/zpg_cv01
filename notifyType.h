@@ -15,6 +15,8 @@ struct CameraData {
     glm::mat4 projection;
 };
 
+
+
 struct LightData {
     int id;
     int type;

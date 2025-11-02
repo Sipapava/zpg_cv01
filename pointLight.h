@@ -2,9 +2,9 @@
 #include "Light.h"
 
 class pointLight : public Light {
-    float attenuation;            // tlumení svìtla s vzdáleností
-    glm::vec3 defaultPosition;    // výchozí pozice
-    glm::vec3 positionSend;       // pozice, která se posílá do shaderu
+    float attenuation;          
+    glm::vec3 defaultPosition;    
+    glm::vec3 positionSend;      
 
 public:
         pointLight(const glm::vec3& pos,

@@ -1,19 +1,13 @@
 #include "ambientLight.h"
 
-ambientLight::ambientLight(
-    const glm::vec4& colorSpecular,
-    const glm::vec4& colorDiffuse,
-    const glm::vec4& colorAmbient,
-    float intensity,
-    float shininess)
-    : Light(  // <- tohle zajistí že DrawableObject nemá model ani shader
-        colorSpecular,
-        intensity,
-        shininess,
-        colorDiffuse),
+ambientLight::ambientLight(const glm::vec4& colorAmbient) : Light(  
+        glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),
+        0.0f,
+        0.0f,
+    glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)),
     ambientColor(colorAmbient)
 {
-    // pøípadné další nastavení
+    
 }
 
 

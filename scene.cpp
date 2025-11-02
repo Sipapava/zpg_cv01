@@ -1,6 +1,5 @@
 #include "Scene.h"
 #include <algorithm> 
-#include "circleBuild.h"
 #include "tree.h"
 
 #include "bushes.h"
@@ -11,46 +10,39 @@ int Scene::nextId = 0;
 Scene::Scene() {
     id = nextId++;
     camera = nullptr;
+    srand(static_cast<unsigned int>(time(nullptr)));
 }
 
 Scene::~Scene() {
-    std::cout << "--- Destroying Scene ---" << std::endl;
-
-    std::cout << "DrawableObjects count: " << drawableObjects.size() << std::endl;
+ 
+    
     for (auto& obj : drawableObjects) {
         if (obj) {
-
-       
-        std::cout << "Deleting DrawableObject: " << obj << std::endl;
+        
         delete obj;
         obj = nullptr;
         }
     }
     drawableObjects.clear();
 
-    
-
-    std::cout << "Lights count: " << lights.size() << std::endl;
-   
     lights.clear();
 
-    std::cout << "ShaderPrograms count: " << shaderPrograms.size() << std::endl;
+
     for (auto& sp : shaderPrograms) {
-        std::cout << "Deleting ShaderProgram: " << sp << std::endl;
+      
         delete sp;
         sp = nullptr;
     }
     shaderPrograms.clear();
 
-    std::cout << "Models count: " << models.size() << std::endl;
+  
     for (auto& m : models) {
-        std::cout << "Deleting Model: " << m << std::endl;
+        
         delete m;
         m = nullptr;
     }
     models.clear();
 
-    std::cout << "--- Scene Destroyed ---" << std::endl;
 }
 
 void Scene::addShaderProgram(ShaderProgram* sp) {
@@ -73,7 +65,7 @@ Model* Scene::CreateModel(const Vertex* vertices, size_t count,bool color,std::s
 std::vector<Vertex> Scene::LoadModelFromObjectFile(const char* path) {
     Assimp::Importer importer;
     std::vector<Vertex> vertices;
-    // Naètení modelu, triangulace a normaly
+    
     const aiScene* scene = importer.ReadFile(path,
         aiProcess_Triangulate |
         aiProcess_FlipUVs |
@@ -91,7 +83,7 @@ std::vector<Vertex> Scene::LoadModelFromObjectFile(const char* path) {
 
         for (unsigned int f = 0; f < mesh->mNumFaces; ++f) {
             aiFace& face = mesh->mFaces[f];
-            // Assimp by mìl mít triangulovan
+          
             for (unsigned int i = 0; i < face.mNumIndices; ++i) {
                 unsigned int idx = face.mIndices[i];
                 Vertex v;
@@ -124,6 +116,24 @@ std::vector<Vertex> Scene::LoadModelFromObjectFile(const char* path) {
 
 }
 
+std::vector<Vertex> Scene::FromFloat(const float* data, size_t size) {
+    std::vector<Vertex> vertices;
+
+    if (size % 6 != 0) {
+        //throw std::runtime_error("Data size is not multiple of 6!");
+    }
+
+    for (size_t i = 0; i < size; i += 6) {
+        Vertex v;
+        v.pos = glm::vec4(data[i], data[i + 1], data[i + 2], 1.0f);
+        v.color = glm::vec4(data[i + 3], data[i + 4], data[i + 5], 1.0f);
+        vertices.push_back(v);
+    }
+
+    return vertices;
+}
+
+
 Camera* Scene::CreateCamera() {
     return new Camera(&this->shaderPrograms);
 }
@@ -146,7 +156,7 @@ Light* Scene::CreateLight(const glm::vec3& position, const glm::vec4& colorSpecu
 
 
 void Scene::draw() {
-    // Nejprve aktualizuj všechna svìtla (napø. dynamické transformace)
+    
     
     for (auto light : lights) {
         if (light) {
@@ -154,7 +164,7 @@ void Scene::draw() {
         }
     }
     
-    // Poté aktualizuj a vykresli všechny kreslitelné objekty
+ 
     for (auto obj : drawableObjects) {
         if (obj) {
             obj->Update();
@@ -267,30 +277,28 @@ bool Scene::prepareTestSceneCv05T3() {
     this->camera = this->CreateCamera();
 
    
-    //
-    // directLight* l = new directLight(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec4(1.0, 1.0, 1.0, 1.0), glm::vec4(0.385, 0.647, 0.812, 1.0), glm::vec4(0.1, 0.1, 0.1, 1.0), 0.5f, 32);
-   ambientLight* a = new ambientLight( glm::vec4(1.0, 1.0, 1.0, 1.0), glm::vec4(0.385, 0.647, 0.812, 1.0), glm::vec4(0.2, 0.2, 0.2, 1.0), 0.5f, 32);
+   ambientLight* a = new ambientLight(  glm::vec4(0.1, 0.1, 0.1, 1.0));
     
-    reflectorLight* l = new reflectorLight(
-        glm::vec3(1.0f, 1.0f, 0.0f),                   // pozice svìtla
-        glm::normalize(glm::vec3(-1.0f, -1.0f, 0.0f)), // smìr kužele
-        glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),            // specular
-        glm::vec4(0.5f, 0.7f, 0.3f, 1.0f),            // diffuse
-                 // ambient
-        1.0f,                                          // intensity
-        32.0f,                                         // shininess
-        0.05f,                                         // attenuation
-        glm::radians(20.0f)                            // cutoff angle
-    );
+   glm::vec3 lightDirection = glm::vec3(0.0f, -1.0f, 0.0f);
+
+  
+   glm::vec4 specularColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f); 
+   glm::vec4 diffuseColor = glm::vec4(0.385, 0.647, 0.812, 1.0); 
+
+   
+   float intensity = 1.0f;
+   float shininess = 32.0f;
+
+   directLight* l =  new directLight(lightDirection, specularColor, diffuseColor, intensity, shininess);
 
     ShaderProgram* shaderProgramCon = new ShaderProgram(vr1, fr1);
     ShaderProgram* shaderProgramAm = new ShaderProgram(vr2, fr2);
     ShaderProgram* shaderProgramBl = new ShaderProgram(vr3, fr3);
-    ShaderProgram* shaderProgramBlPh = new ShaderProgram(vr4, fr4);
+   ShaderProgram* shaderProgramBlPh = new ShaderProgram(vr4, fr4);
     addShaderProgram(shaderProgramCon);
     addShaderProgram(shaderProgramAm);
     addShaderProgram(shaderProgramBl);
-    addShaderProgram(shaderProgramBlPh);
+   addShaderProgram(shaderProgramBlPh);
     addDrawableObject(a);
     addDrawableObject(l);
     camera->AddObserver(shaderProgramCon);
@@ -304,6 +312,7 @@ bool Scene::prepareTestSceneCv05T3() {
     l->AddObserver(shaderProgramAm);
   
     a->AddObserver(shaderProgramBlPh);
+   a->AddObserver(shaderProgramBl);
     camera->UpdateMatrix();
     l->UpdateLightsShaderPro();
     a->UpdateLightsShaderPro();
@@ -320,10 +329,13 @@ bool Scene::prepareTestSceneCv05T3() {
     
 
     int i = 0;
-    srand(static_cast<unsigned int>(time(nullptr))); // inicializace seedem èasu
+     
     std::vector<glm::vec3> sunPositions = { {-0.5f, 0.0f, 0.0f}, {0.5f, 0.0f, 0.0f},{0.0f,0.5f,0.0f},{0.0f,-0.5f,0.0f} };
     for (auto& pos : sunPositions) {
-        DrawableObject* sun = CreateDrawableObject(formula, this->getShaderProgram(3));
+        DrawableObject* sun = CreateDrawableObject(formula, this->getShaderProgram(i));
+        if (i == 0) {
+            sun->setColor(glm::vec4(0.385, 0.647, 0.222, 1.0));
+        }
         sun->Resize(0.01f, 0.01f, 0.01f);
         sun->MoveTo(pos.x, pos.y, pos.z);
         sun->SetRandomMoveAnimation(0.001f, 100);
@@ -340,9 +352,7 @@ bool Scene::prepareTestSceneCv05T3() {
 }
 
 bool Scene::prepareTestSceneCv05T4(){
-    std::cout << ">> START INIT" << std::endl;
-
-    std::cout << "Loading plane vertices..." << std::endl;
+    
     const Vertex planeVertices[] = {
      {{-2.0f, -0.4f, 0.0f, 1.0f}, {0.0f, 0.5f, 0.0f, 1.0f}},
      {{ 2.0f, -0.4f, 0.0f, 1.0f}, {0.0f, 0.5f, 0.0f, 1.0f}},
@@ -353,49 +363,57 @@ bool Scene::prepareTestSceneCv05T4(){
      {{-2.0f, -0.4f, 0.0f, 1.0f}, {0.0f, 0.5f, 0.0f, 1.0f}}
     };
 
-    std::cout << "Converting trees..." << std::endl;
+  
     const int treeSize = sizeof(tree) / sizeof(tree[0]);
     std::vector<Vertex> treeV = FromFloat(tree, treeSize);
 
-    std::cout << "Converting sphere..." << std::endl;
+   
     const int sphereSize = sizeof(sphere) / sizeof(sphere[0]);
     std::vector<Vertex> sphereV = FromFloat(sphere, sphereSize);
 
 
-    std::cout << "Converting bushes..." << std::endl;
+    
     const int bushSize = sizeof(bushes) / sizeof(bushes[0]);
 
     std::vector<Vertex> bushV = FromFloat(bushes, bushSize);
-    std::cout << "Creating shaders..." << std::endl;
+    
     Shader* vr = new Shader();
     Shader* fr = new Shader();
     vr->createShaderFromFile(GL_VERTEX_SHADER, "vertex_shader_ph.glsl");
     fr->createShaderFromFile(GL_FRAGMENT_SHADER, "fragment_shader_blph.glsl");
-    std::cout << "Creating camera..." << std::endl;
+    
     this->camera = this->CreateCamera();
 
     ShaderProgram* shaderProgramColor = new ShaderProgram(vr, fr);
     addShaderProgram(shaderProgramColor);
-    // MODELS
-    std::cout << "Creating sphere model..." << std::endl;
+
+
+    Shader* vr2 = new Shader();
+    Shader* fr2 = new Shader();
+    vr2->createShaderFromFile(GL_VERTEX_SHADER, "vertex_shader_con.glsl");
+    fr2->createShaderFromFile(GL_FRAGMENT_SHADER, "fragment_shader_con.glsl");
+    ShaderProgram* shaderProgramBug = new ShaderProgram(vr2, fr2);
+   
+    addShaderProgram(shaderProgramBug);
+  
     Model* sphereModel = new Model(sphereV.data(), sphereV.size(), true, "triangles");
 
-    std::cout << "Creating tree model..." << std::endl;
+    
     Model* treeModel = new Model(treeV.data(), treeV.size(), true, "triangles");
 
-    std::cout << "Creating bush model..." << std::endl;
+   
     Model* bushModel = new Model(bushV.data(), bushV.size(), true, "triangles");
 
-    std::cout << "Creating point light 1..." << std::endl;
-    pointLight* l1 = new pointLight(sphereModel,shaderProgramColor,glm::vec3(0.0f, 0.0f, 0.0f),
+    
+    pointLight* l1 = new pointLight(sphereModel,shaderProgramBug,glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec4(1.0, 1.0, 1.0, 1.0),
         glm::vec4(0.8, 0.75, 0.3, 1.0),
         0.6f,
         32.0f,
         5.0f);
 
-    std::cout << "Creating point light 2..." << std::endl;
-    pointLight* l2 = new pointLight(glm::vec3(0.0f, 0.0f, 0.0f),
+  
+    pointLight* l2 = new pointLight(sphereModel, shaderProgramBug,glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec4(1.0, 1.0, 1.0, 1.0),
         glm::vec4(0.95, 0.55, 0.15, 1.0),
         0.6f,
@@ -404,34 +422,60 @@ bool Scene::prepareTestSceneCv05T4(){
 
     
 
-    ambientLight* a = new ambientLight(glm::vec4(1.0, 1.0, 1.0, 1.0), glm::vec4(0.385, 0.647, 0.812, 1.0), glm::vec4(0.1, 0.1, 0.1, 1.0), 0.5f, 32);
-    std::cout << "Moving lights..." << std::endl;
+    ambientLight* a = new ambientLight( glm::vec4(0.1, 0.1, 0.1, 1.0));
+
+
+    reflectorLight *newReflector = new reflectorLight(
+        glm::vec3(0.0f, 0.5f, -2.0f),               
+        glm::vec3(0.0f, 0.0f, 0.0f),                   
+        glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),  
+        glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 
+        1.0f,                   
+        32.0f,                
+        0.1f,                
+        0.1f                   
+    );
+
+
+  
     l1->Resize(0.01f, 0.01f, 0.01f);
     l1->MoveTo(1.2f, 0.9f, 3.0f);
     l1->SetRandomMoveAnimation(0.001f, 1000);
-    l2->MoveTo(0.8f, 0.4f, 0.0f);
+    l2->Resize(0.01f, 0.01f, 0.01f);
+    l2->MoveTo(0.7f, 0.5f, 0.0f);
+    l2->SetRandomMoveAnimation(0.001f, 300);
   
-   // l1->SetRandomMoveAnimation(0.001f, 1000);
-    //l3->MoveTo( 0.0f, 0.3f, 0.7f);
- 
    
-    std::cout << "Adding lights to scene..." << std::endl;
+ 
+    l1->setColor(glm::vec4(1.0, 1.0, 1.0, 1.0));
+    l2->setColor(glm::vec4(1.0, 1.0, 1.0, 1.0));
+
 
     
-    //AddLight(l3);
    
     camera->AddObserver(shaderProgramColor);
+    camera->AddObserver(shaderProgramBug);
+    camera->AddObserver(newReflector);
     l1->AddObserver(shaderProgramColor);
     l2->AddObserver(shaderProgramColor);
     a->AddObserver(shaderProgramColor);
-    //l3->AddObserver(shaderProgramColor);
+   newReflector->AddObserver(shaderProgramColor);
+
+   l1->AddObserver(shaderProgramBug);
+   l2->AddObserver(shaderProgramBug);
+   a->AddObserver(shaderProgramBug);
+   newReflector->AddObserver(shaderProgramBug);
+
+
+    
 
    
     camera->UpdateMatrix();
     l1->UpdateLightsShaderPro();
     l2->UpdateLightsShaderPro();
     a->UpdateLightsShaderPro();
-   // l3->UpdateLightsShaderPro();
+   newReflector->UpdateLightsShaderPro();
+  
 
 
     Model* planeModel = new Model(planeVertices, sizeof(planeVertices) / sizeof(Vertex), true, "triangles");
@@ -444,6 +488,8 @@ bool Scene::prepareTestSceneCv05T4(){
 
     addDrawableObject(l1);
     addDrawableObject(l2);
+    addDrawableObject(a);
+    addDrawableObject(newReflector);
 
     addModel(sphereModel);
     addModel(treeModel);
@@ -467,6 +513,7 @@ bool Scene::prepareTestSceneCv05T4(){
     //  Stromy
     int treeRows = 10;
     int treeCols = 5;
+    
     for (int i = 0; i < totalTrees; ++i) {
         DrawableObject* treeObj = CreateDrawableObject(treeModel, shaderProgramColor);
 
@@ -481,8 +528,8 @@ bool Scene::prepareTestSceneCv05T4(){
         treeObj->MoveTo(x, y, z);
         addDrawableObject(treeObj);
     }
-
-    // Keøe
+    
+    // 
     int bushRows = 10;
     int bushCols = 5;
     for (int i = 0; i < totalBushes; ++i) {

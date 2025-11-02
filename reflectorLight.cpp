@@ -5,35 +5,40 @@ reflectorLight::reflectorLight(const glm::vec3& pos, const glm::vec3& dir,
     const glm::vec4& colorDiffuse,
     float intensity,
     float shininess,
-    float atten,float angle)
-    : Light(colorSpecular, intensity, shininess, colorDiffuse), // zavolá konstruktor Light
-    defaultPosition(pos),     // inicializuje vlastní atributy
+    float atten, float angle)
+    : Light(colorSpecular, intensity, shininess, colorDiffuse),
+    defaultPosition(pos),     
     positionSend(pos),
     attenuation(atten),
-    direction(dir),angle(angle)
+    direction(dir), angle(angle), directionSend(dir),Mv(nullptr)
 {
-    // tady mùžeš udìlat další inicializace, pokud je potøeba
+   
 }
 
-
 void reflectorLight::Update() {
-    /*
-    glm::mat4 I = glm::mat4(1.0f);
-    glm::mat4 M = this->transformation->apply(I);
+    if (!Mv) return; 
 
-    glm::vec4 oldPos = glm::vec4(defaultPosition, 1.0f);
-    glm::vec4 newPos = M * oldPos;
+   
+    glm::vec3 forward;
+    forward.x = -(*Mv)[0][2];
+    forward.y = -(*Mv)[1][2];
+    forward.z = -(*Mv)[2][2];
+    forward = glm::normalize(forward);
 
+    glm::vec3 newPosition = positionSend; 
+    glm::vec3 newDirection = forward;     
 
+   
+    bool positionChanged = !glm::all(glm::epsilonEqual(newPosition, positionSend, 0.0005f));
+    bool directionChanged = !glm::all(glm::epsilonEqual(newDirection, direction, 0.0005f));
 
+    if (positionChanged || directionChanged) {
+        positionSend = newPosition;
+        direction = newDirection;
 
-    if (!glm::all(glm::epsilonEqual(newPos, glm::vec4(positionSend, 1.0f), 0.0005f))) {
-        positionSend = glm::vec3(newPos);
-
+        
         UpdateLightsShaderPro();
     }
-
-    */
 }
 
 
@@ -52,4 +57,38 @@ LightData reflectorLight::getLightData() const {
     data.angleReflector = angle;
     data.direction = direction;
     return data;
+}
+
+
+void reflectorLight::Notify(NotifyType type, void* data) {
+    switch (type) {
+    case NotifyType::CameraMatrix: {
+        CameraData* camData = static_cast<CameraData*>(data);
+        Mv = &camData->view;
+        break;
+    }
+    case NotifyType::CameraPos: {
+        glm::vec3* camPos = static_cast<glm::vec3*>(data);
+        this->positionSend = *camPos;
+       
+        break;
+    }
+   
+    case NotifyType::LightChange: {
+        
+        break;
+    }
+    case NotifyType::SpRegisterLight: {
+       
+        break;
+    }
+
+    case NotifyType::SpUnfollowLight: {
+        
+        break;
+    }
+
+    default:
+        break;
+    }
 }

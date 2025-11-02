@@ -15,6 +15,7 @@ DrawableObject::DrawableObject(Model* m, ShaderProgram* sp)
     
     rotation[0] = 0; rotation[1] = 0; rotation[2] = 0;
     rotationAxis = { 0,0,0 };
+    updateColor = false;
 
 }
 
@@ -44,7 +45,7 @@ void DrawableObject::Update() {
 };
 
 void DrawableObject::draw() {
-    if (shaderProgram) {
+    if (shaderProgram) { //must be if, cause some lights have models and shaderprograms set tu null
         bool x = shaderProgram->setShaderProgram(); // aktivuje shader
 
         
@@ -55,11 +56,18 @@ void DrawableObject::draw() {
     glm::mat4 M = transformation->apply(I);
     int ready = shaderProgram->setUniform(M);
 
+    if (!updateColor) {
+        shaderProgram->setUniform4(this->color, "color");
+        updateColor = true;
+    }
+
     if (model && ready) { //pridat if na projection
         model->Draw(); // bindne VAO a vykreslí
 
+
     }
-    }
+    shaderProgram->resetShaderProgram();
+   }
 
 }
 
@@ -80,6 +88,11 @@ void DrawableObject::Rotate(float angle, float xA, float yA, float zA) {
     transformation->Add(new Rotation(angle, glm::vec3(xA, yA, zA)));
 
 
+}
+
+void DrawableObject::setColor(const glm::vec4& color) {
+    this->updateColor = false;
+    this->color = color;
 }
 
 

@@ -18,6 +18,9 @@ protected:
     glm::vec3 position;
     int rotation[3];
     glm::vec3 rotationAxis;
+    bool updateColor;
+    glm::vec4 color;
+    
 
 
 public:
@@ -29,6 +32,7 @@ public:
     void Rotate(float angle, float xA, float yA, float zA);
     void SetRotateAnimation(float addAngle, const glm::vec3& axis);
     void SetRandomMoveAnimation(float speed, int maxSteps);
+    void setColor(const glm::vec4& color);
 
     void Update();
     void draw();

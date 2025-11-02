@@ -6,12 +6,12 @@ pointLight::pointLight(const glm::vec3& pos,
     float intensity,
     float shininess,
     float atten)
-    : Light(colorSpecular, intensity, shininess, colorDiffuse), // zavolá konstruktor Light
-    defaultPosition(pos),     // inicializuje vlastní atributy
+    : Light(colorSpecular, intensity, shininess, colorDiffuse),
+    defaultPosition(pos),     
     positionSend(pos),
     attenuation(atten)
 {
-    // tady mùžeš udìlat další inicializace, pokud je potøeba
+    
 }
 
 pointLight::pointLight(Model* m, ShaderProgram* sp,

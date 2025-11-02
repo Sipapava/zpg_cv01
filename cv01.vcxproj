@@ -44,7 +44,7 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
-    <EnableASAN>false</EnableASAN>
+    <EnableASAN>true</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -134,7 +134,6 @@
     <ClCompile Include="ambientLight.cpp" />
     <ClCompile Include="app.cpp" />
     <ClCompile Include="camera.cpp" />
-    <ClCompile Include="circleBuild.cpp" />
     <ClCompile Include="complexTransformation.cpp" />
     <ClCompile Include="controller.cpp" />
     <ClCompile Include="directLight.cpp" />
@@ -157,7 +156,6 @@
     <ClInclude Include="ambientLight.h" />
     <ClInclude Include="app.h" />
     <ClInclude Include="camera.h" />
-    <ClInclude Include="circleBuild.h" />
     <ClInclude Include="complexTransformation.h" />
     <ClInclude Include="controller.h" />
     <ClInclude Include="drawableObject.h" />

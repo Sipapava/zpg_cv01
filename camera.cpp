@@ -7,11 +7,14 @@ Camera::Camera(std::vector<ShaderProgram*>* shaderprograms) {
     position = glm::vec3(0.0f, 0.5f, -2.0f);
     target = glm::vec3(0.0f, 0.0f, 0.0f);
     up = glm::vec3(0.0f, 1.0f, 0.0f);
+  
 
     fov = 45.0f;
     aspect = 800.0f / 600.0f;
     nearPlane = 0.1f;
     farPlane = 100.0f;
+    
+    CameraData camData; //matice
 };
 
 Camera::~Camera() {};
@@ -30,10 +33,12 @@ void Camera::UpdateMatrix() {
 
   
     NotifyObservers(NotifyType::CameraPos, &position);
-
+   
  
-    CameraData camData{ Mv, Mp };
+    camData = { Mv, Mp };
     NotifyObservers(NotifyType::CameraMatrix, &camData);
+
+    
 }
 
 

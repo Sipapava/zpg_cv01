@@ -7,8 +7,10 @@ ShaderProgram::ShaderProgram(Shader* vertex,Shader* fragment) //musi dostat frag
 {
     updatedCamera = false;
     updatedLight = false;
-    view  = glm::mat4(1.0f);
-    projection = glm::mat4(1.0f);
+    
+
+    view = nullptr;
+    projection = nullptr;
     cameraPos = glm::vec3(0.0f, 0.5f, -2.0f);
 
     // Shadery vytvarime venku
@@ -45,6 +47,16 @@ bool ShaderProgram::setShaderProgram() {
        
             glUseProgram(shaderProgram);
             
+        return true;
+    }
+    return false;
+}
+
+bool ShaderProgram::resetShaderProgram() {
+    if (shaderProgram != 0) {
+
+        glUseProgram(0);
+
         return true;
     }
     return false;
@@ -122,9 +134,12 @@ bool ShaderProgram::setUniformInt(int value, const char* name) {
 void ShaderProgram::Notify(NotifyType type, void* data) {
     switch (type) {
     case NotifyType::CameraMatrix: {
-        CameraData* cam = static_cast<CameraData*>(data);
-        this->view = cam->view;
-        this->projection = cam->projection;
+        CameraData* camData = static_cast<CameraData*>(data);
+
+        
+        view = &camData->view;
+        projection = &camData->projection;
+
         updatedCamera = false;
         break;
     }
@@ -134,6 +149,7 @@ void ShaderProgram::Notify(NotifyType type, void* data) {
         updatedCamera = false;
         break;
     }
+    
     case NotifyType::LightChange: {
         LightData* light = static_cast<LightData*>(data);
         int id = light->id; 
@@ -176,6 +192,7 @@ void ShaderProgram::Notify(NotifyType type, void* data) {
         }
         break;
     }
+   
     default:
         break;
     }
@@ -226,9 +243,7 @@ void ShaderProgram::LightApply() {
             setUniform4(slot.data.diffuseColor, diffuseColorName.c_str());
             setUniformFloat(slot.data.attenuation, attenuationName.c_str());
             setUniform4(slot.data.ambientColor, ambientName.c_str());
-            std::cout << slot.data.ambientColor[0] << " "
-                << slot.data.ambientColor[1] << " "
-                << slot.data.ambientColor[2] << std::endl;
+            
             setUniformInt(slot.data.type, typeName.c_str());
             setUniform3(slot.data.direction, directionName.c_str());
             setUniformFloat(slot.data.angleReflector, angleRName.c_str());
@@ -255,8 +270,8 @@ void ShaderProgram::ProjectionApply() {
         
         this->setUniform3(cameraPos);
        
-        this->setUniform(view,"viewMatrix");
-        this->setUniform(projection,"projectMatrix");
+        this->setUniform(*view,"viewMatrix");
+        this->setUniform(* projection, "projectMatrix");
         updatedCamera = true;
     }
 }

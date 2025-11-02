@@ -32,34 +32,41 @@ void main()
     for (int i = 0; i < numberOfLights && i < MAX_LIGHTS; ++i) {
 
         if (lights[i].type == 1) {
-            // Pouze ambientní svìtlo
-         finalColor += lights[i].ambientColor;
+             finalColor += lights[i].ambientColor;
         }
        
      
         if (lights[i].type == 2) {
-            vec3 lightDir = normalize(-lights[i].direction); // svìtlo dopadá z direction smìrem k objektu
+            vec3 lightDir = normalize(-lights[i].direction); // smer od fragmentu ke svetlu
             vec3 norm = normalize(worldNormal);
 
-            float diff = max(dot(norm, lightDir), 0.0);
-            vec4 diffuse = diff * lights[i].diffuseColor;
+            float dotProduct = smoothstep(0.0, 1.0, dot(lightDir, norm));
+            vec4 diffuse = dotProduct * lights[i].diffuseColor;
 
             float spec = 0.0;
-            if (diff > 0.0) {
-                vec3 viewDir = normalize(cameraPos - worldPosition.xyz);
+            if (dotProduct > 0.0) {
+
+                 vec3 worldPos3 = vec3(
+                        worldPosition.x / worldPosition.w,
+                        worldPosition.y / worldPosition.w,
+                        worldPosition.z / worldPosition.w);
+                vec3 viewDir = normalize(cameraPos - worldPos3);
                 vec3 halfwayDir = normalize(lightDir + viewDir);
                 spec = pow(max(dot(norm, halfwayDir), 0.0), lights[i].shiness);
             }
 
             vec4 specular = lights[i].specularIntensity * spec * lights[i].lightColor;
-
+            specular *= dotProduct;
             finalColor +=  diffuse + specular;
         }
 
      
         if(lights[i].type == 3){
           
-            vec3 worldPos3 = worldPosition.xyz / worldPosition.w;
+             vec3 worldPos3 = vec3(
+                        worldPosition.x / worldPosition.w,
+                        worldPosition.y / worldPosition.w,
+                        worldPosition.z / worldPosition.w);
             vec3 lightToVector = lights[i].lightPosition - worldPos3;
             float distance = length(lightToVector);
             float attenuation  = 1.0 / (1.0 + (lights[i].attenuation * distance) + (lights[i].attenuation * distance * distance));
@@ -70,7 +77,7 @@ void main()
 
             float spec = 0.0;
             if (dotProduct > 0.0) {
-                vec3 viewDir = normalize(cameraPos - worldPosition.xyz);
+                vec3 viewDir = normalize(cameraPos - worldPos3 );
                 vec3 halfwayDir = normalize(normalize(lightToVector) + normalize(viewDir));
                 spec = pow(max(dot(worldNormal, halfwayDir), 0.0), lights[i].shiness);
             }
@@ -84,34 +91,39 @@ void main()
         }
 
         if (lights[i].type == 4) { // spotlight
-    vec3 worldPos3 = worldPosition.xyz / worldPosition.w;
-    vec3 lightDir = normalize(lights[i].lightPosition - worldPos3); // smìr k pixelu
-    vec3 spotDir = normalize(-lights[i].direction);                 // smìr kužele
+            vec3 worldPos3 = vec3(
+                        worldPosition.x / worldPosition.w,
+                        worldPosition.y / worldPosition.w,
+                        worldPosition.z / worldPosition.w);
+            vec3 lightDir = normalize(lights[i].lightPosition - worldPos3); // odraz od fragmentu k pozici svetla
+            vec3 spotDir = normalize(-lights[i].direction);                 // smer reflectoru
 
-    float theta = dot(lightDir, spotDir);                            // úhel mezi pixel a osou kužele
-    float epsilon = cos(lights[i].angleReflector);                  // cutoff úhel
+            float theta = dot(lightDir, spotDir);                            // uhel os a kuzele a svetla
+            float epsilon = cos(lights[i].angleReflector);                  // cutoff uhel, polovina refelcotove oblasti
 
    
 
-if (theta > epsilon) {  // pixel je uvnitø kužele
-    float distance = length(lights[i].lightPosition - worldPos3);
-    float attenuation = 1.0 / (1.0 + lights[i].attenuation * distance + lights[i].attenuation * distance * distance);
+            if (theta > epsilon) {  // hodnota cos rostes mensim uhlem
+                float distance = length(lights[i].lightPosition - worldPos3);
+                float attenuation = 1.0 / (1.0 + lights[i].attenuation * distance + lights[i].attenuation * distance * distance);
 
-    vec3 norm = normalize(worldNormal);
-    float diff = max(dot(norm, lightDir), 0.0);
-    vec4 diffuse = diff * lights[i].diffuseColor * attenuation;
+                vec3 norm = normalize(worldNormal);
+                float dotProduct  = max(dot(norm, lightDir), 0.0);
+                vec4 diffuse = dotProduct  * lights[i].diffuseColor * attenuation;
 
-    float spec = 0.0;
-    if(diff > 0.0){
-        vec3 viewDir = normalize(cameraPos - worldPosition.xyz);
-        vec3 halfwayDir = normalize(lightDir + viewDir);
-        spec = pow(max(dot(norm, halfwayDir), 0.0), lights[i].shiness);
-    }
-    vec4 specular = lights[i].specularIntensity * spec * lights[i].lightColor * attenuation;
+                float spec = 0.0;
+                if(dotProduct  > 0.0){
+                    vec3 viewDir = normalize(cameraPos - worldPos3 );
+                    vec3 halfwayDir = normalize(lightDir + viewDir);
+                    spec = pow(max(dot(norm, halfwayDir), 0.0), lights[i].shiness);
+                 }
+                vec4 specular = lights[i].specularIntensity * spec * lights[i].lightColor * attenuation;
+                specular *= dotProduct;
 
-    finalColor += diffuse + specular;
-}
-}
+                finalColor += diffuse + specular;
+            }
+        }
+
 
     
 
