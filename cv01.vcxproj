@@ -105,7 +105,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\knihovny\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;..\..\knihovny\glm-master\glm-master;..\..\knihovny\glew-2.1.0-win32\glew-2.1.0\include;..\..\knihovny\assimp-5.3.1\assimp-5.3.1\include;..\..\knihovny\assimp-5.3.1\assimp-build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\knihovny\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;..\..\knihovny\glm-master\glm-master;..\..\knihovny\glew-2.1.0-win32\glew-2.1.0\include;..\..\knihovny\assimp-5.3.1\assimp-5.3.1\include;..\..\knihovny\assimp-5.3.1\assimp-build\include;..\..\knihovny\stb_image;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -139,6 +139,7 @@
     <ClCompile Include="directLight.cpp" />
     <ClCompile Include="directLight.h" />
     <ClCompile Include="drawableObject.cpp" />
+    <ClCompile Include="drawableSky.cpp" />
     <ClCompile Include="elementarTransformation.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="main.cpp" />
@@ -150,6 +151,7 @@
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="shaderProgram.cpp" />
     <ClCompile Include="subject.cpp" />
+    <ClCompile Include="texture.cpp" />
     <ClCompile Include="transformation.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -159,6 +161,7 @@
     <ClInclude Include="complexTransformation.h" />
     <ClInclude Include="controller.h" />
     <ClInclude Include="drawableObject.h" />
+    <ClInclude Include="drawableSky.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="model.h" />
     <ClInclude Include="Observer.h" />
@@ -168,16 +171,19 @@
     <ClInclude Include="shader.h" />
     <ClInclude Include="shaderProgram.h" />
     <ClInclude Include="subject.h" />
+    <ClInclude Include="texture.h" />
     <ClInclude Include="transformation.h" />
     <ClInclude Include="elementarTransformation.h" />
     <ClInclude Include="vertex.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="fragment_shader_cube.glsl" />
     <None Include="fragment_shader_lam.glsl" />
     <None Include="fragment_shader_blph.glsl" />
     <None Include="fragment_shader_con.glsl" />
     <None Include="fragment_shader_ph.glsl" />
     <None Include="vertex_shader_con.glsl" />
+    <None Include="vertex_shader_cube.glsl" />
     <None Include="vertex_shader_ph.glsl" />
     <None Include="vertex_shader_lam.glsl" />
   </ItemGroup>

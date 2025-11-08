@@ -271,7 +271,20 @@ void ShaderProgram::ProjectionApply() {
         this->setUniform3(cameraPos);
        
         this->setUniform(*view,"viewMatrix");
-        this->setUniform(* projection, "projectMatrix");
+        this->setUniform(*projection, "projectMatrix");
+        updatedCamera = true;
+    }
+}
+
+void ShaderProgram::ProjectionApplySky() {
+
+    if (!updatedCamera) {
+
+        this->setUniform3(cameraPos);
+
+        glm::mat4 viewNoTranslation = glm::mat4(glm::mat3(*view)); // odstraní translaci
+        this->setUniform(viewNoTranslation, "viewMatrix");
+        this->setUniform(*projection, "projectMatrix");
         updatedCamera = true;
     }
 }

@@ -1,7 +1,7 @@
 #pragma once
 #include "ShaderProgram.h"
 #include "Model.h"
-
+#include "texture.h"
 #include "elementarTransformation.h"
 #include "complexTransformation.h"
 
@@ -16,10 +16,10 @@ protected:
 
     Transformation* transformation;
     glm::vec3 position;
-    int rotation[3];
-    glm::vec3 rotationAxis;
     bool updateColor;
     glm::vec4 color;
+
+    std::vector<Texture*> textures;
     
 
 
@@ -34,6 +34,8 @@ public:
     void SetRandomMoveAnimation(float speed, int maxSteps);
     void setColor(const glm::vec4& color);
 
+    void AddTexture(Texture* texture);
+
     void Update();
-    void draw();
+    virtual void draw();
 };

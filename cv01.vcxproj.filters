@@ -75,6 +75,12 @@
     <ClCompile Include="drawableObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="drawableSky.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="vertex.h">
@@ -131,6 +137,12 @@
     <ClInclude Include="drawableObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="drawableSky.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="fragment_shader_lam.glsl">
@@ -152,6 +164,12 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="fragment_shader_con.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="vertex_shader_cube.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="fragment_shader_cube.glsl">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

@@ -1,5 +1,6 @@
 #pragma once
 #include "shaderProgram.h"
+#include "reflectorLight.h"
 #include<vector>
 #include "subject.h"
 #include "Observer.h"
@@ -21,7 +22,7 @@ private:
 
    
 public:
-    Camera(std::vector<ShaderProgram*>* shaderprograms);
+    Camera();
     ~Camera();
     void UpdateMatrix();
     
@@ -33,5 +34,6 @@ public:
     void moveLeft();
     void moveRight();
     void setAspect(float aspect);
+    void setAttachedReflectors();
 
 };

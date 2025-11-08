@@ -13,8 +13,7 @@ DrawableObject::DrawableObject(Model* m, ShaderProgram* sp)
         position = model->ComputeInitialCenter();
     }
     
-    rotation[0] = 0; rotation[1] = 0; rotation[2] = 0;
-    rotationAxis = { 0,0,0 };
+   
     updateColor = false;
 
 }
@@ -22,7 +21,17 @@ DrawableObject::DrawableObject(Model* m, ShaderProgram* sp)
 DrawableObject::~DrawableObject() {
     //delete model; zodpovednost prebrala scena
     delete transformation;
+
+    for (auto& t : textures) {
+        delete t;    // destruktor Texture se postará o glDeleteTextures
+        t = nullptr;
+    }
+    textures.clear();
 }
+
+void DrawableObject::AddTexture(Texture* t) {
+    textures.push_back(t);
+};
 
 void DrawableObject::SetRotateAnimation(float addAngle, const glm::vec3& axis) {
 
@@ -60,6 +69,20 @@ void DrawableObject::draw() {
         shaderProgram->setUniform4(this->color, "color");
         updateColor = true;
     }
+
+    
+     //  Bind textur
+    for (auto t : textures) {
+        if (!t) continue;
+        t->ActiveTexture();
+        t->BindTexture();
+
+        // Uniform dostane slot podle typu
+        shaderProgram->setUniformInt(t->GetSlot(), t->GetType().c_str()); //upravit to type asi
+    }
+
+    
+    
 
     if (model && ready) { //pridat if na projection
         model->Draw(); // bindne VAO a vykreslí

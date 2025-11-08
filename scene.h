@@ -2,10 +2,11 @@
 #include <vector>
 #include "shaderProgram.h"
 #include "drawableObject.h"
+#include "drawableSky.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "camera.h"
-
+#include "texture.h"
 #include "pointLight.h"
 #include "directLight.h"
 #include "reflectorLight.h"
@@ -47,9 +48,9 @@ public:
     
 
     DrawableObject* CreateDrawableObject(Model* m, ShaderProgram* sp);
-    Model* CreateModel(const Vertex* vertices, size_t count,bool color,std::string type);
+    Model* CreateModel(const Vertex* vertices, size_t count,std::string type);
     std::vector<Vertex> LoadModelFromObjectFile(const char* path);
-    std::vector<Vertex> FromFloat(const float* data, size_t size);
+    std::vector<Vertex> FromFloat(const float* data, size_t size, bool hasTexture, bool hasNormal);
     Camera* CreateCamera();
     //Light* CreateLight(const glm::vec3& position, const glm::vec4& colorSpecular, float intesnity, float shiness, const glm::vec4& colorDiffuse, float attenuation, const glm::vec4& ambientColor);
     bool prepareTestSceneCv05T1(); //presunout do tovarny

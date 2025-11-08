@@ -1,8 +1,9 @@
 #include "camera.h"
 
+
 #include <glm/gtc/constants.hpp>
 
-Camera::Camera(std::vector<ShaderProgram*>* shaderprograms) {
+Camera::Camera() {
   
     position = glm::vec3(0.0f, 0.5f, -2.0f);
     target = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -48,6 +49,16 @@ void Camera::setAspect(float aspect) {
 
 }
 
+void Camera::setAttachedReflectors()
+{
+    for (Observer* obs : observers)
+    {
+        if (auto* reflector = dynamic_cast<reflectorLightCamera*>(obs))
+        {
+            reflector->TurnOnOff();   // zavoláme správnì jen na reflektor svìtlo
+        }
+    }
+}
 
 
 //kamera jde dopredu vzdy relativne k eyeTargetu

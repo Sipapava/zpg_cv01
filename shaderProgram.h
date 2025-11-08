@@ -45,6 +45,7 @@ public:
     bool setUniformFloat(float value, const char* name);
     void Notify(NotifyType type, void* data);
     void ProjectionApply();
+    void ProjectionApplySky();
     void LightApply();
     
 

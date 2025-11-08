@@ -1,6 +1,6 @@
 #include "Model.h"
 
-Model::Model(const Vertex* vertices, size_t count,bool color,std::string type)
+Model::Model(const Vertex* vertices, size_t count, std::string type)
     : points(vertices), vertexCount(count), type(type)
 {
     // Vertex Buffer Object (VBO)
@@ -17,22 +17,77 @@ Model::Model(const Vertex* vertices, size_t count,bool color,std::string type)
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glVertexAttribPointer(
         0,
-        4, 
+        4,
         GL_FLOAT, GL_FALSE,
         sizeof(Vertex),
         (GLvoid*)offsetof(Vertex, pos)
     );
 
-    if(color){
+   
         glEnableVertexAttribArray(1);
         glVertexAttribPointer(
             1,
             4,
             GL_FLOAT, GL_FALSE,
             sizeof(Vertex), //pocet bajtu celeho vertexu, o kolik skocit na dalsi
-            (GLvoid*)offsetof(Vertex, color) //offsefof vrati pocet bajru od zacatku struktury k poli
+            (GLvoid*)offsetof(Vertex, normal) //offsefof vrati pocet bajru od zacatku struktury k poli
+        );
+    
+
+    //pridat atribut na location 3, pro texturu
+
+     // Atribut textury (location = 2)
+    
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(
+        2,
+        2,                      // vec2
+        GL_FLOAT, GL_FALSE,
+        sizeof(Vertex),
+        (GLvoid*)offsetof(Vertex, texture)
+    );
+    
+
+}
+
+Model::Model(const Vertex* vertices, size_t count, std::string type,std::string specialCase)
+    : points(vertices), vertexCount(count), type(type)
+{
+    // Vertex Buffer Object (VBO)
+    glGenBuffers(1, &VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * vertexCount, points, GL_STATIC_DRAW);
+
+    // Vertex Array Object (VAO)
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
+
+    // Atribut pozice (location = 0)
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glVertexAttribPointer(
+        0,
+        4,
+        GL_FLOAT, GL_FALSE,
+        sizeof(Vertex),
+        (GLvoid*)offsetof(Vertex, pos)
+    );
+
+
+     // Atribut textury (location = 2)
+    if (specialCase.compare("skyDom") == 0) {
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(
+            2,
+            2,                      // vec2
+            GL_FLOAT, GL_FALSE,
+            sizeof(Vertex),
+            (GLvoid*)offsetof(Vertex, texture)
         );
     }
+    
+
+
 }
 
 Model::~Model() {

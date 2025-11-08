@@ -42,6 +42,9 @@ void Controller::keyboardMovement(int key, int scancode, int action, int mods) {
         else if (key == GLFW_KEY_A) {
             this->movementPressed[3] = true;
         }
+        else if (key == GLFW_KEY_F) {
+            camera->setAttachedReflectors();
+        }
     }
     else if (action == GLFW_RELEASE) {
        

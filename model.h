@@ -17,7 +17,8 @@ private:
 public:
     
 
-    Model(const Vertex* vertices, size_t count,bool color,std::string type);
+    Model(const Vertex* vertices, size_t count, std::string type);
+    Model(const Vertex* vertices, size_t count, std::string type, std::string specialCase);
 
     
     ~Model();
