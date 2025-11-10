@@ -1,19 +1,19 @@
 #include "controller.h"
 #include <stdio.h>
-//Osetrit kdyz jeste nemame kameru podminky
+//Take care if we don't have a camera yet. make Conditions
 
-Controller::Controller(Camera* camera) {
+Controller::Controller(Scene* scene) {
     this->rightMousePressed = false;
-    this->camera = camera;
+    this->scene = scene;
     lastX = 0;lastY = 0;
 }
 Controller::~Controller() {
 
 }
 
-bool Controller::setCamera(Camera* camera) {
-    this->camera = camera;
-    if (this->camera) {
+bool Controller::setScene(Scene* scene) {
+    this->scene = scene;
+    if (this->scene) {
         return true;
     }
     return false;
@@ -24,7 +24,8 @@ void Controller::updateWindowSize(int width, int height) {
 
     float aspect = width / (float)height;;
 
-    this->camera->setAspect(aspect);
+    this->scene->getCamera()->setAspect(aspect);
+    this->scene->getCamera()->SetResolutionY(height);
 }
 void Controller::keyboardMovement(int key, int scancode, int action, int mods) {
    
@@ -43,7 +44,7 @@ void Controller::keyboardMovement(int key, int scancode, int action, int mods) {
             this->movementPressed[3] = true;
         }
         else if (key == GLFW_KEY_F) {
-            camera->setAttachedReflectors();
+            scene->getCamera()->setAttachedReflectors();
         }
     }
     else if (action == GLFW_RELEASE) {
@@ -70,14 +71,14 @@ void Controller::mouseMovement(double xpos, double ypos) {
         double dx = xpos - lastX;
         double dy = ypos - lastY;  
         
-        camera->adjustTarget(dx, dy);
+        scene->getCamera()->adjustTarget(dx, dy);
     }
 
     lastX = xpos;
     lastY = ypos;
 }
 
-void Controller::mousePress(int button, int action, int mods) {
+void Controller::mousePress(int button, int action, int mods,double xM, double yM) {
     if (button == GLFW_MOUSE_BUTTON_RIGHT) {
         if (action == GLFW_PRESS) {
             rightMousePressed = true;
@@ -88,6 +89,33 @@ void Controller::mousePress(int button, int action, int mods) {
            
         }
     }
+
+    if (button == GLFW_MOUSE_BUTTON_LEFT) {
+        if (action == GLFW_PRESS) {
+            printf("Clicked on depth\n");
+            GLbyte color[4];
+            GLfloat depth;
+            GLuint index;
+
+            GLint x = (GLint)xM;
+            GLint y = (GLint)yM;
+
+            int newy = (scene->getCamera()->GetResolutionY()) - y;
+
+            glReadPixels(x, newy, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, color);
+            glReadPixels(x, newy, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+            glReadPixels(x, newy, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &index);
+
+            printf("Clicked on pixel %d, %d, color %02hhx%02hhx%02hhx%02hhx, depth %f, stencil index % u\n", x, y, color[0], color[1], color[2], color[3], depth, index);
+
+            //jestlize index neni nula a drawable object neni zem (pridame novu atribut do DO a to typ) - tak jej odtranim
+            // jestlize index neni nula a drawable object je zem
+            // tak se podivam jak je far plane pokud vetsi nez > nasatvim  max dalku
+            // prevedo unporojectem a to misto polozi novy objekt pomoci metody buildObject(x,y,z) se sceny 
+            
+        }
+        
+    }
 }
 
 void Controller::Update() {
@@ -95,16 +123,16 @@ void Controller::Update() {
     for (int i = 0; i < 4; i++) {
         switch (i) {
         case 0:
-            if (this->movementPressed[0]) camera->moveForward();
+            if (this->movementPressed[0]) scene->getCamera()->moveForward();
             break;
         case 1:
-            if (this->movementPressed[1]) camera->moveBackward();
+            if (this->movementPressed[1]) scene->getCamera()->moveBackward();
             break;
         case 2:
-            if(this->movementPressed[2]) camera->moveRight();
+            if(this->movementPressed[2]) scene->getCamera()->moveRight();
             break;
         case 3:
-            if (this->movementPressed[3]) camera->moveLeft();
+            if (this->movementPressed[3]) scene->getCamera()->moveLeft();
             break;
         }
     }

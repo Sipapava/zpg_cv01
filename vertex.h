@@ -4,7 +4,7 @@
 
 struct Vertex {
     glm::vec4 pos;
-    glm::vec4 normal; //normala?
+    glm::vec4 normal; 
     glm::vec2 texture;
     
 };

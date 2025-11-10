@@ -13,17 +13,17 @@ DrawableObject::DrawableObject(Model* m, ShaderProgram* sp)
         position = model->ComputeInitialCenter();
     }
     
-   
+    this->color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
     updateColor = false;
 
 }
 
 DrawableObject::~DrawableObject() {
-    //delete model; zodpovednost prebrala scena
+    
     delete transformation;
 
     for (auto& t : textures) {
-        delete t;    // destruktor Texture se postará o glDeleteTextures
+        delete t;    
         t = nullptr;
     }
     textures.clear();
@@ -55,9 +55,15 @@ void DrawableObject::Update() {
 
 void DrawableObject::draw() {
     if (shaderProgram) { //must be if, cause some lights have models and shaderprograms set tu null
-        bool x = shaderProgram->setShaderProgram(); // aktivuje shader
+        bool x = shaderProgram->setShaderProgram(); 
+
+        // rovnou zapisuj ID objektu do stencil bufferu
 
         
+        glStencilMask(0xFF); //  nastavuje bitovou masku definující, které bity ve stencil bufferu mohou být pøi kreslení pøepsány.
+        glStencilFunc(GL_ALWAYS, getId(), 0xFF);
+        
+   
     shaderProgram->ProjectionApply();
     shaderProgram->LightApply();
 
@@ -65,27 +71,26 @@ void DrawableObject::draw() {
     glm::mat4 M = transformation->apply(I);
     int ready = shaderProgram->setUniform(M);
 
-    if (!updateColor) {
-        shaderProgram->setUniform4(this->color, "color");
-        updateColor = true;
-    }
+    
+    shaderProgram->setUniform4(this->color, "color");
+        
 
     
-     //  Bind textur
+     
     for (auto t : textures) {
         if (!t) continue;
         t->ActiveTexture();
         t->BindTexture();
 
-        // Uniform dostane slot podle typu
-        shaderProgram->setUniformInt(t->GetSlot(), t->GetType().c_str()); //upravit to type asi
+        
+        shaderProgram->setUniformInt(t->GetSlot(), t->GetType().c_str()); //do...update types
     }
 
     
     
 
-    if (model && ready) { //pridat if na projection
-        model->Draw(); // bindne VAO a vykreslí
+    if (model && ready) { 
+        model->Draw(); 
 
 
     }
@@ -113,6 +118,7 @@ void DrawableObject::Rotate(float angle, float xA, float yA, float zA) {
 
 }
 
+//cancel this each object has individual color so shader Must do setUnifrm for eaach
 void DrawableObject::setColor(const glm::vec4& color) {
     this->updateColor = false;
     this->color = color;

@@ -182,10 +182,12 @@
     <None Include="fragment_shader_blph.glsl" />
     <None Include="fragment_shader_con.glsl" />
     <None Include="fragment_shader_ph.glsl" />
+    <None Include="fragment_shader_skydom.glsl" />
     <None Include="vertex_shader_con.glsl" />
     <None Include="vertex_shader_cube.glsl" />
     <None Include="vertex_shader_ph.glsl" />
     <None Include="vertex_shader_lam.glsl" />
+    <None Include="vertex_shader_skydom.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

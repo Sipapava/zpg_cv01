@@ -5,7 +5,6 @@
 #include <stdexcept>
 
 
-//matice transformaci
 class Transformation {
 protected:
     int id;

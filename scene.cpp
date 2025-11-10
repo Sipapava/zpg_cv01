@@ -62,14 +62,20 @@ Model* Scene::CreateModel(const Vertex* vertices, size_t count, std::string type
     return new Model(vertices, count,type);
 }
 
+void Scene::AttachToStencilBuffer() {
+    
+
+    for (DrawableObject* d : drawableObjects) {
+        glStencilFunc(GL_ALWAYS, d->getId(), 0xFF);  // Nastaví stencil ref na ID objektu
+        d->draw();  // Vykreslí pouze tento objekt, aby se jeho ID zapsalo do stencil bufferu
+    }
+}
 std::vector<Vertex> Scene::LoadModelFromObjectFile(const char* path) {
     Assimp::Importer importer;
     std::vector<Vertex> vertices;
 
     const aiScene* scene = importer.ReadFile(path,
-        aiProcess_Triangulate |
-        aiProcess_FlipUVs |
-        aiProcess_GenNormals // jistota, že budou normály, pokud chybí
+        aiProcess_Triangulate  
     );
 
     if (!scene || !scene->HasMeshes()) {
@@ -87,7 +93,7 @@ std::vector<Vertex> Scene::LoadModelFromObjectFile(const char* path) {
                 unsigned int idx = face.mIndices[i];
                 Vertex v;
 
-                // Pozice
+           
                 v.pos = glm::vec4(
                     mesh->mVertices[idx].x,
                     mesh->mVertices[idx].y,
@@ -95,7 +101,7 @@ std::vector<Vertex> Scene::LoadModelFromObjectFile(const char* path) {
                     1.0f
                 );
 
-                // Normála
+               
                 if (mesh->HasNormals()) {
                     v.normal = glm::vec4(
                         mesh->mNormals[idx].x,
@@ -108,7 +114,7 @@ std::vector<Vertex> Scene::LoadModelFromObjectFile(const char* path) {
                     v.normal = glm::vec4(0, 0, 0, 0);
                 }
 
-                // Texturovací souøadnice
+                
                 if (mesh->HasTextureCoords(0)) {
                     aiVector3D tex = mesh->mTextureCoords[0][idx];
                     v.texture = glm::vec2(tex.x, tex.y);
@@ -143,7 +149,7 @@ std::vector<Vertex> Scene::FromFloat(const float* data, size_t size, bool hasTex
         size_t offset = 3;
 
         if (hasNormal) {
-            v.normal = glm::vec4(data[i + offset], data[i + offset + 1], data[i + offset + 2], 0.0f);
+            v.normal = glm::vec4(data[i + offset], data[i + offset + 1], data[i + offset + 2], 1.0f);
             offset += 3;
         }
         else {
@@ -155,7 +161,7 @@ std::vector<Vertex> Scene::FromFloat(const float* data, size_t size, bool hasTex
             offset += 2;
         }
         else {
-            v.texture = glm::vec2(0.0f);
+            v.texture = glm::vec2(1.0f);
         }
 
         vertices.push_back(v);
@@ -175,9 +181,9 @@ void Scene::addDrawableObject(DrawableObject* obj) {
 }
 
 void Scene::addDrawableObject(Light* lightObj) {
-    drawableObjects.push_back(lightObj);  // vlastnictví pamìti
+    drawableObjects.push_back(lightObj);  
     if (std::find(lights.begin(), lights.end(), lightObj) == lights.end()) {
-        lights.push_back(lightObj);       // nevlastní ukazatel
+        lights.push_back(lightObj);      
     }
 }
 
@@ -316,7 +322,8 @@ bool Scene::prepareTestSceneCv05T3() {
 
     Texture* skyboxTexture = new Texture(faces, "skybox");
     const int cubeSize = sizeof(skycube) / sizeof(skycube[0]);
-    std::vector<Vertex> cubeV = FromFloat(skycube, cubeSize, false, false);
+    std::vector<Vertex> sunss = FromFloat(skycube, cubeSize, false, false);
+    Model* skyModel = new Model(sunss.data(), sunss.size(), "triangles","cube");
 
 
     Shader* vrS = new Shader();
@@ -374,17 +381,12 @@ bool Scene::prepareTestSceneCv05T3() {
     l->UpdateLightsShaderPro();
     a->UpdateLightsShaderPro();
 
-    
-   //na modely manager,sceny budou sharovat modely
-    //v appikaci resource managera, a scena pak bude jen mit reference
-    //Model::manager get Model s timto nazvem
-    // na tridu vlam tridni metodu
-    //model manager ma unordered map nazev a model
+  
 
     Model* sphereModel = new Model(sphereV.data(), sphereV.size(), "triangles");
     std::vector<Vertex> form = this->LoadModelFromObjectFile("formula1.obj");
     Model* formula = new Model(form.data(), form.size(),  "triangles");
-    Model* skyModel = new Model(cubeV.data(), cubeV.size(), "triangles", "cube");
+    //Model* skyModel = new Model(cubeV.data(), cubeV.size(), "triangles", "cube");
 
     addModel(sphereModel);
     addModel(formula);
@@ -408,10 +410,8 @@ bool Scene::prepareTestSceneCv05T3() {
      
     std::vector<glm::vec3> sunPositions = { {-0.5f, 0.0f, 0.0f}, {0.5f, 0.0f, 0.0f},{0.0f,0.5f,0.0f},{0.0f,-0.5f,0.0f} };
     for (auto& pos : sunPositions) {
-        DrawableObject* sun = CreateDrawableObject(formula, this->getShaderProgram(0));
-        if (i == 0) {
-            sun->setColor(glm::vec4(0.385, 0.647, 0.222, 1.0));
-        }
+        DrawableObject* sun = CreateDrawableObject(formula, this->getShaderProgram(i));
+        
         sun->Resize(0.01f, 0.01f, 0.01f);
         sun->MoveTo(pos.x, pos.y, pos.z);
         sun->SetRandomMoveAnimation(0.001f, 100);
@@ -429,30 +429,31 @@ bool Scene::prepareTestSceneCv05T3() {
 }
 
 bool Scene::prepareTestSceneCv05T4(){
-    /*
+    
     const Vertex planeVertices[] = {
-     {{-2.0f, -0.4f, 0.0f, 1.0f}, {0.0f, 0.5f, 0.0f, 1.0f}},
-     {{ 2.0f, -0.4f, 0.0f, 1.0f}, {0.0f, 0.5f, 0.0f, 1.0f}},
-     {{ 2.0f, -0.4f, 2.5f, 1.0f}, {0.0f, 0.5f, 0.0f, 1.0f}},
+        // pozice                   normal                     uv
+        {{-2.0f, -0.4f, 0.0f, 1.0f}, {0.0f, 0.5f, 0.0f, 1.0f}, {0.0f, 0.0f}},
+        {{ 2.0f, -0.4f, 0.0f, 1.0f}, {0.0f, 0.5f, 0.0f, 1.0f}, {100.0f, 0.0f}},
+        {{ 2.0f, -0.4f, 2.5f, 1.0f}, {0.0f, 0.5f, 0.0f, 1.0f}, {100.0f, 100.0f}},
 
-     {{ 2.0f, -0.4f, 2.5f, 1.0f}, {0.0f, 0.5f, 0.0f, 1.0f}},
-     {{-2.0f, -0.4f, 2.5f, 1.0f}, {0.0f, 0.5f, 0.0f, 1.0f}},
-     {{-2.0f, -0.4f, 0.0f, 1.0f}, {0.0f, 0.5f, 0.0f, 1.0f}}
+        {{ 2.0f, -0.4f, 2.5f, 1.0f}, {0.0f, 0.5f, 0.0f, 1.0f}, {100.0f, 100.0f}},
+        {{-2.0f, -0.4f, 2.5f, 1.0f}, {0.0f, 0.5f, 0.0f, 1.0f}, {0.0f, 100.0f}},
+        {{-2.0f, -0.4f, 0.0f, 1.0f}, {0.0f, 0.5f, 0.0f, 1.0f}, {0.0f, 0.0f}}
     };
 
   
     const int treeSize = sizeof(tree) / sizeof(tree[0]);
-    std::vector<Vertex> treeV = FromFloat(tree, treeSize);
+    std::vector<Vertex> treeV = FromFloat(tree, treeSize,false,true);
 
    
     const int sphereSize = sizeof(sphere) / sizeof(sphere[0]);
-    std::vector<Vertex> sphereV = FromFloat(sphere, sphereSize);
+    std::vector<Vertex> sphereV = FromFloat(sphere, sphereSize,false,true);
 
 
     
     const int bushSize = sizeof(bushes) / sizeof(bushes[0]);
 
-    std::vector<Vertex> bushV = FromFloat(bushes, bushSize);
+    std::vector<Vertex> bushV = FromFloat(bushes, bushSize,false,true);
     
     Shader* vr = new Shader();
     Shader* fr = new Shader();
@@ -464,7 +465,13 @@ bool Scene::prepareTestSceneCv05T4(){
     ShaderProgram* shaderProgramColor = new ShaderProgram(vr, fr);
     addShaderProgram(shaderProgramColor);
 
+    Model* sphereModel = new Model(sphereV.data(), sphereV.size(), "triangles");
 
+
+    Model* treeModel = new Model(treeV.data(), treeV.size(), "triangles");
+
+
+    Model* bushModel = new Model(bushV.data(), bushV.size(), "triangles");
     Shader* vr2 = new Shader();
     Shader* fr2 = new Shader();
     vr2->createShaderFromFile(GL_VERTEX_SHADER, "vertex_shader_con.glsl");
@@ -473,14 +480,6 @@ bool Scene::prepareTestSceneCv05T4(){
    
     addShaderProgram(shaderProgramBug);
   
-    Model* sphereModel = new Model(sphereV.data(), sphereV.size(), true, "triangles",false);
-
-    
-    Model* treeModel = new Model(treeV.data(), treeV.size(), true, "triangles",false);
-
-   
-    Model* bushModel = new Model(bushV.data(), bushV.size(), true, "triangles",false);
-
     
     pointLight* l1 = new pointLight(sphereModel,shaderProgramBug,glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec4(1.0, 1.0, 1.0, 1.0),
@@ -489,6 +488,9 @@ bool Scene::prepareTestSceneCv05T4(){
         32.0f,
         5.0f);
 
+    Texture* t1 = new Texture();
+    l1->AddTexture(t1);
+
   
     pointLight* l2 = new pointLight(sphereModel, shaderProgramBug,glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec4(1.0, 1.0, 1.0, 1.0),
@@ -496,7 +498,8 @@ bool Scene::prepareTestSceneCv05T4(){
         0.6f,
         32.0f,
         5.0f);
-
+    Texture* t2 = new Texture();
+    l2->AddTexture(t2);
     
 
     ambientLight* a = new ambientLight( glm::vec4(0.1, 0.1, 0.1, 1.0));
@@ -513,6 +516,22 @@ bool Scene::prepareTestSceneCv05T4(){
         1.0f                   
     );
 
+    Texture* skyboxTexture = new Texture("sunset.jpg", "skyTexture");
+    std::vector<Vertex> sunss = this->LoadModelFromObjectFile("skydome.obj");
+    Model* skyModel = new Model(sunss.data(), sunss.size(), "triangles", "skyDom");
+
+
+    Shader* vrS = new Shader();
+    Shader* frS = new Shader();
+    vrS->createShaderFromFile(GL_VERTEX_SHADER, "vertex_shader_skydom.glsl");
+    frS->createShaderFromFile(GL_FRAGMENT_SHADER, "fragment_shader_skydom.glsl");
+    ShaderProgram* shaderProgramSky = new ShaderProgram(vrS, frS);
+    addShaderProgram(shaderProgramSky);
+
+    drawableSky* sky = new drawableSky(skyModel, shaderProgramSky);
+    sky->AddTexture(skyboxTexture);
+    addDrawableObject(sky);
+
 
   
     l1->Resize(0.01f, 0.01f, 0.01f);
@@ -528,15 +547,25 @@ bool Scene::prepareTestSceneCv05T4(){
     l2->setColor(glm::vec4(1.0, 1.0, 1.0, 1.0));
 
 
-    
+
+    Shader* vC = new Shader();
+    Shader* frC = new Shader();
+    vC->createShaderFromFile(GL_VERTEX_SHADER, "vertex_shader_con.glsl");
+    frC->createShaderFromFile(GL_FRAGMENT_SHADER, "fragment_shader_con.glsl");
+    ShaderProgram* shaderProgramCon = new ShaderProgram(vC, frC);
+    addShaderProgram(shaderProgramCon);
+
    
     camera->AddObserver(shaderProgramColor);
     camera->AddObserver(shaderProgramBug);
     camera->AddObserver(newReflector);
+    camera->AddObserver(shaderProgramSky);
+    camera->AddObserver(shaderProgramCon);
     l1->AddObserver(shaderProgramColor);
     l2->AddObserver(shaderProgramColor);
     a->AddObserver(shaderProgramColor);
    newReflector->AddObserver(shaderProgramColor);
+   
 
    l1->AddObserver(shaderProgramBug);
    l2->AddObserver(shaderProgramBug);
@@ -555,45 +584,77 @@ bool Scene::prepareTestSceneCv05T4(){
   
 
 
-    Model* planeModel = new Model(planeVertices, sizeof(planeVertices) / sizeof(Vertex), true, "triangles",false);
-    addModel(planeModel);
+    Model* planeModel = new Model(planeVertices, sizeof(planeVertices) / sizeof(Vertex), "triangles");
+  addModel(planeModel);
 
     DrawableObject* bushPlane = CreateDrawableObject(planeModel, shaderProgramColor);
+   
+   Texture* t6 = new Texture("grass.jpg", "texture_test");
+   bushPlane->AddTexture(t6);
+
     bushPlane->Resize(10.0f, 10.0f, 10.0f);
     bushPlane->MoveTo(-2.0f, 4.0f, -2.0f);
     addDrawableObject(bushPlane);
 
-    addDrawableObject(l1);
-    addDrawableObject(l2);
-    addDrawableObject(a);
-    addDrawableObject(newReflector);
+    std::vector<Vertex> shrek = this->LoadModelFromObjectFile("shrek.obj");
+    Model* shrekM = new Model(shrek.data(), shrek.size(), "triangles");
 
-    addModel(sphereModel);
-    addModel(treeModel);
-    addModel(bushModel);
+    std::vector<Vertex> fiona = this->LoadModelFromObjectFile("fiona.obj");
+    Model* fionaM = new Model(fiona.data(), fiona.size(), "triangles");
 
+    Texture* shrekT = new Texture("shrek.png", "texture_test");
+   
+    Texture* fionaT = new Texture("fiona.png", "texture_test");
+
+
+    DrawableObject* shrekD = CreateDrawableObject(shrekM, shaderProgramColor);
+    shrekD->Resize(0.2f, 0.2f, 0.2f);
+    shrekD->MoveTo( -1.5f, -0.002f, 0.0f );
+    
+    DrawableObject* fionaD = CreateDrawableObject(fionaM, shaderProgramColor);
+    fionaD->Rotate(glm::radians(180.0f), 0, 1, 0);
+    fionaD->Resize(0.2f, 0.2f, 0.2f);
+    fionaD->MoveTo(-1.5f, -0.002f, 0.2f);
+
+
+    shrekD->AddTexture(shrekT);
+    fionaD->AddTexture(fionaT);
+
+    addDrawableObject(shrekD);
+    addDrawableObject(fionaD);
     
 
+
+    int totalTrees = 50;
+    int totalBushes = 50;
+
+   
+    int treeRows = 10;
+    int treeCols = 5;
+    
+
+   
+
+    
     std::vector<glm::vec3> sunPositions = { {-0.8f, 0.8f, 0.0f}, {0.8f, 0.8f, 0.0f} };
     for (auto& pos : sunPositions) {
         DrawableObject* sun = CreateDrawableObject(sphereModel, shaderProgramColor);
+        sun->setColor(glm::vec4(1.0f, 0.87f, 0.13f, 1.0f));
+        Texture* t = new Texture();
+        sun->AddTexture(t);
         sun->SetRotateAnimation(glm::radians(1.0f), glm::vec3(0, 0.5, 0.5));
         sun->Resize(0.1f, 0.1f, 0.1f);
         sun->MoveTo(pos.x, pos.y, pos.z);
         addDrawableObject(sun);
     }
 
-
-    int totalTrees = 50;
-    int totalBushes = 50;
-
-    //  Stromy
-    int treeRows = 10;
-    int treeCols = 5;
+    
     
     for (int i = 0; i < totalTrees; ++i) {
         DrawableObject* treeObj = CreateDrawableObject(treeModel, shaderProgramColor);
-
+        treeObj->setColor(glm::vec4(0.2f, 0.5f, 0.2f, 1.0f));
+        Texture* t = new Texture();
+        treeObj->AddTexture(t);
         int row = i / treeCols;
         int col = i % treeCols;
 
@@ -605,13 +666,14 @@ bool Scene::prepareTestSceneCv05T4(){
         treeObj->MoveTo(x, y, z);
         addDrawableObject(treeObj);
     }
-    
-    // 
+
     int bushRows = 10;
     int bushCols = 5;
     for (int i = 0; i < totalBushes; ++i) {
         DrawableObject* bushObj = CreateDrawableObject(bushModel, shaderProgramColor);
-
+        bushObj->setColor(glm::vec4(0.6f, 0.9f, 0.6f, 1.0f));
+        Texture* t = new Texture();
+        bushObj->AddTexture(t);
         int row = i / bushCols;
         int col = i % bushCols;
 
@@ -623,7 +685,17 @@ bool Scene::prepareTestSceneCv05T4(){
         bushObj->MoveTo(x, y, z);
         addDrawableObject(bushObj);
     }
-    */
+
+    addDrawableObject(l1);
+    addDrawableObject(l2);
+    addDrawableObject(a);
+    addDrawableObject(newReflector);
+
+    addModel(sphereModel);
+    addModel(treeModel);
+    addModel(bushModel);
+
+    
     return true;
 }
 

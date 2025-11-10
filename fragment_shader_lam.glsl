@@ -4,10 +4,11 @@ in vec4 fragColor;
 in vec4 worldPosition;
 in vec3 worldNormal;
 out vec4 outColor;
+in vec2 textCoords;
 
 #define MAX_LIGHTS 5
 struct Light {
-    int type;               // 1=ambient, 2=directional, 3=point, 4=spotlight
+    int type;               
     vec3 lightPosition;
     float attenuation;
     vec4 diffuseColor;
@@ -18,6 +19,8 @@ struct Light {
 
 uniform Light lights[MAX_LIGHTS];
 uniform int numberOfLights;
+uniform sampler2D texture_test;
+uniform vec4 color;
 
 void main()
 {
@@ -66,5 +69,9 @@ void main()
         }
     }
 
-    outColor = diffuseFinal + ambientFinal;
+    vec4 texColor = texture(texture_test, textCoords); 
+    if(texColor.a > 0.0)
+        outColor = texColor * (diffuseFinal + ambientFinal);
+    else
+        outColor = color*(diffuseFinal + ambientFinal);
 }

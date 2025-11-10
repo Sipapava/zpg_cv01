@@ -2,7 +2,7 @@
 #include "Light.h" 
 #include <cstdio>
 
-ShaderProgram::ShaderProgram(Shader* vertex,Shader* fragment) //musi dostat fragment a vertex
+ShaderProgram::ShaderProgram(Shader* vertex,Shader* fragment) 
     : vertexShader(vertex), fragmentShader(fragment), shaderProgram(0)
 {
     updatedCamera = false;
@@ -13,7 +13,6 @@ ShaderProgram::ShaderProgram(Shader* vertex,Shader* fragment) //musi dostat frag
     projection = nullptr;
     cameraPos = glm::vec3(0.0f, 0.5f, -2.0f);
 
-    // Shadery vytvarime venku
 
    
 
@@ -33,7 +32,7 @@ ShaderProgram::ShaderProgram(Shader* vertex,Shader* fragment) //musi dostat frag
         glGetProgramInfoLog(shaderProgram, infoLogLength, NULL, strInfoLog);
         fprintf(stderr, "Shader Program linker failure: %s\n", strInfoLog);
         delete[] strInfoLog;
-        //pridat return na false;
+        //add return  false;
     }
 }
 
@@ -282,7 +281,7 @@ void ShaderProgram::ProjectionApplySky() {
 
         this->setUniform3(cameraPos);
 
-        glm::mat4 viewNoTranslation = glm::mat4(glm::mat3(*view)); // odstraní translaci
+        glm::mat4 viewNoTranslation = glm::mat4(glm::mat3(*view)); 
         this->setUniform(viewNoTranslation, "viewMatrix");
         this->setUniform(*projection, "projectMatrix");
         updatedCamera = true;

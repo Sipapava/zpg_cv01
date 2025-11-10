@@ -14,18 +14,18 @@ class Light;
 
 class ShaderProgram : public Observer {
 private:
-    bool updatedCamera; //nastaveno na false ve vychozim,
+    bool updatedCamera; //initiliazed false
     bool updatedLight;
     glm::mat4* view;
     glm::mat4* projection;
     glm::vec3 cameraPos;
    
 
-    //buffery na cameru a svetla jsou ok
-    //tahle optimalizace ok
+    //
+    //optim. here
     std::vector<ShaderLightSlot> lightsSlots;
 
-    std::unordered_map<int, int> lightIdToIndex; //index muzeme pripojit ke slotum
+    std::unordered_map<int, int> lightIdToIndex; //index join to slots
     int nextFreeLightIndex = 0;
          
     Shader* vertexShader;     

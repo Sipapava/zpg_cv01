@@ -3,6 +3,7 @@
 in vec4 fragColor;
 in vec4 worldPosition;
 in vec3 worldNormal;
+in vec2 textCoords;
 out vec4 outColor;
 
 uniform vec3 cameraPos;
@@ -22,6 +23,8 @@ struct Light {
 };
 uniform Light lights[MAX_LIGHTS];
 uniform int numberOfLights;
+uniform sampler2D texture_test;
+uniform vec4 color;
 
 void main()
 {
@@ -128,6 +131,10 @@ void main()
     
 
     }
-
-    outColor = finalColor;
+     vec4 texColor = texture(texture_test, textCoords); 
+    
+    if(texColor.a > 0.1)
+        outColor = texColor * finalColor;
+    else
+        outColor =  finalColor * color; 
 }

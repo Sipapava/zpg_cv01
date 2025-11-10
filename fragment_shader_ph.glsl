@@ -4,6 +4,7 @@ in vec4 fragColor;
 in vec4 worldPosition;
 in vec3 worldNormal;
 out vec4 outColor;
+in vec2 textCoords;
 
 uniform vec3 cameraPos;
 
@@ -22,6 +23,8 @@ struct Light {
 };
 uniform Light lights[MAX_LIGHTS];
 uniform int numberOfLights;
+uniform sampler2D texture_test;
+uniform vec4 color;
 
 void main()
 {
@@ -29,12 +32,11 @@ void main()
 
     for (int i = 0; i < numberOfLights && i < MAX_LIGHTS; ++i) {
 
-        // Ambientní svìtlo
         if (lights[i].type == 1) {
             finalColor += lights[i].ambientColor;
         }
 
-        // Directional light
+     
         if (lights[i].type == 2) {
             vec3 lightDir = normalize(-lights[i].direction); 
             vec3 norm = normalize(worldNormal);
@@ -50,7 +52,7 @@ void main()
                         worldPosition.y / worldPosition.w,
                         worldPosition.z / worldPosition.w);
                 vec3 viewDir = normalize(cameraPos - worldPos3);
-                vec3 reflectDir = reflect(-lightDir, norm); // reflektujeme smìrem *k svìtlu*
+                vec3 reflectDir = reflect(-lightDir, norm); 
                 spec = pow(max(dot(viewDir, reflectDir), 0.0), lights[i].shiness);
             }
 
@@ -59,7 +61,7 @@ void main()
             finalColor += diffuse + specular;
         }
 
-        // Point / spot light
+   
         if(lights[i].type == 3) {
             vec3 norm = normalize(worldNormal);
             vec3 worldPos3 = vec3(
@@ -70,7 +72,7 @@ void main()
             float distance = length(lightToVector);
             vec3 lightDir = normalize(lightToVector);
 
-            // opravená attenuation
+       
             float att = 1.0 / (1.0 + lights[i].attenuation * distance + lights[i].attenuation * distance * distance);
 
             float dotProduct = max(dot(norm, lightDir), 0.0);
@@ -88,7 +90,7 @@ void main()
             finalColor += diffuse + specular;
         }
 
-        if (lights[i].type == 4) { // spotlight
+        if (lights[i].type == 4) {
                 vec3 worldPos3 = vec3(
                     worldPosition.x / worldPosition.w,
                     worldPosition.y / worldPosition.w,
@@ -99,7 +101,7 @@ void main()
             float theta = dot(lightDir, spotDir);                          
             float epsilon = cos(lights[i].angleReflector);               
 
-            if (theta > epsilon) {  // v kuželu reflektoru
+            if (theta > epsilon) { 
                 float distance = length(lights[i].lightPosition - worldPos3);
                 float attenuation = 1.0 / (1.0 + lights[i].attenuation * distance + lights[i].attenuation * distance * distance);
 
@@ -110,7 +112,7 @@ void main()
                 float spec = 0.0;
                 if(dotProduct > 0.0){
                     vec3 viewDir = normalize(cameraPos - worldPos3);
-                    vec3 reflectDir = reflect(-lightDir, norm);  // fázovaný odrazový vektor
+                    vec3 reflectDir = reflect(-lightDir, norm);  
                     spec = pow(max(dot(viewDir, reflectDir), 0.0), lights[i].shiness);
                 }
                 vec4 specular = lights[i].specularIntensity * spec * lights[i].lightColor * attenuation;
@@ -121,6 +123,12 @@ void main()
 
 
     }
+    vec4 texColor = texture(texture_test, textCoords);
+    
+    if(texColor.a > 0.0)
+        outColor = texColor * finalColor;
+    else
+        outColor = color * finalColor;
 
-    outColor = finalColor;
+   
 }

@@ -17,6 +17,8 @@ private:
     float aspect;
     float nearPlane;
     float farPlane;
+
+    int resolutionY;
   
     CameraData camData;
 
@@ -35,5 +37,7 @@ public:
     void moveRight();
     void setAspect(float aspect);
     void setAttachedReflectors();
+    void SetResolutionY(int y);
+    int GetResolutionY();
 
 };

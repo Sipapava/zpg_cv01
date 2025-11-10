@@ -52,8 +52,10 @@ public:
     std::vector<Vertex> LoadModelFromObjectFile(const char* path);
     std::vector<Vertex> FromFloat(const float* data, size_t size, bool hasTexture, bool hasNormal);
     Camera* CreateCamera();
+
+    void AttachToStencilBuffer();
     //Light* CreateLight(const glm::vec3& position, const glm::vec4& colorSpecular, float intesnity, float shiness, const glm::vec4& colorDiffuse, float attenuation, const glm::vec4& ambientColor);
-    bool prepareTestSceneCv05T1(); //presunout do tovarny
+    bool prepareTestSceneCv05T1(); //move to factory
     bool prepareTestSceneCv05T2();
     bool prepareTestSceneCv05T3();
     bool prepareTestSceneCv05T4();

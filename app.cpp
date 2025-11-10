@@ -24,8 +24,7 @@ void App::addScene(Scene* scene) {
 }
 
 bool App::prepareController() {
-    Scene* scene = scenes[sceneIndex];
-    controller = new Controller(scene->getCamera());
+    controller = new Controller(scenes[sceneIndex]);
     return true;
 }
 
@@ -90,7 +89,7 @@ bool App::initialize() {
 
     int width, height;
     glfwGetFramebufferSize(window, &width, &height);
-    float ratio = width / (float)height; //ratio obrazovky
+    float ratio = width / (float)height; //ratio of display
     glViewport(0, 0, width, height);
 
     glEnable(GL_DEPTH_TEST);
@@ -105,14 +104,18 @@ void App::run(int sceneId) {
     sceneIndex = sceneId;
 
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_STENCIL_TEST);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    
 
     while (window && !glfwWindowShouldClose(window)) {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         controller->Update();
 
         
         Scene* scene = scenes[sceneIndex];
+        
         scene->draw();
 
         glfwPollEvents();
@@ -129,7 +132,7 @@ void App::error_callback(int error, const char* description) {
 
 void App::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if (glfwGetWindowUserPointer(window)) {
-        App* app = static_cast<App*>(glfwGetWindowUserPointer(window)); //vrati obecny ukazatel
+        App* app = static_cast<App*>(glfwGetWindowUserPointer(window)); //returns general reference
         app->onKey(key, scancode, action, mods);
     }
 }
@@ -144,6 +147,7 @@ void App::cursor_pos_callback(GLFWwindow* window, double xpos, double ypos) {
 void App::mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
     if (glfwGetWindowUserPointer(window)) {
         App* app = static_cast<App*>(glfwGetWindowUserPointer(window));
+        
         app->onMouseButton(button, action, mods);
     }
 }
@@ -176,7 +180,7 @@ void App::onKey(int key, int scancode, int action, int mods) {
         if (sceneIndex >= count) {
             sceneIndex = 0;
         }
-        this->controller->setCamera(scenes[sceneIndex]->getCamera());
+        this->controller->setScene(scenes[sceneIndex]);
 
     }
     else if (key == GLFW_KEY_J && action == GLFW_PRESS) {
@@ -185,7 +189,7 @@ void App::onKey(int key, int scancode, int action, int mods) {
         if (sceneIndex < 0) {
             sceneIndex = count - 1;
         }
-        this->controller->setCamera(scenes[sceneIndex]->getCamera());
+        this->controller->setScene(scenes[sceneIndex]);
     }
     else {
         controller->keyboardMovement(key, scancode, action, mods);
@@ -199,7 +203,9 @@ void App::onKey(int key, int scancode, int action, int mods) {
 
 
 void App::onMouseButton(int button, int action, int mods) {
-    controller->mousePress(button, action, mods);
+    double xpos; double ypos;
+    glfwGetCursorPos(window, &xpos, &ypos);
+    controller->mousePress(button, action, mods,xpos,ypos);
 }
 
 void App::onMouseMove(double xpos, double ypos) {

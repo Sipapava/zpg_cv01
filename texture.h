@@ -12,6 +12,7 @@ public:
 
     Texture(const std::string& pathFilename, const std::string& typeName);
     Texture(const std::vector<std::string>& faces, const std::string& typeName);
+    Texture();
     ~Texture();
     bool BindTexture();
     bool ActiveTexture();

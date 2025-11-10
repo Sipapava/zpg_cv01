@@ -2,7 +2,7 @@
 #include "observer.h"
 #include <vector>
 #include "notifyType.h"
-#include <algorithm> // pro std::remove
+#include <algorithm> 
 
 class subject {
 protected:

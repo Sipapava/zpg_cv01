@@ -29,12 +29,12 @@ Model::Model(const Vertex* vertices, size_t count, std::string type)
             1,
             4,
             GL_FLOAT, GL_FALSE,
-            sizeof(Vertex), //pocet bajtu celeho vertexu, o kolik skocit na dalsi
-            (GLvoid*)offsetof(Vertex, normal) //offsefof vrati pocet bajru od zacatku struktury k poli
+            sizeof(Vertex), //number of bytes of the entire vertex, how much to jump to the next one
+            (GLvoid*)offsetof(Vertex, normal) //offsefof returns the number of bytes from the beginning of the structure to the array
         );
     
 
-    //pridat atribut na location 3, pro texturu
+   
 
      // Atribut textury (location = 2)
     

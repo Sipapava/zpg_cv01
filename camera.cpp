@@ -14,8 +14,10 @@ Camera::Camera() {
     aspect = 800.0f / 600.0f;
     nearPlane = 0.1f;
     farPlane = 100.0f;
+
+    resolutionY = 600;
     
-    CameraData camData; //matice
+    CameraData camData; //matrix
 };
 
 Camera::~Camera() {};
@@ -49,25 +51,34 @@ void Camera::setAspect(float aspect) {
 
 }
 
+void Camera::SetResolutionY(int y) {
+    this->resolutionY = y;
+}
+
+
+int Camera::GetResolutionY() {
+    return this->resolutionY;
+}
+
 void Camera::setAttachedReflectors()
 {
     for (Observer* obs : observers)
     {
         if (auto* reflector = dynamic_cast<reflectorLightCamera*>(obs))
         {
-            reflector->TurnOnOff();   // zavoláme správnì jen na reflektor svìtlo
+            reflector->TurnOnOff();   
         }
     }
 }
 
 
-//kamera jde dopredu vzdy relativne k eyeTargetu
+//camera goes forawrd everytime reative to eye target
 
 const float CAMERA_SPEED = 0.02f; 
 
 void Camera::moveForward() {
-    glm::vec3 direction = glm::normalize(target - position); //spocita vektor smer a notmalizuje na jendotku
-    position += direction * CAMERA_SPEED; //jen pricteme k position a vynasobime pohybem
+    glm::vec3 direction = glm::normalize(target - position); //calculate direction and normalize
+    position += direction * CAMERA_SPEED; 
     target += direction * CAMERA_SPEED;
     this->UpdateMatrix();
    
@@ -107,14 +118,14 @@ void Camera::adjustTarget(double xOffsetMouse, double yOffsetMouse) {
     glm::vec3 forward = glm::normalize(target - position); //direction
     float alfa = glm::degrees(asin(forward.y));
     float fi = glm::degrees(atan2(forward.z, forward.x));
-    //atan2 rozlisi pravou a levou pulku x osy, vraci rozsah (-180 - 180)
+    //atan2 distinguishes the right and left halves of the x axis, returns the range (-180 - 180)
 
     
     fi += (float)xOffsetMouse;
     alfa -= (float)yOffsetMouse; //minus dat
 
     
-    if (fi > 179.9f)  fi = -179.9f; //omezeni navratovych hodnot gon. funkci
+    if (fi > 179.9f)  fi = -179.9f; //limiting the return values ??of gon.functions
     if (fi < -179.9f) fi = +179.9f;
    
     

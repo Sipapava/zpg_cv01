@@ -37,9 +37,3 @@ public:
 };
 
 
-//baterka podedi ze svetla a bude osberver camery
-//rozsirit strukturu svetla v shaderu a podle typu Int taham co potrebuju
-//pocitani do bufferu a az pak se spocita jedno osvetleni
-//shdeProgram potom casem soupneme do materialu, coz jsou vlastne jen nastaveni shaderu
-//bacha jeden model vlastne muze mit vice textur treba kmen a listy u stromu
-//scena muze mit i manazer svetel at se o to nemusi starat

@@ -172,5 +172,11 @@
     <None Include="fragment_shader_cube.glsl">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="vertex_shader_skydom.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="fragment_shader_skydom.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
