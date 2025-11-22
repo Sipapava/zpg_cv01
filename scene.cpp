@@ -10,11 +10,12 @@
 //remake create and add methods for DrObj and Shaders
 
 int Scene::nextId = 0;
-Scene::Scene() {
+Scene::Scene(ModelManager* mM) {
     id = nextId++;
     camera = nullptr;
     srand(static_cast<unsigned int>(time(nullptr)));
     ma_engine_init(NULL, &engine);
+    modelManager = mM;
 }
 
 Scene::~Scene() {
@@ -29,6 +30,15 @@ Scene::~Scene() {
     }
     drawableObjects.clear();
 
+    for (auto& m : materials) {
+        if (m) {
+
+            delete m;
+            m = nullptr;
+        }
+    }
+    materials.clear();
+
     lights.clear();
 
 
@@ -39,13 +49,7 @@ Scene::~Scene() {
     }
     shaderPrograms.clear();
 
-  
-    for (auto& m : models) {
-        
-        delete m;
-        m = nullptr;
-    }
-    models.clear();
+ 
 
 }
 
@@ -53,18 +57,14 @@ void Scene::addShaderProgram(ShaderProgram* sp) {
     shaderPrograms.push_back(sp);
 }
 
-void Scene::addModel(Model* m) {
-    models.push_back(m);
-}
+
 
 
 DrawableObject* Scene::CreateDrawableObject(Model* m, ShaderProgram* sp, std::string type) {
     return new DrawableObject(m, sp,type);
 }
 
-Model* Scene::CreateModel(const Vertex* vertices, size_t count, std::string type) {
-    return new Model(vertices, count,type);
-}
+
 
 bool Scene::DeleteObject(int id) {
     auto oldSize = drawableObjects.size();
@@ -94,10 +94,10 @@ bool Scene::DeleteObject(int id) {
 
 
 bool Scene::BuildObject(float x, float y, float z) {
-    if (models.size() < 2 || shaderPrograms.empty())
-        return false;
+  
 
-    Model* treeModel = models[2];
+    Model* treeModel = modelManager->GetModelByName("tree");
+
     ShaderProgram* shaderProgramColor = shaderPrograms[0];
 
    
@@ -249,6 +249,16 @@ void Scene::addDrawableObject(Light* lightObj) {
     }
 }
 
+Material* Scene::CreateMaterial(const glm::vec4& ambient,
+    const glm::vec4& diffuse,
+    const glm::vec4& specular,
+    const float shin)
+{
+    Material* m = new Material(ambient, diffuse, specular, shin);
+    materials.push_back(m);
+    return m;
+}
+
 /*
 Light* Scene::CreateLight(const glm::vec3& position, const glm::vec4& colorSpecular, float intesnity, float shiness, const glm::vec4& colorDiffuse, float attenuation, const glm::vec4& ambientColor) {
     return new Light(position, colorSpecular, intesnity, shiness,colorDiffuse,attenuation,ambientColor);
@@ -368,8 +378,7 @@ bool Scene::prepareTestSceneCv05T3() {
     fr4->createShaderFromFile(GL_FRAGMENT_SHADER, "fragment_shader_blph.glsl");
 
 
-    const int sphereSize = sizeof(sphere) / sizeof(sphere[0]);
-    std::vector<Vertex> sphereV = FromFloat(sphere, sphereSize,false,true);
+   
     //-----------------------------------------------------------------------------------
     std::vector<std::string> faces = {
     "skybox/posx.jpg",
@@ -381,9 +390,8 @@ bool Scene::prepareTestSceneCv05T3() {
     };
 
     Texture* skyboxTexture = new Texture(faces, "skybox");
-    const int cubeSize = sizeof(skycube) / sizeof(skycube[0]);
-    std::vector<Vertex> sunss = FromFloat(skycube, cubeSize, false, false);
-    Model* skyModel = new Model(sunss.data(), sunss.size(), "triangles","cube");
+    
+    Model* skyModel = modelManager->GetModelByName("skyCube");
 
 
     Shader* vrS = new Shader();
@@ -443,14 +451,12 @@ bool Scene::prepareTestSceneCv05T3() {
 
   
 
-    Model* sphereModel = new Model(sphereV.data(), sphereV.size(), "triangles");
+    Model* sphereModel = modelManager->GetModelByName("sphere");
     std::vector<Vertex> form = this->LoadModelFromObjectFile("formula1.obj");
-    Model* formula = new Model(form.data(), form.size(),  "triangles");
+    Model* formula = modelManager->GetModelByName("formule");
     //Model* skyModel = new Model(cubeV.data(), cubeV.size(), "triangles", "cube");
 
-    addModel(sphereModel);
-    addModel(formula);
-    addModel(skyModel);
+    
     
 
     int i = 0;
@@ -490,30 +496,7 @@ bool Scene::prepareTestSceneCv05T3() {
 
 bool Scene::prepareTestSceneCv05T4(){
     
-    const Vertex planeVertices[] = {
-        // pozice                   normal                     uv
-        {{-2.0f, -0.4f, 0.0f, 1.0f}, {0.0f, 0.5f, 0.0f, 1.0f}, {0.0f, 0.0f}},
-        {{ 2.0f, -0.4f, 0.0f, 1.0f}, {0.0f, 0.5f, 0.0f, 1.0f}, {100.0f, 0.0f}},
-        {{ 2.0f, -0.4f, 2.5f, 1.0f}, {0.0f, 0.5f, 0.0f, 1.0f}, {100.0f, 100.0f}},
-
-        {{ 2.0f, -0.4f, 2.5f, 1.0f}, {0.0f, 0.5f, 0.0f, 1.0f}, {100.0f, 100.0f}},
-        {{-2.0f, -0.4f, 2.5f, 1.0f}, {0.0f, 0.5f, 0.0f, 1.0f}, {0.0f, 100.0f}},
-        {{-2.0f, -0.4f, 0.0f, 1.0f}, {0.0f, 0.5f, 0.0f, 1.0f}, {0.0f, 0.0f}}
-    };
-
-  
-    const int treeSize = sizeof(tree) / sizeof(tree[0]);
-    std::vector<Vertex> treeV = FromFloat(tree, treeSize,false,true);
-
-   
-    const int sphereSize = sizeof(sphere) / sizeof(sphere[0]);
-    std::vector<Vertex> sphereV = FromFloat(sphere, sphereSize,false,true);
-
-
     
-    const int bushSize = sizeof(bushes) / sizeof(bushes[0]);
-
-    std::vector<Vertex> bushV = FromFloat(bushes, bushSize,false,true);
     
     Shader* vr = new Shader();
     Shader* fr = new Shader();
@@ -525,13 +508,13 @@ bool Scene::prepareTestSceneCv05T4(){
     ShaderProgram* shaderProgramColor = new ShaderProgram(vr, fr);
     addShaderProgram(shaderProgramColor);
 
-    Model* sphereModel = new Model(sphereV.data(), sphereV.size(), "triangles");
+    Model* sphereModel = modelManager->GetModelByName("sphere");
 
 
-    Model* treeModel = new Model(treeV.data(), treeV.size(), "triangles");
+    Model* treeModel = modelManager->GetModelByName("tree");
 
 
-    Model* bushModel = new Model(bushV.data(), bushV.size(), "triangles");
+    Model* bushModel = modelManager->GetModelByName("bush");
     Shader* vr2 = new Shader();
     Shader* fr2 = new Shader();
     vr2->createShaderFromFile(GL_VERTEX_SHADER, "vertex_shader_con.glsl");
@@ -577,8 +560,8 @@ bool Scene::prepareTestSceneCv05T4(){
     );
 
     Texture* skyboxTexture = new Texture("sunset.jpg", "skyTexture");
-    std::vector<Vertex> sunss = this->LoadModelFromObjectFile("skydome.obj");
-    Model* skyModel = new Model(sunss.data(), sunss.size(), "triangles", "skyDom");
+   
+    Model* skyModel = modelManager->GetModelByName("skyDom");
 
 
     Shader* vrS = new Shader();
@@ -644,8 +627,8 @@ bool Scene::prepareTestSceneCv05T4(){
   
 
 
-    Model* planeModel = new Model(planeVertices, sizeof(planeVertices) / sizeof(Vertex), "triangles");
-  addModel(planeModel);
+    Model* planeModel = modelManager->GetModelByName("plane");
+ 
 
     DrawableObject* bushPlane = CreateDrawableObject(planeModel, shaderProgramColor,"plane");
    
@@ -656,20 +639,28 @@ bool Scene::prepareTestSceneCv05T4(){
     bushPlane->MoveTo(-2.0f, 4.0f, -2.0f);
     addDrawableObject(bushPlane);
 
-    std::vector<Vertex> shrek = this->LoadModelFromObjectFile("shrek.obj");
-    Model* shrekM = new Model(shrek.data(), shrek.size(), "triangles");
+    
+    Model* shrekM = modelManager->GetModelByName("shrek");
 
-    std::vector<Vertex> fiona = this->LoadModelFromObjectFile("fiona.obj");
-    Model* fionaM = new Model(fiona.data(), fiona.size(), "triangles");
+   
+    Model* fionaM = modelManager->GetModelByName("fiona");
 
     Texture* shrekT = new Texture("shrek.png", "texture_test");
    
     Texture* fionaT = new Texture("fiona.png", "texture_test");
 
 
+    Material* shrekMat = this->CreateMaterial(
+        glm::vec4(0.1f, 0.1f, 0.1f, 1.0f),   // ambient
+        glm::vec4(0.8f, 0.8f, 0.8f, 1.0f),   // diffuseh
+        glm::vec4(0.0f, 0.0f, 0.0f, 1.0f),  // specular
+        5.0f    // shiness
+    );
+
     DrawableObject* shrekD = CreateDrawableObject(shrekM, shaderProgramColor,"zlobr");
     shrekD->Resize(0.2f, 0.2f, 0.2f);
     shrekD->MoveTo( -1.5f, -0.002f, 0.0f );
+    shrekD->setMaterial(shrekMat);
     
     DrawableObject* fionaD = CreateDrawableObject(fionaM, shaderProgramColor,"zlobr");
     fionaD->Rotate(glm::radians(180.0f), 0, 1, 0);
@@ -751,12 +742,78 @@ bool Scene::prepareTestSceneCv05T4(){
     addDrawableObject(a);
     addDrawableObject(newReflector);
 
-    addModel(sphereModel);
-    addModel(treeModel);
-    addModel(bushModel);
+    
 
     
     return true;
 }
 
 
+void Scene::createModelsForScenes() {
+
+    const int sphereSize = sizeof(sphere) / sizeof(sphere[0]);
+    std::vector<Vertex> sphereV = FromFloat(sphere, sphereSize, false, true);
+  
+    std::vector<std::string> faces = {
+    "skybox/posx.jpg",
+    "skybox/negx.jpg",
+    "skybox/posy.jpg",
+    "skybox/negy.jpg",
+    "skybox/posz.jpg",
+    "skybox/negz.jpg"
+    };
+
+    const int cubeSize = sizeof(skycube) / sizeof(skycube[0]);
+    std::vector<Vertex> sunss = FromFloat(skycube, cubeSize, false, false);
+    modelManager->CreateModel(sunss.data(), sunss.size(), "triangles", "skyCube");
+  
+
+    modelManager->CreateModel(sphereV.data(), sphereV.size(), "triangles", "sphere");
+
+    std::vector<Vertex> form = this->LoadModelFromObjectFile("formula1.obj");
+    modelManager->CreateModel(form.data(), form.size(), "triangles", "formule");
+
+    const Vertex planeVertices[] = {
+        // pozice                   normal                     uv
+        {{-2.0f, -0.4f, 0.0f, 1.0f}, {0.0f, 0.5f, 0.0f, 1.0f}, {0.0f, 0.0f}},
+        {{ 2.0f, -0.4f, 0.0f, 1.0f}, {0.0f, 0.5f, 0.0f, 1.0f}, {100.0f, 0.0f}},
+        {{ 2.0f, -0.4f, 2.5f, 1.0f}, {0.0f, 0.5f, 0.0f, 1.0f}, {100.0f, 100.0f}},
+
+        {{ 2.0f, -0.4f, 2.5f, 1.0f}, {0.0f, 0.5f, 0.0f, 1.0f}, {100.0f, 100.0f}},
+        {{-2.0f, -0.4f, 2.5f, 1.0f}, {0.0f, 0.5f, 0.0f, 1.0f}, {0.0f, 100.0f}},
+        {{-2.0f, -0.4f, 0.0f, 1.0f}, {0.0f, 0.5f, 0.0f, 1.0f}, {0.0f, 0.0f}}
+    };
+
+
+    const int treeSize = sizeof(tree) / sizeof(tree[0]);
+    std::vector<Vertex> treeV = FromFloat(tree, treeSize, false, true);
+
+
+    
+
+
+
+    const int bushSize = sizeof(bushes) / sizeof(bushes[0]);
+
+    std::vector<Vertex> bushV = FromFloat(bushes, bushSize, false, true);
+
+    
+
+
+    modelManager->CreateModel(treeV.data(), treeV.size(), "triangles", "tree");
+
+
+    modelManager->CreateModel(bushV.data(), bushV.size(), "triangles", "bush");
+
+    std::vector<Vertex> skydome = this->LoadModelFromObjectFile("skydome.obj");
+    modelManager->CreateModel(skydome.data(), skydome.size(), "triangles", "skyDom");
+
+    modelManager->CreateModel(planeVertices, sizeof(planeVertices) / sizeof(Vertex), "triangles", "plane");
+
+    std::vector<Vertex> shrek = this->LoadModelFromObjectFile("shrek.obj");
+    modelManager->CreateModel(shrek.data(), shrek.size(), "triangles", "shrek");
+
+    std::vector<Vertex> fiona = this->LoadModelFromObjectFile("fiona.obj");
+    modelManager->CreateModel(fiona.data(), fiona.size(), "triangles", "fiona");
+
+}

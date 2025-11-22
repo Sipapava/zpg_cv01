@@ -9,10 +9,12 @@
 #include <cstdlib>
 #include "controller.h"
 #include "Scene.h"
+#include "modelManager.h"
 
 class App {
 private:
     std::vector<Scene*> scenes;
+    ModelManager* modelManager;
     GLFWwindow* window = nullptr;
     int sceneIndex = 0;
     Controller* controller;
@@ -21,7 +23,7 @@ public:
     App();
     ~App();
 
-    void addScene(Scene* scene);
+    void createScene();
     void deleteScene(size_t index);
     Scene* getScene(size_t index);
     int getSceneIndex();

@@ -38,12 +38,11 @@ LightData ambientLight::getLightData() const {
     data.id = id;
     data.type = 1;
     data.position = glm::vec3(0.0f, 0.0f, 0.0f);
-    data.colorSpecular = colorSpecular;
+  ;
     data.intensity = specularIntesity;
-    data.shininess = shiness;
-    data.diffuseColor = diffuseColor;
+   
     data.attenuation = 0.0f;
-    data.ambientColor = ambientColor;
+  
 
     data.angleReflector = 0.0f;
     data.direction = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);

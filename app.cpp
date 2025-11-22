@@ -1,6 +1,7 @@
 #include "app.h"
 App::App() {
     controller = nullptr;
+    modelManager = new ModelManager();
 }
 
 App::~App() {
@@ -19,8 +20,9 @@ App::~App() {
     }
 }
 
-void App::addScene(Scene* scene) {
-    scenes.push_back(scene);
+void App::createScene() {
+    Scene* ss = new Scene(this->modelManager);
+    scenes.push_back(ss);
 }
 
 bool App::prepareController() {

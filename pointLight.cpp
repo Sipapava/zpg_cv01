@@ -54,12 +54,11 @@ LightData pointLight::getLightData() const {
     data.id = id;
     data.type = 3;
     data.position = positionSend;
-    data.colorSpecular = colorSpecular;
+
     data.intensity = specularIntesity;
-    data.shininess = shiness;
-    data.diffuseColor = diffuseColor;
+    
     data.attenuation = attenuation;
-    data.ambientColor = glm::vec4(0.0f, 0.0f, 0.0f,1.0f);
+
 
     data.angleReflector = 0.0f;
     data.direction = glm::vec3(0.0f,0.0f,0.0f);

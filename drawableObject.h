@@ -4,6 +4,7 @@
 #include "texture.h"
 #include "elementarTransformation.h"
 #include "complexTransformation.h"
+#include "material.h"
 
 
 class DrawableObject {
@@ -17,10 +18,10 @@ protected:
 
     Transformation* transformation;
     glm::vec3 position;
-    bool updateColor;
     glm::vec4 color;
 
     std::vector<Texture*> textures;
+    Material* material;
     
 
 
@@ -34,6 +35,7 @@ public:
     void SetRotateAnimation(float addAngle, const glm::vec3& axis);
     void SetRandomMoveAnimation(float speed, int maxSteps);
     void setColor(const glm::vec4& color);
+    void setMaterial(Material* m);
     std::string GetType();
 
     void AddTexture(Texture* texture);

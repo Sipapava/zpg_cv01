@@ -14,8 +14,9 @@ DrawableObject::DrawableObject(Model* m, ShaderProgram* sp,std::string type)
     }
     
     this->color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-    updateColor = false;
+   
     this->type = type;
+    material = new Material();
 
 }
 
@@ -66,7 +67,7 @@ void DrawableObject::draw() {
         //glStencilMask(0xFF); //  nastavuje bitovou masku definující, které bity ve stencil bufferu mohou být pøi kreslení pøepsány.
         glStencilFunc(GL_ALWAYS, getId(), 0xFF);
         
-   
+    
     shaderProgram->ProjectionApply();
     shaderProgram->LightApply();
 
@@ -76,6 +77,7 @@ void DrawableObject::draw() {
 
     
     shaderProgram->setUniform4(this->color, "color");
+    shaderProgram->materialApply(this->material);
         
 
     
@@ -123,8 +125,13 @@ void DrawableObject::Rotate(float angle, float xA, float yA, float zA) {
 
 //cancel this each object has individual color so shader Must do setUnifrm for eaach
 void DrawableObject::setColor(const glm::vec4& color) {
-    this->updateColor = false;
+    
     this->color = color;
 }
+
+void DrawableObject::setMaterial(Material *m) {
+    this->material = m;
+}
+
 
 

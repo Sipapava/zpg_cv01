@@ -7,6 +7,7 @@
 #include "Observer.h"
 #include <unordered_map>
 #include<string>
+#include "material.h"
 
 class Light;
 
@@ -47,6 +48,7 @@ public:
     void ProjectionApply();
     void ProjectionApplySky();
     void LightApply();
+    void materialApply(Material *m);
     
 
     bool setShaderProgram();

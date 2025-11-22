@@ -1,7 +1,7 @@
 #include "Model.h"
 
-Model::Model(const Vertex* vertices, size_t count, std::string type)
-    : vertexCount(count), type(type)
+Model::Model(const Vertex* vertices, size_t count, std::string type, std::string name)
+    : vertexCount(count), type(type),name(name)
 {
     // Vertex Buffer Object (VBO)
 
@@ -32,7 +32,7 @@ Model::Model(const Vertex* vertices, size_t count, std::string type)
         (GLvoid*)offsetof(Vertex, pos)
     );
 
-   
+    if (name.compare("skyCube") != 0) {
         glEnableVertexAttribArray(1);
         glVertexAttribPointer(
             1,
@@ -41,56 +41,13 @@ Model::Model(const Vertex* vertices, size_t count, std::string type)
             sizeof(Vertex), //number of bytes of the entire vertex, how much to jump to the next one
             (GLvoid*)offsetof(Vertex, normal) //offsefof returns the number of bytes from the beginning of the structure to the array
         );
+    }
     
 
    
 
      // Atribut textury (location = 2)
-    
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(
-        2,
-        2,                      // vec2
-        GL_FLOAT, GL_FALSE,
-        sizeof(Vertex),
-        (GLvoid*)offsetof(Vertex, texture)
-    );
-    
-
-}
-
-Model::Model(const Vertex* vertices, size_t count, std::string type,std::string specialCase)
-    :  vertexCount(count), type(type)
-{
-    points = new Vertex[vertexCount];       // alokace vlastního bufferu
-    for (size_t i = 0; i < vertexCount; ++i) {
-        points[i].pos = glm::vec4(vertices[i].pos);
-        points[i].normal = glm::vec4(vertices[i].normal);
-        points[i].texture = glm::vec2(vertices[i].texture);
-    }
-    // Vertex Buffer Object (VBO)
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * vertexCount, points, GL_STATIC_DRAW);
-
-    // Vertex Array Object (VAO)
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
-
-    // Atribut pozice (location = 0)
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glVertexAttribPointer(
-        0,
-        4,
-        GL_FLOAT, GL_FALSE,
-        sizeof(Vertex),
-        (GLvoid*)offsetof(Vertex, pos)
-    );
-
-
-     // Atribut textury (location = 2)
-    if (specialCase.compare("skyDom") == 0) {
+    if (name.compare("skyCube") != 0) {
         glEnableVertexAttribArray(2);
         glVertexAttribPointer(
             2,
@@ -102,8 +59,8 @@ Model::Model(const Vertex* vertices, size_t count, std::string type,std::string 
     }
     
 
-
 }
+
 
 Model::~Model() {
     glDeleteVertexArrays(1, &VAO);
@@ -130,4 +87,8 @@ glm::vec3 Model::ComputeInitialCenter() const {
     }
 
     return sum / static_cast<float>(vertexCount);
+}
+
+std::string Model::getName() {
+    return this->name;
 }

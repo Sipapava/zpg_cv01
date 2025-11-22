@@ -49,12 +49,11 @@ LightData reflectorLight::getLightData() const {
     data.id = id;
     data.type = 4;
     data.position = positionSend;
-    data.colorSpecular = colorSpecular;
+ 
     data.intensity = specularIntesity;
-    data.shininess = shiness;
-    data.diffuseColor = diffuseColor;
+  
     data.attenuation = attenuation;
-    data.ambientColor = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+ 
 
     data.angleReflector = angle;
     data.direction = direction;
@@ -118,25 +117,22 @@ LightData reflectorLightCamera::getLightData() const {
     if (turnOn) {
 
        
-        data.colorSpecular = colorSpecular;
+       
         data.intensity = specularIntesity;
-        data.shininess = shiness;
-        data.diffuseColor = diffuseColor;
+       
         data.attenuation = attenuation;
-        data.ambientColor = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+       
 
         
         
 
     }
     else {
-        
-        data.colorSpecular = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+        data.type = 5; //vupnute svetlo
         data.intensity = specularIntesity;
-        data.shininess = shiness;
-        data.diffuseColor = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    ;
         data.attenuation = attenuation;
-        data.ambientColor = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    
 
        
 
@@ -181,5 +177,6 @@ void reflectorLightCamera::Notify(NotifyType type, void* data) {
 
 void reflectorLightCamera::TurnOnOff() {
     this->turnOn = !this->turnOn;
+   
     UpdateLightsShaderPro();
 }

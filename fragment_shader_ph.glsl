@@ -12,19 +12,29 @@ uniform vec3 cameraPos;
 struct Light {
     int type;
     vec3 lightPosition;
-    vec4 lightColor;
+   
     float specularIntensity;
-    float shiness;         
+          
     float attenuation;
-    vec4 diffuseColor;
-    vec4 ambientColor;
+    
+    
     vec3 direction;
     float angleReflector;
 };
+
+struct Material{
+    vec4 diffuseColor;
+    vec4 ambientColor;
+    vec4 lightColor;
+    float shiness;
+};
+
+
 uniform Light lights[MAX_LIGHTS];
 uniform int numberOfLights;
 uniform sampler2D texture_test;
 uniform vec4 color;
+uniform Material material;
 
 void main()
 {
@@ -33,7 +43,7 @@ void main()
     for (int i = 0; i < numberOfLights && i < MAX_LIGHTS; ++i) {
 
         if (lights[i].type == 1) {
-            finalColor += lights[i].ambientColor;
+            finalColor += material.ambientColor;
         }
 
      
@@ -43,7 +53,7 @@ void main()
 
             // nepoužívat smoothstep zde, prostì max(0,dot)
             float dotProduct = max(dot(norm, lightDir), 0.0);
-            vec4 diffuse = dotProduct * lights[i].diffuseColor;
+            vec4 diffuse = dotProduct * material.diffuseColor;
 
             float spec = 0.0;
             if (dotProduct > 0.0) {
@@ -53,10 +63,10 @@ void main()
                         worldPosition.z / worldPosition.w);
                 vec3 viewDir = normalize(cameraPos - worldPos3);
                 vec3 reflectDir = reflect(-lightDir, norm); 
-                spec = pow(max(dot(viewDir, reflectDir), 0.0), lights[i].shiness);
+                spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shiness);
             }
 
-            vec4 specular = lights[i].specularIntensity * spec * lights[i].lightColor;
+            vec4 specular = lights[i].specularIntensity * spec * material.lightColor;
             specular *= dotProduct;
             finalColor += diffuse + specular;
         }
@@ -76,16 +86,16 @@ void main()
             float att = 1.0 / (1.0 + lights[i].attenuation * distance + lights[i].attenuation * distance * distance);
 
             float dotProduct = max(dot(norm, lightDir), 0.0);
-            vec4 diffuse = dotProduct * lights[i].diffuseColor * att;
+            vec4 diffuse = dotProduct * material.diffuseColor * att;
 
             float spec = 0.0;
             if (dotProduct > 0.0) {
                 vec3 viewDir = normalize(cameraPos - worldPos3);
                 vec3 reflectDir = reflect(-lightDir, norm);
-                spec = pow(max(dot(viewDir, reflectDir), 0.0), lights[i].shiness);
+                spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shiness);
             }
 
-            vec4 specular = lights[i].specularIntensity * spec * lights[i].lightColor * att;
+            vec4 specular = lights[i].specularIntensity * spec * material.lightColor * att;
             specular *= dotProduct;
             finalColor += diffuse + specular;
         }
@@ -107,15 +117,15 @@ void main()
 
                 vec3 norm = normalize(worldNormal);
                 float dotProduct = max(dot(norm, lightDir), 0.0);
-                vec4 diffuse = dotProduct * lights[i].diffuseColor * attenuation;
+                vec4 diffuse = dotProduct * material.diffuseColor * attenuation;
 
                 float spec = 0.0;
                 if(dotProduct > 0.0){
                     vec3 viewDir = normalize(cameraPos - worldPos3);
                     vec3 reflectDir = reflect(-lightDir, norm);  
-                    spec = pow(max(dot(viewDir, reflectDir), 0.0), lights[i].shiness);
+                    spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shiness);
                 }
-                vec4 specular = lights[i].specularIntensity * spec * lights[i].lightColor * attenuation;
+                vec4 specular = lights[i].specularIntensity * spec * material.lightColor * attenuation;
                 specular *= dotProduct;
                 finalColor += diffuse + specular;
             }

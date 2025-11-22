@@ -224,24 +224,24 @@ void ShaderProgram::LightApply() {
 
             std::string typeName = "lights[" + std::to_string(indexInShader) + "].type";
             std::string posName = "lights[" + std::to_string(indexInShader) + "].lightPosition";
-            std::string colorSpecName = "lights[" + std::to_string(indexInShader) + "].lightColor";
+            
             std::string specularName = "lights[" + std::to_string(indexInShader) + "].specularIntensity";
-            std::string shininessName = "lights[" + std::to_string(indexInShader) + "].shiness";
-            std::string diffuseColorName = "lights[" + std::to_string(indexInShader) + "].diffuseColor";
+       
+           
             std::string attenuationName = "lights[" + std::to_string(indexInShader) + "].attenuation";
-            std::string ambientName = "lights[" + std::to_string(indexInShader) + "].ambientColor";
+          
             std::string directionName = "lights[" + std::to_string(indexInShader) + "].direction";
             std::string angleRName = "lights[" + std::to_string(indexInShader) + "].angleReflector";
             
 
             
             setUniform3(slot.data.position, posName.c_str());
-            setUniform4(slot.data.colorSpecular, colorSpecName.c_str());
+           
             setUniformFloat(slot.data.intensity, specularName.c_str());
-            setUniformFloat(slot.data.shininess, shininessName.c_str());
-            setUniform4(slot.data.diffuseColor, diffuseColorName.c_str());
+            
+           
             setUniformFloat(slot.data.attenuation, attenuationName.c_str());
-            setUniform4(slot.data.ambientColor, ambientName.c_str());
+            
             
             setUniformInt(slot.data.type, typeName.c_str());
             setUniform3(slot.data.direction, directionName.c_str());
@@ -261,7 +261,19 @@ void ShaderProgram::LightApply() {
 }
 
 
+void ShaderProgram::materialApply(Material* m) {
 
+    std::string ambientName = "material.ambientColor";
+    std::string diffuseColorName = "material.diffuseColor";
+    std::string colorSpecName = "material.lightColor";
+    std::string shininessName = "material.shiness";
+
+
+    setUniform4(m->getAmbientColor(), ambientName.c_str());
+    setUniform4(m->getSpecularColor(), colorSpecName.c_str());
+    setUniform4(m->getDiffuseColor(), diffuseColorName.c_str());
+    setUniformFloat(m->getShinnines(), shininessName.c_str());
+}
 
 void ShaderProgram::ProjectionApply() {
 

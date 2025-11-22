@@ -20,16 +20,19 @@ int main(void)
     
    
   
-    Scene* scene3 = new Scene();
-    Scene* scene4 = new Scene();
+    
    // Scene* scene2 = new Scene();
    
     
     
-   app.addScene(scene3);
-    app.addScene(scene4);
+   app.createScene();
+    app.createScene();
     //app.addScene(scene2);
    
+    Scene* scene3 = app.getScene(0);
+    Scene* scene4 = app.getScene(1);
+
+    scene3->createModelsForScenes(); //udelat z toho statickou
    bool z = scene3->prepareTestSceneCv05T3();
     bool a = scene4->prepareTestSceneCv05T4();
     //bool b = scene2->prepareTestSceneCv05T2();

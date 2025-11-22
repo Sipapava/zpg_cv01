@@ -11,16 +11,21 @@ struct Light {
     int type;               
     vec3 lightPosition;
     float attenuation;
-    vec4 diffuseColor;
-    vec4 ambientColor;
+   
     vec3 direction;
     float angleReflector;
+};
+
+struct Material{
+    vec4 diffuseColor;
+    vec4 ambientColor;
 };
 
 uniform Light lights[MAX_LIGHTS];
 uniform int numberOfLights;
 uniform sampler2D texture_test;
 uniform vec4 color;
+uniform Material material;
 
 void main()
 {
@@ -34,12 +39,12 @@ void main()
 
     for (int i = 0; i < numberOfLights && i < MAX_LIGHTS; ++i) {
         if (lights[i].type == 1) { 
-            ambientFinal += lights[i].ambientColor;
+            ambientFinal += material.ambientColor;
         } 
         else if (lights[i].type == 2) { 
             vec3 lightDir = normalize(-lights[i].direction);
             float dotProduct = max(dot(norm, lightDir), 0.0);
-            vec4 diffuse = dotProduct * lights[i].diffuseColor;
+            vec4 diffuse = dotProduct * material.diffuseColor;
             diffuseFinal += diffuse;
         } 
         else if (lights[i].type == 3) {
@@ -48,7 +53,7 @@ void main()
             float att =  1.0 / (1.0 + lights[i].attenuation * distance + lights[i].attenuation * distance * distance);
             vec3 lightDir = normalize(lightToVector);
             float dotProduct = max(dot(norm, lightDir), 0.0);
-            vec4 diffuse = dotProduct * lights[i].diffuseColor * att;
+            vec4 diffuse = dotProduct * material.diffuseColor * att;
             diffuseFinal += diffuse;
         } 
         else if (lights[i].type == 4) { 
@@ -62,7 +67,7 @@ void main()
                 float distance = length(lightToVector);
                 float att =  1.0 / (1.0 + lights[i].attenuation * distance + lights[i].attenuation * distance * distance);
                 float dotProduct = max(dot(norm, lightDir), 0.0);
-                vec4 diffuse = dotProduct * lights[i].diffuseColor * att;
+                vec4 diffuse = dotProduct * material.diffuseColor * att;
                 
                 diffuseFinal += diffuse;
             }

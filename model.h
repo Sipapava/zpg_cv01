@@ -13,12 +13,13 @@ private:
     Vertex* points;       
     size_t vertexCount;   
     std::string type;
+    std::string name;
 
 public:
     
 
-    Model(const Vertex* vertices, size_t count, std::string type);
-    Model(const Vertex* vertices, size_t count, std::string type, std::string specialCase);
+    Model(const Vertex* vertices, size_t count, std::string type,std::string name);
+  
 
     
     ~Model();
@@ -26,4 +27,5 @@ public:
     
     void Draw();
     glm::vec3 ComputeInitialCenter() const;
+    std::string getName();
 };
