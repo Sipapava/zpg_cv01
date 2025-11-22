@@ -105,7 +105,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\knihovny\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;..\..\knihovny\glm-master\glm-master;..\..\knihovny\glew-2.1.0-win32\glew-2.1.0\include;..\..\knihovny\assimp-5.3.1\assimp-5.3.1\include;..\..\knihovny\assimp-5.3.1\assimp-build\include;..\..\knihovny\stb_image;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\knihovny\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;..\..\knihovny\glm-master\glm-master;..\..\knihovny\glew-2.1.0-win32\glew-2.1.0\include;..\..\knihovny\assimp-5.3.1\assimp-5.3.1\include;..\..\knihovny\assimp-5.3.1\assimp-build\include;..\..\knihovny\stb_image;..\..\knihovny\audio;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

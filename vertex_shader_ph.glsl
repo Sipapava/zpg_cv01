@@ -15,6 +15,7 @@ uniform mat4 viewMatrix;
 
 void main()
 {
+    
     gl_Position = projectMatrix * viewMatrix * modelMatrix * vp;
     fragColor = normal;
     worldPosition = modelMatrix * vp;

@@ -1,5 +1,8 @@
 #pragma once
+
+#include "miniaudio.h"
 #include <vector>
+
 #include "shaderProgram.h"
 #include "drawableObject.h"
 #include "drawableSky.h"
@@ -29,6 +32,8 @@ private:
     int id;                     
     static int nextId;
 
+    ma_engine engine;
+
 public:
     Scene();
     ~Scene();
@@ -44,16 +49,18 @@ public:
     int getId() const { return id; }
     Camera* getCamera() { return camera; }
     ShaderProgram* getShaderProgram(int index) { return shaderPrograms[index]; }
-
+    bool DeleteObject(int id);
+    bool BuildObject(int x, int y, float depht);
+    bool BuildObject(float x, float y, float z);
     
 
-    DrawableObject* CreateDrawableObject(Model* m, ShaderProgram* sp);
+    DrawableObject* CreateDrawableObject(Model* m, ShaderProgram* sp, std::string type);
     Model* CreateModel(const Vertex* vertices, size_t count,std::string type);
     std::vector<Vertex> LoadModelFromObjectFile(const char* path);
     std::vector<Vertex> FromFloat(const float* data, size_t size, bool hasTexture, bool hasNormal);
     Camera* CreateCamera();
 
-    void AttachToStencilBuffer();
+
     //Light* CreateLight(const glm::vec3& position, const glm::vec4& colorSpecular, float intesnity, float shiness, const glm::vec4& colorDiffuse, float attenuation, const glm::vec4& ambientColor);
     bool prepareTestSceneCv05T1(); //move to factory
     bool prepareTestSceneCv05T2();

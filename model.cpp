@@ -1,9 +1,18 @@
 #include "Model.h"
 
 Model::Model(const Vertex* vertices, size_t count, std::string type)
-    : points(vertices), vertexCount(count), type(type)
+    : vertexCount(count), type(type)
 {
     // Vertex Buffer Object (VBO)
+
+    points = new Vertex[vertexCount];       // alokace vlastního bufferu
+    for (size_t i = 0; i < vertexCount; ++i) {
+    points[i].pos     = glm::vec4(vertices[i].pos);
+    points[i].normal  = glm::vec4(vertices[i].normal);
+    points[i].texture = glm::vec2(vertices[i].texture);
+}
+
+
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * vertexCount, points, GL_STATIC_DRAW);
@@ -51,8 +60,14 @@ Model::Model(const Vertex* vertices, size_t count, std::string type)
 }
 
 Model::Model(const Vertex* vertices, size_t count, std::string type,std::string specialCase)
-    : points(vertices), vertexCount(count), type(type)
+    :  vertexCount(count), type(type)
 {
+    points = new Vertex[vertexCount];       // alokace vlastního bufferu
+    for (size_t i = 0; i < vertexCount; ++i) {
+        points[i].pos = glm::vec4(vertices[i].pos);
+        points[i].normal = glm::vec4(vertices[i].normal);
+        points[i].texture = glm::vec2(vertices[i].texture);
+    }
     // Vertex Buffer Object (VBO)
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);

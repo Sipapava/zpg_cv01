@@ -37,7 +37,9 @@ int main(void)
    
     bool d = app.prepareController();
     if ( z && a) {
-        
+        GLuint dummy; //na toto metodu
+        glReadPixels(0, 0, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &dummy);
+
         app.run(0);
     }
 

@@ -1,9 +1,12 @@
+
+#define MINIAUDIO_IMPLEMENTATION
 #include "Scene.h"
 #include <algorithm> 
 #include "tree.h"
 #include "skycube.h"
 #include "bushes.h"
 #include "sphere.h"
+
 //remake create and add methods for DrObj and Shaders
 
 int Scene::nextId = 0;
@@ -11,10 +14,11 @@ Scene::Scene() {
     id = nextId++;
     camera = nullptr;
     srand(static_cast<unsigned int>(time(nullptr)));
+    ma_engine_init(NULL, &engine);
 }
 
 Scene::~Scene() {
- 
+    ma_engine_uninit(&engine);
     
     for (auto& obj : drawableObjects) {
         if (obj) {
@@ -54,22 +58,80 @@ void Scene::addModel(Model* m) {
 }
 
 
-DrawableObject* Scene::CreateDrawableObject(Model* m, ShaderProgram* sp) {
-    return new DrawableObject(m, sp);
+DrawableObject* Scene::CreateDrawableObject(Model* m, ShaderProgram* sp, std::string type) {
+    return new DrawableObject(m, sp,type);
 }
 
 Model* Scene::CreateModel(const Vertex* vertices, size_t count, std::string type) {
     return new Model(vertices, count,type);
 }
 
-void Scene::AttachToStencilBuffer() {
-    
+bool Scene::DeleteObject(int id) {
+    auto oldSize = drawableObjects.size();
 
-    for (DrawableObject* d : drawableObjects) {
-        glStencilFunc(GL_ALWAYS, d->getId(), 0xFF);  // Nastaví stencil ref na ID objektu
-        d->draw();  // Vykreslí pouze tento objekt, aby se jeho ID zapsalo do stencil bufferu
-    }
+    auto it = std::remove_if(drawableObjects.begin(), drawableObjects.end(),
+        [this, id](DrawableObject* obj) {
+            if (obj->getId() == id && obj->GetType() != "plane") {
+                
+                if (obj->GetType() == "zlobr") {
+                    ma_engine_play_sound(&this->engine, "hurt.mp3", NULL);
+                }
+                else {
+                    ma_engine_play_sound(&this->engine, "hit.mp3", NULL);
+                }
+                delete obj;
+                return true;
+            }
+            return false;
+        });
+
+    drawableObjects.erase(it, drawableObjects.end());
+    return drawableObjects.size() != oldSize;
+    
 }
+
+
+
+
+bool Scene::BuildObject(float x, float y, float z) {
+    if (models.size() < 2 || shaderPrograms.empty())
+        return false;
+
+    Model* treeModel = models[2];
+    ShaderProgram* shaderProgramColor = shaderPrograms[0];
+
+   
+    DrawableObject* treeObj = CreateDrawableObject(treeModel, shaderProgramColor, "normal");
+    if (!treeObj) {
+   
+        return false;
+    }
+
+  
+    treeObj->setColor(glm::vec4(0.2f, 0.5f, 0.2f, 1.0f));
+
+ 
+    Texture* t = new Texture();
+    treeObj->AddTexture(t);
+
+
+    treeObj->Resize(0.1f, 0.1f, 0.1f);
+
+ 
+    treeObj->MoveTo(x, y , z);
+
+
+    addDrawableObject(treeObj);
+
+    
+    
+    ma_engine_play_sound(&engine, "plantSound.mp3", NULL);
+
+    return true;
+}
+
+
+
 std::vector<Vertex> Scene::LoadModelFromObjectFile(const char* path) {
     Assimp::Importer importer;
     std::vector<Vertex> vertices;
@@ -215,8 +277,6 @@ void Scene::draw() {
 
 bool Scene::prepareTestSceneCv05T1() {
 
-
-   
     return true;
 }
 
@@ -410,7 +470,7 @@ bool Scene::prepareTestSceneCv05T3() {
      
     std::vector<glm::vec3> sunPositions = { {-0.5f, 0.0f, 0.0f}, {0.5f, 0.0f, 0.0f},{0.0f,0.5f,0.0f},{0.0f,-0.5f,0.0f} };
     for (auto& pos : sunPositions) {
-        DrawableObject* sun = CreateDrawableObject(formula, this->getShaderProgram(i));
+        DrawableObject* sun = CreateDrawableObject(formula, this->getShaderProgram(i),"normal");
         
         sun->Resize(0.01f, 0.01f, 0.01f);
         sun->MoveTo(pos.x, pos.y, pos.z);
@@ -587,7 +647,7 @@ bool Scene::prepareTestSceneCv05T4(){
     Model* planeModel = new Model(planeVertices, sizeof(planeVertices) / sizeof(Vertex), "triangles");
   addModel(planeModel);
 
-    DrawableObject* bushPlane = CreateDrawableObject(planeModel, shaderProgramColor);
+    DrawableObject* bushPlane = CreateDrawableObject(planeModel, shaderProgramColor,"plane");
    
    Texture* t6 = new Texture("grass.jpg", "texture_test");
    bushPlane->AddTexture(t6);
@@ -607,11 +667,11 @@ bool Scene::prepareTestSceneCv05T4(){
     Texture* fionaT = new Texture("fiona.png", "texture_test");
 
 
-    DrawableObject* shrekD = CreateDrawableObject(shrekM, shaderProgramColor);
+    DrawableObject* shrekD = CreateDrawableObject(shrekM, shaderProgramColor,"zlobr");
     shrekD->Resize(0.2f, 0.2f, 0.2f);
     shrekD->MoveTo( -1.5f, -0.002f, 0.0f );
     
-    DrawableObject* fionaD = CreateDrawableObject(fionaM, shaderProgramColor);
+    DrawableObject* fionaD = CreateDrawableObject(fionaM, shaderProgramColor,"zlobr");
     fionaD->Rotate(glm::radians(180.0f), 0, 1, 0);
     fionaD->Resize(0.2f, 0.2f, 0.2f);
     fionaD->MoveTo(-1.5f, -0.002f, 0.2f);
@@ -638,7 +698,7 @@ bool Scene::prepareTestSceneCv05T4(){
     
     std::vector<glm::vec3> sunPositions = { {-0.8f, 0.8f, 0.0f}, {0.8f, 0.8f, 0.0f} };
     for (auto& pos : sunPositions) {
-        DrawableObject* sun = CreateDrawableObject(sphereModel, shaderProgramColor);
+        DrawableObject* sun = CreateDrawableObject(sphereModel, shaderProgramColor,"normal");
         sun->setColor(glm::vec4(1.0f, 0.87f, 0.13f, 1.0f));
         Texture* t = new Texture();
         sun->AddTexture(t);
@@ -651,7 +711,7 @@ bool Scene::prepareTestSceneCv05T4(){
     
     
     for (int i = 0; i < totalTrees; ++i) {
-        DrawableObject* treeObj = CreateDrawableObject(treeModel, shaderProgramColor);
+        DrawableObject* treeObj = CreateDrawableObject(treeModel, shaderProgramColor,"normal");
         treeObj->setColor(glm::vec4(0.2f, 0.5f, 0.2f, 1.0f));
         Texture* t = new Texture();
         treeObj->AddTexture(t);
@@ -670,7 +730,7 @@ bool Scene::prepareTestSceneCv05T4(){
     int bushRows = 10;
     int bushCols = 5;
     for (int i = 0; i < totalBushes; ++i) {
-        DrawableObject* bushObj = CreateDrawableObject(bushModel, shaderProgramColor);
+        DrawableObject* bushObj = CreateDrawableObject(bushModel, shaderProgramColor,"normal");
         bushObj->setColor(glm::vec4(0.6f, 0.9f, 0.6f, 1.0f));
         Texture* t = new Texture();
         bushObj->AddTexture(t);

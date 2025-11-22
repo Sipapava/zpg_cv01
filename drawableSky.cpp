@@ -1,7 +1,7 @@
 #include "drawableSky.h"
 
 drawableSky::drawableSky(Model* model,ShaderProgram* shader)
-    : DrawableObject(model, shader) 
+    : DrawableObject(model, shader, "sky")
 {
   
 }
@@ -13,7 +13,8 @@ void drawableSky::draw() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     
-    glStencilMask(0x00); // musim zakazat zapis, zustava tam nastevni z posledniho objektu minule smycky a tak se prepisuji
+    //glStencilMask(0x00); // musim zakazat zapis, zustava tam nastevni z posledniho objektu minule smycky a tak se prepisuji
+    glStencilFunc(GL_ALWAYS, 0, 0xFF);
     shaderProgram->setShaderProgram();
     shaderProgram->ProjectionApply();
 

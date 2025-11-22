@@ -2,9 +2,9 @@
 #include "drawableObject.h"
 #include <stdio.h>
 
-int DrawableObject::nextId = 0;
+int DrawableObject::nextId = 1;
 
-DrawableObject::DrawableObject(Model* m, ShaderProgram* sp)
+DrawableObject::DrawableObject(Model* m, ShaderProgram* sp,std::string type)
     : model(m), shaderProgram(sp) {
     complexTransformation* complexTrans = new complexTransformation();
     transformation = complexTrans;
@@ -15,6 +15,7 @@ DrawableObject::DrawableObject(Model* m, ShaderProgram* sp)
     
     this->color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
     updateColor = false;
+    this->type = type;
 
 }
 
@@ -45,7 +46,9 @@ void DrawableObject::SetRandomMoveAnimation(float speed, int maxSteps) {
 
 };
 
-
+std::string DrawableObject::GetType() {
+    return this->type;
+}
 
 
 void DrawableObject::Update() {
@@ -57,10 +60,10 @@ void DrawableObject::draw() {
     if (shaderProgram) { //must be if, cause some lights have models and shaderprograms set tu null
         bool x = shaderProgram->setShaderProgram(); 
 
-        // rovnou zapisuj ID objektu do stencil bufferu
+        
 
         
-        glStencilMask(0xFF); //  nastavuje bitovou masku definující, které bity ve stencil bufferu mohou být pøi kreslení pøepsány.
+        //glStencilMask(0xFF); //  nastavuje bitovou masku definující, které bity ve stencil bufferu mohou být pøi kreslení pøepsány.
         glStencilFunc(GL_ALWAYS, getId(), 0xFF);
         
    

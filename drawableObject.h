@@ -10,6 +10,7 @@ class DrawableObject {
 protected:
     int id;
     static int nextId;
+    std::string type;
 
     Model* model;
     ShaderProgram* shaderProgram;
@@ -24,7 +25,7 @@ protected:
 
 
 public:
-    DrawableObject(Model* m, ShaderProgram* sp);
+    DrawableObject(Model* m, ShaderProgram* sp, std::string type);
     virtual ~DrawableObject();
     int getId() const { return id; }
     void MoveTo(float x, float y, float z);
@@ -33,6 +34,7 @@ public:
     void SetRotateAnimation(float addAngle, const glm::vec3& axis);
     void SetRandomMoveAnimation(float speed, int maxSteps);
     void setColor(const glm::vec4& color);
+    std::string GetType();
 
     void AddTexture(Texture* texture);
 

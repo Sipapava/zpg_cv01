@@ -10,7 +10,7 @@ class Model {
 private:
     GLuint VAO;
     GLuint VBO;
-    const Vertex* points;       
+    Vertex* points;       
     size_t vertexCount;   
     std::string type;
 

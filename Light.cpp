@@ -2,7 +2,7 @@
 
 
 Light::Light(const glm::vec4& colorSpecular, float intensity, float shiness, const glm::vec4& colorDiffuse)
-    : DrawableObject(nullptr, nullptr), 
+    : DrawableObject(nullptr, nullptr,"light"),
     colorSpecular(colorSpecular),
     specularIntesity(intensity),
     shiness(shiness),
@@ -14,7 +14,7 @@ Light::Light(const glm::vec4& colorSpecular, float intensity, float shiness, con
 
 Light::Light(Model* m, ShaderProgram* sp,
     const glm::vec4& colorSpecular, float intensity, float shiness, const glm::vec4& colorDiffuse)
-    : DrawableObject(m, sp), 
+    : DrawableObject(m, sp,"light"),
     colorSpecular(colorSpecular),
     specularIntesity(intensity),
     shiness(shiness),

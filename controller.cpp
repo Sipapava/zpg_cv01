@@ -92,7 +92,7 @@ void Controller::mousePress(int button, int action, int mods,double xM, double y
 
     if (button == GLFW_MOUSE_BUTTON_LEFT) {
         if (action == GLFW_PRESS) {
-            printf("Clicked on depth\n");
+           // printf("Clicked on depth\n");
             GLbyte color[4];
             GLfloat depth;
             GLuint index;
@@ -102,16 +102,35 @@ void Controller::mousePress(int button, int action, int mods,double xM, double y
 
             int newy = (scene->getCamera()->GetResolutionY()) - y;
 
-            glReadPixels(x, newy, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, color);
-            glReadPixels(x, newy, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
-            glReadPixels(x, newy, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &index);
+           glReadPixels(x, newy, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, color);
+           glReadPixels(x, newy, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+           glReadPixels(x, newy, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &index);
 
-            printf("Clicked on pixel %d, %d, color %02hhx%02hhx%02hhx%02hhx, depth %f, stencil index % u\n", x, y, color[0], color[1], color[2], color[3], depth, index);
+            //printf("Clicked on pixel %d, %d, color %02hhx%02hhx%02hhx%02hhx, depth%f, stencil index % u\n", x, y, color[0], color[1], color[2], color[3], depth, index);
+            
+            bool ret = this->scene->DeleteObject(index);
+            if (!ret && index != 0) {
+                
+                if(depth > 0.977f){
+                    depth = 0.977f;
+                 }
+                
+                GLint viewport[4];
+                glGetIntegerv(GL_VIEWPORT, viewport);
 
-            //jestlize index neni nula a drawable object neni zem (pridame novu atribut do DO a to typ) - tak jej odtranim
-            // jestlize index neni nula a drawable object je zem
-            // tak se podivam jak je far plane pokud vetsi nez > nasatvim  max dalku
-            // prevedo unporojectem a to misto polozi novy objekt pomoci metody buildObject(x,y,z) se sceny 
+                glm::vec3 winPos(x, newy, depth);
+                glm::vec3 worldPos = glm::unProject(
+                    winPos,
+                    scene->getCamera()->getViewMatrix(),
+                    scene->getCamera()->getProjectionMatrix(),
+                    glm::vec4(viewport[0], viewport[1], viewport[2], viewport[3])
+                );
+
+               
+                scene->BuildObject(worldPos.x, worldPos.y, worldPos.z);
+                
+            }
+           
             
         }
         
