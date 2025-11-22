@@ -119,8 +119,14 @@ void DrawableObject::Resize(float x, float y, float z) {
 
 void DrawableObject::Rotate(float angle, float xA, float yA, float zA) {
     transformation->Add(new Rotation(angle, glm::vec3(xA, yA, zA)));
+}
 
+void DrawableObject::moveOnLine(float speed) {
+    transformation->Add(new RandomLine(speed));
+}
 
+void DrawableObject::setCustomTransformation(const glm::mat4x4& matrix) {
+    transformation->Add(new CostumTransformation(matrix));
 }
 
 //cancel this each object has individual color so shader Must do setUnifrm for eaach

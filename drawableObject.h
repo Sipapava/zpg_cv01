@@ -34,9 +34,14 @@ public:
     void Rotate(float angle, float xA, float yA, float zA);
     void SetRotateAnimation(float addAngle, const glm::vec3& axis);
     void SetRandomMoveAnimation(float speed, int maxSteps);
+    void moveOnLine(float speed);
+
+    void setCustomTransformation(const glm::mat4x4& matrix);
+
     void setColor(const glm::vec4& color);
     void setMaterial(Material* m);
     std::string GetType();
+   
 
     void AddTexture(Texture* texture);
 

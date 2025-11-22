@@ -53,3 +53,25 @@ public:
     glm::mat4 apply(const glm::mat4& matrix) override;
 };
 
+
+class CostumTransformation : public Transformation {
+private:
+    glm::mat4x4 matrix;
+public:
+    CostumTransformation(const glm::mat4x4& matrix);
+    glm::mat4 apply(const glm::mat4& matrix) override;
+};
+
+class RandomLine : public Transformation {
+private:
+    glm::vec3 startPoint;
+    glm::vec3 endPoint;
+    float t;
+    float speed;
+
+    glm::vec3 randomPoint();
+
+public:
+    RandomLine(float speed);
+    glm::mat4 apply(const glm::mat4& matrix) override;
+};

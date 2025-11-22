@@ -69,25 +69,34 @@ DrawableObject* Scene::CreateDrawableObject(Model* m, ShaderProgram* sp, std::st
 bool Scene::DeleteObject(int id) {
     auto oldSize = drawableObjects.size();
 
-    auto it = std::remove_if(drawableObjects.begin(), drawableObjects.end(),
-        [this, id](DrawableObject* obj) {
-            if (obj->getId() == id && obj->GetType() != "plane") {
-                
-                if (obj->GetType() == "zlobr") {
-                    ma_engine_play_sound(&this->engine, "hurt.mp3", NULL);
-                }
-                else {
-                    ma_engine_play_sound(&this->engine, "hit.mp3", NULL);
-                }
-                delete obj;
+    for (auto it = drawableObjects.begin(); it != drawableObjects.end(); ) {
+        DrawableObject* obj = *it;
+
+        if (obj->getId() == id && obj->GetType() != "plane") {
+
+            if (obj->GetType() == "simplePlane") {
                 return true;
             }
-            return false;
-        });
 
-    drawableObjects.erase(it, drawableObjects.end());
+            if (obj->GetType() == "zlobr") {
+                ma_engine_play_sound(&this->engine, "hurt.mp3", NULL);
+            }
+            if (obj->GetType() == "cat") {
+                ma_engine_play_sound(&this->engine, "cat.wav", NULL);
+            }
+            else {
+                ma_engine_play_sound(&this->engine, "hit.mp3", NULL);
+            }
+
+            delete obj;
+            it = drawableObjects.erase(it);
+        }
+        else {
+            ++it;
+        }
+    }
+
     return drawableObjects.size() != oldSize;
-    
 }
 
 
@@ -286,6 +295,54 @@ void Scene::draw() {
 
 
 bool Scene::prepareTestSceneCv05T1() {
+
+    Shader* vr = new Shader();
+    Shader* fr = new Shader();
+    this->camera = this->CreateCamera();
+    vr->createShaderFromFile(GL_VERTEX_SHADER, "vertex_shader_ph.glsl");
+    fr->createShaderFromFile(GL_FRAGMENT_SHADER, "fragment_shader_blph.glsl");
+
+    ShaderProgram* shaderProgramColor = new ShaderProgram(vr, fr);
+    addShaderProgram(shaderProgramColor);
+
+    Model* sphereModel = modelManager->GetModelByName("sphere");
+    DrawableObject* sun = CreateDrawableObject(sphereModel, shaderProgramColor, "normal");
+    Texture* t = new Texture();
+    sun->AddTexture(t);
+    sun->SetRotateAnimation(glm::radians(1.0f), glm::vec3(0, 0.5, 0.5));
+    sun->Resize(0.1f, 0.1f, 0.1f);
+
+    glm::mat4 custom = glm::mat4(1.0f);
+    custom[3][3] = 20.0f;
+
+
+    sun->setCustomTransformation(custom);
+
+    sun->setColor(glm::vec4(0.9f, 0.1f, 0.5f, 1.0f));
+    glm::vec3 lightDirection = glm::vec3(0.0f, -1.0f, 0.0f);
+
+
+    glm::vec4 specularColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+    glm::vec4 diffuseColor = glm::vec4(0.385, 0.647, 0.812, 1.0);
+
+
+
+    float intensity = 1.0f;
+    float shininess = 32.0f;
+
+    directLight* l = new directLight(lightDirection, specularColor, diffuseColor, intensity, shininess);
+
+
+
+    ambientLight* a = new ambientLight(glm::vec4(0.1, 0.1, 0.1, 1.0));
+    camera->AddObserver(shaderProgramColor);
+
+    a->AddObserver(shaderProgramColor);
+    l->AddObserver(shaderProgramColor);
+    addDrawableObject(sun);
+    camera->UpdateMatrix();
+    addDrawableObject(a);
+    addDrawableObject(l);
 
     return true;
 }
@@ -748,6 +805,157 @@ bool Scene::prepareTestSceneCv05T4(){
     return true;
 }
 
+bool Scene::prepareTestSceneCv05T6(){
+
+
+    Shader* vr = new Shader();
+    Shader* fr = new Shader();
+    vr->createShaderFromFile(GL_VERTEX_SHADER, "vertex_shader_ph.glsl");
+    fr->createShaderFromFile(GL_FRAGMENT_SHADER, "fragment_shader_blph.glsl");
+
+    this->camera = this->CreateCamera();
+
+    ShaderProgram* shaderProgramColor = new ShaderProgram(vr, fr);
+    addShaderProgram(shaderProgramColor);
+
+   
+
+
+    Model* catModel = modelManager->GetModelByName("cat");
+
+
+    
+    
+
+
+   
+   
+
+    pointLight* l2 = new pointLight(glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec4(1.0, 1.0, 1.0, 1.0),
+        glm::vec4(0.95, 0.55, 0.15, 1.0),
+        0.6f,
+        32.0f,
+        0.05f);
+    
+
+
+    ambientLight* a = new ambientLight(glm::vec4(0.1, 0.1, 0.1, 1.0));
+
+
+  
+
+    Texture* skyboxTexture = new Texture("sunset.jpg", "skyTexture");
+
+    Model* skyModel = modelManager->GetModelByName("skyDom");
+
+
+    Shader* vrS = new Shader();
+    Shader* frS = new Shader();
+    vrS->createShaderFromFile(GL_VERTEX_SHADER, "vertex_shader_skydom.glsl");
+    frS->createShaderFromFile(GL_FRAGMENT_SHADER, "fragment_shader_skydom.glsl");
+    ShaderProgram* shaderProgramSky = new ShaderProgram(vrS, frS);
+    addShaderProgram(shaderProgramSky);
+
+    drawableSky* sky = new drawableSky(skyModel, shaderProgramSky);
+    sky->AddTexture(skyboxTexture);
+    addDrawableObject(sky);
+
+
+
+
+
+
+
+
+    camera->AddObserver(shaderProgramColor);
+    
+   
+    camera->AddObserver(shaderProgramSky);
+    
+ 
+    l2->AddObserver(shaderProgramColor);
+    a->AddObserver(shaderProgramColor);
+  
+
+ 
+
+    camera->UpdateMatrix();
+ 
+    l2->UpdateLightsShaderPro();
+    a->UpdateLightsShaderPro();
+  
+    
+
+    Model* planeModel = modelManager->GetModelByName("plane");
+
+
+    DrawableObject* bushPlane = CreateDrawableObject(planeModel, shaderProgramColor, "simplePlane");
+
+    Texture* t6 = new Texture("grass.jpg", "texture_test");
+    bushPlane->AddTexture(t6);
+
+    bushPlane->Resize(12.0f, 12.0f, 12.0f);
+   bushPlane->MoveTo(0.0f, 4.7f, 10.0f);
+    addDrawableObject(bushPlane);
+
+
+   
+
+
+    Material* Mat = this->CreateMaterial(
+        glm::vec4(0.1f, 0.1f, 0.1f, 1.0f),   // ambient
+        glm::vec4(0.8f, 0.8f, 0.8f, 1.0f),   // diffuseh
+        glm::vec4(0.0f, 0.0f, 0.0f, 1.0f),  // specular
+        5.0f    // shiness
+    );
+
+   
+
+    int totalCat = 15;
+  
+
+
+    int treeRows = 3;
+    int treeCols = 5;
+
+
+
+
+
+    
+
+
+
+    for (int i = 0; i < totalCat; ++i) {
+        DrawableObject* treeObj = CreateDrawableObject(catModel, shaderProgramColor, "cat");
+        treeObj->setColor(glm::vec4(0.9f, 0.6f, 0.0f, 1.0f));
+        Texture* t = new Texture();
+        treeObj->AddTexture(t);
+        int row = i / treeCols;
+        int col = i % treeCols;
+
+        float x = -1.0f + col * 0.5f;
+        float y = 0.0f;
+        float z = -1.0f + row * 0.5f;
+
+        treeObj->Resize(0.01f, 0.01f, 0.01f);
+        treeObj->MoveTo(x, y, z);
+        treeObj->moveOnLine(0.001f);
+        addDrawableObject(treeObj);
+    }
+
+  
+
+  
+    addDrawableObject(l2);
+    addDrawableObject(a);
+ 
+
+
+
+    return true;
+}
 
 void Scene::createModelsForScenes() {
 
@@ -815,5 +1023,9 @@ void Scene::createModelsForScenes() {
 
     std::vector<Vertex> fiona = this->LoadModelFromObjectFile("fiona.obj");
     modelManager->CreateModel(fiona.data(), fiona.size(), "triangles", "fiona");
+
+
+    std::vector<Vertex> cat = this->LoadModelFromObjectFile("fatcat.obj");
+    modelManager->CreateModel(cat.data(), cat.size(), "triangles", "cat");
 
 }

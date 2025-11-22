@@ -62,3 +62,45 @@ glm::mat4 RandomTranslation::apply(const glm::mat4& matrix) {
     stepsRemaining--;
     return result;
 }
+
+
+
+
+CostumTransformation::CostumTransformation(const glm::mat4x4& matrix) : Transformation(), matrix(matrix) {}
+
+glm::mat4 CostumTransformation::apply(const glm::mat4& matrix) {
+    return matrix * this->matrix;
+};
+
+
+glm::vec3 RandomLine::randomPoint() {
+    float x = -5.0f + (rand() / (float)RAND_MAX) * 10.0f;;
+    float y = 0.1f;
+    float z = -5.0f + (rand() / (float)RAND_MAX) * 10.0f;
+
+    return glm::vec3(x, y, z);
+}
+
+RandomLine::RandomLine(float speed)
+    : speed(speed), t(0.0f)
+{
+    startPoint = randomPoint();
+    endPoint = randomPoint();
+}
+
+glm::mat4 RandomLine::apply(const glm::mat4& matrix) {
+    // když úseèka skonèí, vygeneruj novou
+    if (t >= 1.0f) {
+        startPoint = endPoint;
+        endPoint = randomPoint();
+        t = 0.0f;
+    }
+
+    glm::vec3 pos =
+        startPoint * (1.0f - t) +
+        endPoint * t;
+
+    t += speed;
+
+    return glm::translate(matrix, pos);
+}

@@ -27,15 +27,20 @@ int main(void)
     
    app.createScene();
     app.createScene();
+    app.createScene();
+    app.createScene();
     //app.addScene(scene2);
    
     Scene* scene3 = app.getScene(0);
     Scene* scene4 = app.getScene(1);
+    Scene* scene2 = app.getScene(2);
+    Scene* scene5 = app.getScene(3);
 
     scene3->createModelsForScenes(); //udelat z toho statickou
    bool z = scene3->prepareTestSceneCv05T3();
     bool a = scene4->prepareTestSceneCv05T4();
-    //bool b = scene2->prepareTestSceneCv05T2();
+    bool b = scene2->prepareTestSceneCv05T1();
+    bool x = scene5->prepareTestSceneCv05T6();
  
    
     bool d = app.prepareController();

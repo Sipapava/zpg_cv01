@@ -12,6 +12,7 @@ App::~App() {
     }
     scenes.clear();
     delete controller;
+    delete modelManager;
 
     if (window) {
         glfwDestroyWindow(window);

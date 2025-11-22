@@ -71,5 +71,6 @@ public:
     bool prepareTestSceneCv05T2();
     bool prepareTestSceneCv05T3();
     bool prepareTestSceneCv05T4();
+    bool prepareTestSceneCv05T6();
    
 };
