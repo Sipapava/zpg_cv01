@@ -34,11 +34,13 @@ private:
 
     int id;                     
     static int nextId;
+    std::string type;
+    int score;
 
     ma_engine engine;
 
 public:
-    Scene(ModelManager* mM);
+    Scene(ModelManager* mM,std::string type);
     ~Scene();
 
     void addShaderProgram(ShaderProgram* sp);  

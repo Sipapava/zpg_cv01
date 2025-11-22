@@ -21,8 +21,8 @@ App::~App() {
     }
 }
 
-void App::createScene() {
-    Scene* ss = new Scene(this->modelManager);
+void App::createScene(std::string type) {
+    Scene* ss = new Scene(this->modelManager,type);
     scenes.push_back(ss);
 }
 

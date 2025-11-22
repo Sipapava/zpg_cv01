@@ -23,7 +23,7 @@ public:
     App();
     ~App();
 
-    void createScene();
+    void createScene(std::string type);
     void deleteScene(size_t index);
     Scene* getScene(size_t index);
     int getSceneIndex();
