@@ -48,6 +48,14 @@ Scene* App::getScene(size_t index) {
 int App::getSceneIndex() {
     return sceneIndex;
 }
+void App::dummyStencilRead() {
+    GLuint dummy; 
+    glReadPixels(0, 0, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &dummy);
+}
+
+void App::prepareModelsFromManager() {
+    modelManager->createModelsForScenes();
+}
 
 bool App::initialize() {
     glfwSetErrorCallback(error_callback);
@@ -171,7 +179,12 @@ void App::onResize(int width, int height) {
     
     if (height == 0) height = 1;
     glViewport(0, 0, width, height);
-    controller->updateWindowSize(width, height);
+    if (height == 0) height = 1;
+    float aspect = width / (float)height;
+    for (Scene* s : scenes) {
+        s->getCamera()->setAspect(aspect);
+        s->getCamera()->SetResolutionY(height);
+    }
 }
 
 void App::onKey(int key, int scancode, int action, int mods) {

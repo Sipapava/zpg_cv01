@@ -8,17 +8,14 @@ class pointLight : public Light {
 
 public:
         pointLight(const glm::vec3& pos,
-        const glm::vec4& colorSpecular,
-        const glm::vec4& colorDiffuse,
         float intensity,
-        float shininess,
+
         float atten);
 
         pointLight(Model* m, ShaderProgram* sp, const glm::vec3& pos,
-            const glm::vec4& colorSpecular,
-            const glm::vec4& colorDiffuse,
+            
             float intensity,
-            float shininess,
+           
             float atten);
 
        

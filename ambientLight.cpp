@@ -1,11 +1,7 @@
 #include "ambientLight.h"
 
-ambientLight::ambientLight(const glm::vec4& colorAmbient) : Light(  
-        glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),
-        0.0f,
-        0.0f,
-    glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)),
-    ambientColor(colorAmbient)
+ambientLight::ambientLight() : Light(  
+        0.0f)  
 {
     
 }

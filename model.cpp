@@ -92,3 +92,5 @@ glm::vec3 Model::ComputeInitialCenter() const {
 std::string Model::getName() {
     return this->name;
 }
+
+

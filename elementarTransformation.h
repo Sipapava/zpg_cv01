@@ -64,12 +64,13 @@ public:
 
 class RandomLine : public Transformation {
 private:
-    glm::vec3 startPoint;
-    glm::vec3 endPoint;
+    glm::vec3 A;
+    glm::vec3 u;
     float t;
     float speed;
 
     glm::vec3 randomPoint();
+    glm::vec3 randomDir();
 
 public:
     RandomLine(float speed);

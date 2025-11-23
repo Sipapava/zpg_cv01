@@ -1,12 +1,11 @@
 #include "pointLight.h"
 
 pointLight::pointLight(const glm::vec3& pos,
-    const glm::vec4& colorSpecular,
-    const glm::vec4& colorDiffuse,
+    
     float intensity,
-    float shininess,
+    
     float atten)
-    : Light(colorSpecular, intensity, shininess, colorDiffuse),
+    : Light( intensity),
     defaultPosition(pos),     
     positionSend(pos),
     attenuation(atten)
@@ -16,12 +15,11 @@ pointLight::pointLight(const glm::vec3& pos,
 
 pointLight::pointLight(Model* m, ShaderProgram* sp,
     const glm::vec3& pos,
-    const glm::vec4& colorSpecular,
-    const glm::vec4& colorDiffuse,
+   
     float intensity,
-    float shininess,
+    
     float atten)
-    : Light(m, sp, colorSpecular, intensity, shininess, colorDiffuse),
+    : Light(m, sp, intensity),
     defaultPosition(pos),
     positionSend(pos),
     attenuation(atten)

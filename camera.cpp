@@ -53,6 +53,7 @@ void Camera::setAspect(float aspect) {
 
 void Camera::SetResolutionY(int y) {
     this->resolutionY = y;
+    
 }
 
 

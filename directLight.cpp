@@ -1,11 +1,10 @@
 #include "directLight.h"
 
 directLight::directLight(const glm::vec3& direction,
-    const glm::vec4& colorSpecular,
-    const glm::vec4& colorDiffuse,
-    float intensity,
-    float shininess)
-    : Light(colorSpecular, intensity, shininess, colorDiffuse),
+    
+    float intensity
+    )
+    : Light( intensity),
     direction(direction)
 {
    

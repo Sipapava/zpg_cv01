@@ -19,5 +19,5 @@ public:
 	void mousePress(int button, int action, int mods,double x, double y);
 	bool setScene(Scene* scene);
 	void Update();
-	void updateWindowSize(int width, int height);
+	
 };

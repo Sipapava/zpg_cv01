@@ -1,24 +1,21 @@
 #include "Light.h"
 
 
-Light::Light(const glm::vec4& colorSpecular, float intensity, float shiness, const glm::vec4& colorDiffuse)
+Light::Light(float intensity)
     : DrawableObject(nullptr, nullptr,"light"),
-    colorSpecular(colorSpecular),
-    specularIntesity(intensity),
-    shiness(shiness),
-    diffuseColor(colorDiffuse)
+    specularIntesity(intensity)
 {
     
 }
 
 
 Light::Light(Model* m, ShaderProgram* sp,
-    const glm::vec4& colorSpecular, float intensity, float shiness, const glm::vec4& colorDiffuse)
+    float intensity)
     : DrawableObject(m, sp,"light"),
-    colorSpecular(colorSpecular),
-    specularIntesity(intensity),
-    shiness(shiness),
-    diffuseColor(colorDiffuse)
+    
+    specularIntesity(intensity)
+    
+   
 {
     
 }

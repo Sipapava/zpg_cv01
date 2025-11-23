@@ -13,11 +13,10 @@ protected:
 
 public:
     reflectorLight(const glm::vec3& pos, const glm::vec3& dir,
-        const glm::vec4& colorSpecular,
-        const glm::vec4& colorDiffuse,
+        
      
         float intensity,
-        float shininess,
+      
         float atten, float angle);
 
     ~reflectorLight() {};
@@ -37,11 +36,10 @@ private:
 
 public:
     reflectorLightCamera(const glm::vec3& pos, const glm::vec3& dir,
-        const glm::vec4& colorSpecular,
-        const glm::vec4& colorDiffuse,
+        
 
         float intensity,
-        float shininess,
+        
         float atten, float angle);
 
     ~reflectorLightCamera() {};

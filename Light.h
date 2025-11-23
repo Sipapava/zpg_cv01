@@ -10,19 +10,16 @@
 
 class Light : public subject, public DrawableObject {
 protected:
-	
-	
-	glm::vec4 colorSpecular;
 	float specularIntesity;
-	float shiness;
-	glm::vec4 diffuseColor;
+	
+	
 	
 	
 
 public:
 
-	Light(const glm::vec4& colorSpecular, float intesnity, float shiness, const glm::vec4& colorDiffuse);
-	Light(Model* m, ShaderProgram* sp,const glm::vec4& colorSpecular, float intesnity, float shiness, const glm::vec4& colorDiffuse);
+	Light(float intesnity);
+	Light(Model* m, ShaderProgram* sp, float intesnity);
 	~Light() {};
 	
 	void UpdateLightsShaderPro();

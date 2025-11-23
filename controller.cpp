@@ -13,20 +13,14 @@ Controller::~Controller() {
 
 bool Controller::setScene(Scene* scene) {
     this->scene = scene;
+   
     if (this->scene) {
         return true;
     }
     return false;
     
 }
-void Controller::updateWindowSize(int width, int height) {
-    if (height == 0) height = 1; 
 
-    float aspect = width / (float)height;;
-
-    this->scene->getCamera()->setAspect(aspect);
-    this->scene->getCamera()->SetResolutionY(height);
-}
 void Controller::keyboardMovement(int key, int scancode, int action, int mods) {
    
     if (action == GLFW_PRESS) {

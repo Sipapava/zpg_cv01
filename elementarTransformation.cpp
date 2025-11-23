@@ -74,32 +74,35 @@ glm::mat4 CostumTransformation::apply(const glm::mat4& matrix) {
 
 
 glm::vec3 RandomLine::randomPoint() {
-    float x = -5.0f + (rand() / (float)RAND_MAX) * 10.0f;;
+    float x = -5.0f + (rand() / (float)RAND_MAX) * 10.0f;
     float y = 0.1f;
     float z = -5.0f + (rand() / (float)RAND_MAX) * 10.0f;
-
     return glm::vec3(x, y, z);
+}
+
+glm::vec3 RandomLine::randomDir() {
+    float x = -1.0f + (rand() / (float)RAND_MAX) * 2.0f;
+    float y = 0.0f;
+    float z = -1.0f + (rand() / (float)RAND_MAX) * 2.0f;
+    glm::vec3 d(x, y, z);
+    return glm::normalize(d);
 }
 
 RandomLine::RandomLine(float speed)
     : speed(speed), t(0.0f)
 {
-    startPoint = randomPoint();
-    endPoint = randomPoint();
+    A = randomPoint();
+    u = randomDir();
 }
 
 glm::mat4 RandomLine::apply(const glm::mat4& matrix) {
-    // když úseèka skonèí, vygeneruj novou
     if (t >= 1.0f) {
-        startPoint = endPoint;
-        endPoint = randomPoint();
+        A = A + u;        // nový zaèátek je skuteèný konec pøedchozího pohybu
+        u = randomDir(); // nový smìrový vektor
         t = 0.0f;
     }
 
-    glm::vec3 pos =
-        startPoint * (1.0f - t) +
-        endPoint * t;
-
+    glm::vec3 pos = A + u * t;
     t += speed;
 
     return glm::translate(matrix, pos);

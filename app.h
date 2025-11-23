@@ -32,6 +32,8 @@ public:
     void run(int sceneId);
 
     bool prepareController();
+    void dummyStencilRead();
+    void prepareModelsFromManager();
     
 
     void onKey(int key, int scancode, int action, int mods);

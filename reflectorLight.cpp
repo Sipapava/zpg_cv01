@@ -1,12 +1,11 @@
 #include "reflectorLight.h"
 
 reflectorLight::reflectorLight(const glm::vec3& pos, const glm::vec3& dir,
-    const glm::vec4& colorSpecular,
-    const glm::vec4& colorDiffuse,
+    
     float intensity,
-    float shininess,
+    
     float atten, float angle)
-    : Light(colorSpecular, intensity, shininess, colorDiffuse),
+    : Light(intensity),
     defaultPosition(pos),     
     positionSend(pos),
     attenuation(atten),
@@ -67,13 +66,12 @@ LightData reflectorLight::getLightData() const {
 
 reflectorLightCamera::reflectorLightCamera(
     const glm::vec3& pos, const glm::vec3& dir,
-    const glm::vec4& colorSpecular,
-    const glm::vec4& colorDiffuse,
+   
     float intensity,
-    float shininess,
+    
     float atten,
     float angle)
-    : reflectorLight(pos, dir, colorSpecular, colorDiffuse, intensity, shininess, atten, angle),
+    : reflectorLight(pos, dir,  intensity,  atten, angle),
     Mv(nullptr),
     turnOn(true)
 {

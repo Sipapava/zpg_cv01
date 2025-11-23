@@ -2,10 +2,7 @@
 #define MINIAUDIO_IMPLEMENTATION
 #include "Scene.h"
 #include <algorithm> 
-#include "tree.h"
-#include "skycube.h"
-#include "bushes.h"
-#include "sphere.h"
+
 
 //remake create and add methods for DrObj and Shaders
 
@@ -99,30 +96,13 @@ bool Scene::DeleteObject(int id) {
                 score++;
                 std::cout << "Score adds up: " << this->score << std::endl;
                 if (score % 5 == 0) {
-                    //Z TOHOT Udelat dunkci
-                    Model* treeModel = modelManager->GetModelByName("spinosaurus");
-                    ShaderProgram* shaderProgramColor = shaderPrograms[0];
-                    DrawableObject* treeObj = CreateDrawableObject(treeModel, shaderProgramColor, "spinosaurus");
-                    treeObj->setColor(glm::vec4(0.33f, 0.2f, 0.8f, 1.0f));
-                    Texture* t = new Texture();
-                    treeObj->AddTexture(t);
-                    float r = 0 + (rand() / (float)RAND_MAX) * (359 - 0);
-
-                    float x = -2.0f + (rand() / (float)RAND_MAX) * 4.0f;;
-                    float y = -0.2f;
-                    float z = -2.0f + (rand() / (float)RAND_MAX) * 4.0f;
-
+                    this->buildSpinosaurus();
                    
-                    treeObj->Rotate(glm::radians(-90.0f), 1, 0, 0); // srovná Z-up -> Y-up
-                    treeObj->Rotate(glm::radians(90.0f), 0, 1, 0);
-                    treeObj->Rotate(glm::radians(r), 0, 1, 0);
-                    treeObj->Resize(0.005f, 0.005f, 0.005f);
-                    treeObj->MoveTo(x, y, z);
-                    treeObj->moveOnLine(0.001f);
-
-
-                    addDrawableObject(treeObj);
                     return true;
+                }
+
+                if (this->drawableObjects.size() == 4) {
+                    std::cout << "YOU CATCH THEM ALL! "<< std::endl;
                 }
             }
         }
@@ -174,107 +154,32 @@ bool Scene::BuildObject(float x, float y, float z) {
     return true;
 }
 
+void Scene::buildSpinosaurus() {
+    Model* spinoModel = modelManager->GetModelByName("spinosaurus");
+    ShaderProgram* shaderProgramColor = shaderPrograms[0];
+    DrawableObject* spObj = CreateDrawableObject(spinoModel, shaderProgramColor, "spinosaurus");
+    spObj->setColor(glm::vec4(0.33f, 0.2f, 0.8f, 1.0f));
+    Texture* t = new Texture();
+    spObj->AddTexture(t);
+    float r = 0 + (rand() / (float)RAND_MAX) * (359 - 0);
+
+    float x = -2.0f + (rand() / (float)RAND_MAX) * 4.0f;;
+    float y = -0.2f;
+    float z = -2.0f + (rand() / (float)RAND_MAX) * 4.0f;
 
 
-std::vector<Vertex> Scene::LoadModelFromObjectFile(const char* path) {
-    Assimp::Importer importer;
-    std::vector<Vertex> vertices;
+    spObj->Rotate(glm::radians(-90.0f), 1, 0, 0); // srovná Z-up -> Y-up
+    spObj->Rotate(glm::radians(90.0f), 0, 1, 0);
+    spObj->Rotate(glm::radians(r), 0, 1, 0);
+    spObj->Resize(0.005f, 0.005f, 0.005f);
+    spObj->MoveTo(x, y, z);
+    spObj->moveOnLine(0.02f);
 
-    const aiScene* scene = importer.ReadFile(path,
-        aiProcess_Triangulate  
-    );
 
-    if (!scene || !scene->HasMeshes()) {
-        std::cerr << "Assimp error: " << importer.GetErrorString() << std::endl;
-        return vertices;
-    }
-
-    for (unsigned int m = 0; m < scene->mNumMeshes; ++m) {
-        aiMesh* mesh = scene->mMeshes[m];
-
-        for (unsigned int f = 0; f < mesh->mNumFaces; ++f) {
-            aiFace& face = mesh->mFaces[f];
-
-            for (unsigned int i = 0; i < face.mNumIndices; ++i) {
-                unsigned int idx = face.mIndices[i];
-                Vertex v;
-
-           
-                v.pos = glm::vec4(
-                    mesh->mVertices[idx].x,
-                    mesh->mVertices[idx].y,
-                    mesh->mVertices[idx].z,
-                    1.0f
-                );
-
-               
-                if (mesh->HasNormals()) {
-                    v.normal = glm::vec4(
-                        mesh->mNormals[idx].x,
-                        mesh->mNormals[idx].y,
-                        mesh->mNormals[idx].z,
-                        1.0f
-                    );
-                }
-                else {
-                    v.normal = glm::vec4(0, 0, 0, 0);
-                }
-
-                
-                if (mesh->HasTextureCoords(0)) {
-                    aiVector3D tex = mesh->mTextureCoords[0][idx];
-                    v.texture = glm::vec2(tex.x, tex.y);
-                }
-                else {
-                    v.texture = glm::vec2(0.0f, 0.0f);
-                }
-
-                vertices.push_back(v);
-            }
-        }
-    }
-
-    return vertices;
+    addDrawableObject(spObj);
 }
 
-std::vector<Vertex> Scene::FromFloat(const float* data, size_t size, bool hasTexture, bool hasNormal) {
-    std::vector<Vertex> vertices;
 
-    // 3 (pos) + 3 (normal) + 2 (tex)
-    size_t stride = 3 + (hasNormal ? 3 : 0) + (hasTexture ? 2 : 0);
-
-    if (size % stride != 0) {
-        std::cerr << " FromFloat: Data size (" << size
-            << ") is not a multiple of stride (" << stride << ")!\n";
-    }
-
-    for (size_t i = 0; i < size; i += stride) {
-        Vertex v;
-
-        v.pos = glm::vec4(data[i], data[i + 1], data[i + 2], 1.0f);
-        size_t offset = 3;
-
-        if (hasNormal) {
-            v.normal = glm::vec4(data[i + offset], data[i + offset + 1], data[i + offset + 2], 1.0f);
-            offset += 3;
-        }
-        else {
-            v.normal = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
-        }
-
-        if (hasTexture) {
-            v.texture = glm::vec2(data[i + offset], data[i + offset + 1]);
-            offset += 2;
-        }
-        else {
-            v.texture = glm::vec2(1.0f);
-        }
-
-        vertices.push_back(v);
-    }
-
-    return vertices;
-}
 
 
 
@@ -331,12 +236,12 @@ void Scene::draw() {
 }
 
 
-bool Scene::prepareTestSceneCv05T1() {
+bool Scene::prepareHomogenusChange() {
 
     Shader* vr = new Shader();
     Shader* fr = new Shader();
     this->camera = this->CreateCamera();
-    vr->createShaderFromFile(GL_VERTEX_SHADER, "shaders/vertex_shader_ph.glsl");
+    vr->createShaderFromFile(GL_VERTEX_SHADER, "shaders/vertex_shader_phlam.glsl");
     fr->createShaderFromFile(GL_FRAGMENT_SHADER, "shaders/fragment_shader_blph.glsl");
 
     ShaderProgram* shaderProgramColor = new ShaderProgram(vr, fr);
@@ -359,19 +264,18 @@ bool Scene::prepareTestSceneCv05T1() {
     glm::vec3 lightDirection = glm::vec3(0.0f, -1.0f, 0.0f);
 
 
-    glm::vec4 specularColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-    glm::vec4 diffuseColor = glm::vec4(0.385, 0.647, 0.812, 1.0);
+ 
 
 
 
     float intensity = 1.0f;
-    float shininess = 32.0f;
+    
 
-    directLight* l = new directLight(lightDirection, specularColor, diffuseColor, intensity, shininess);
+    directLight* l = new directLight(lightDirection,  intensity);
 
 
 
-    ambientLight* a = new ambientLight(glm::vec4(0.1, 0.1, 0.1, 1.0));
+    ambientLight* a = new ambientLight();
     camera->AddObserver(shaderProgramColor);
 
     a->AddObserver(shaderProgramColor);
@@ -384,11 +288,11 @@ bool Scene::prepareTestSceneCv05T1() {
     return true;
 }
 
-bool Scene::prepareTestSceneCv05T2() {
+bool Scene::prepareSolarSystem() {
     
     Shader* vr1 = new Shader();
     Shader* fr1 = new Shader();
-    vr1->createShaderFromFile(GL_VERTEX_SHADER, "shaders/vertex_shader_ph.glsl");
+    vr1->createShaderFromFile(GL_VERTEX_SHADER, "shaders/vertex_shader_phlam.glsl");
     fr1->createShaderFromFile(GL_FRAGMENT_SHADER, "shaders/fragment_shader_blph.glsl");
 
     ShaderProgram* shaderProgramBl = new ShaderProgram(vr1, fr1);
@@ -411,17 +315,16 @@ bool Scene::prepareTestSceneCv05T2() {
 
     Model* sphereModel = modelManager->GetModelByName("planet");
     pointLight* l2 = new pointLight(sphereModel, shaderProgramCon, glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec4(1.0, 1.0, 1.0, 1.0),
-        glm::vec4(0.95, 0.55, 0.15, 1.0),
+      
         0.6f,
-        32.0f,
+        
         0.001f);
     Texture* t2 = new Texture();
     l2->AddTexture(t2);
 
 
 
-   ambientLight * a = new ambientLight(glm::vec4(0.1, 0.1, 0.1, 1.0));
+   ambientLight * a = new ambientLight();
   
     
    
@@ -444,25 +347,25 @@ bool Scene::prepareTestSceneCv05T2() {
 
 
     Material* sunMat = this->CreateMaterial(
-        glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),   // ambient
-        glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),   // diffuseh
-        glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),  // specular
-        5.0f    // shiness
+        glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),   
+        glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),  
+        glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),  
+        5.0f   
     );
     
 
     
 
     DrawableObject* sun = CreateDrawableObject(sphereModel, shaderProgramBl,"normal");
-    sun->Resize(0.3f, 0.3f, 0.3f);
-    sun->SetRotateAnimation(glm::radians(0.001f), glm::vec3(0, 0.5, 0.5));
+    sun->Resize(0.4f, 0.4f, 0.4f);
+    sun->SetRotateAnimation(glm::radians(0.001f), glm::vec3(0, 1, 0));
     sun->AddTexture(new Texture("textures/sun.jpg", "texture_test"));
     sun->setMaterial(sunMat);
     addDrawableObject(sun);
 
     DrawableObject* mercur = CreateDrawableObject(sphereModel, shaderProgramBl, "normal");
     mercur->Resize(0.05f, 0.05f, 0.05f);
-    mercur->SetRotateAnimation(glm::radians(0.01f), glm::vec3(0, 0.5, 0.5));
+    mercur->SetRotateAnimation(glm::radians(0.01f), glm::vec3(0, 1, 0));
     mercur->MoveTo(1.0f, 0.0f, 0.0f);
     mercur->SetRotateAnimation(glm::radians(4.0f), glm::vec3(0, 1, 0));
     mercur->AddTexture(new Texture("textures/mercury.jpg", "texture_test"));
@@ -470,7 +373,7 @@ bool Scene::prepareTestSceneCv05T2() {
 
     DrawableObject* venus = CreateDrawableObject(sphereModel, shaderProgramBl, "normal");
     venus->Resize(0.09f, 0.09f, 0.09f);
-    venus->SetRotateAnimation(glm::radians(0.001f), glm::vec3(0, 0.5, 0.5));
+    venus->SetRotateAnimation(glm::radians(-0.05f), glm::vec3(0, 0, 1));
     venus->MoveTo(2.0f, 0.0f, 0.0f);
     venus->SetRotateAnimation(glm::radians(1.2f), glm::vec3(0, 1, 0));
     venus->AddTexture(new Texture("textures/venus.jpg", "texture_test"));
@@ -478,7 +381,7 @@ bool Scene::prepareTestSceneCv05T2() {
 
     DrawableObject* earth = CreateDrawableObject(sphereModel, shaderProgramBl,"normal");
     earth->Resize(0.1f, 0.1f, 0.1f);
-    earth->SetRotateAnimation(glm::radians(1.0f), glm::vec3(0, 0.5, 0.5));
+    earth->SetRotateAnimation(glm::radians(1.0f), glm::vec3(0, 0.8, -0.2));
     earth->MoveTo(3.0f, 0.0f, 0.0f);
     earth->SetRotateAnimation(glm::radians(1.0f), glm::vec3(0, 1, 0));
     earth->AddTexture(new Texture("textures/earth.jpg", "texture_test"));
@@ -486,7 +389,7 @@ bool Scene::prepareTestSceneCv05T2() {
 
     DrawableObject* moon = CreateDrawableObject(sphereModel, shaderProgramBl,"normal");
     moon->Resize(0.05f, 0.05f, 0.05f);
-    moon->SetRotateAnimation(glm::radians(1.0f), glm::vec3(0, 0.5, 0.5));
+    moon->SetRotateAnimation(glm::radians(1.0f), glm::vec3(0, 1, 0));
     moon->MoveTo(0.3f, 0.0f, 0.0f);
     moon->SetRotateAnimation(glm::radians(1.0f), glm::vec3(0, 1, 0));
     moon->MoveTo(3.0f, 0.0f, 0.0f);
@@ -496,7 +399,7 @@ bool Scene::prepareTestSceneCv05T2() {
 
     DrawableObject* mars = CreateDrawableObject(sphereModel, shaderProgramBl, "normal");
     mars->Resize(0.09f, 0.09f, 0.09f);
-    mars->SetRotateAnimation(glm::radians(1.0f), glm::vec3(0, 0.5, 0.5));
+    mars->SetRotateAnimation(glm::radians(1.0f), glm::vec3(0, 0.85, 0.15));
     mars->MoveTo(4.0f, 0.0f, 0.0f);
     mars->SetRotateAnimation(glm::radians(0.5f), glm::vec3(0, 1, 0));
     mars->AddTexture(new Texture("textures/mars.jpg", "texture_test"));
@@ -505,7 +408,7 @@ bool Scene::prepareTestSceneCv05T2() {
     return true;
 }
 
-bool Scene::prepareTestSceneCv05T3() {
+bool Scene::prepareFlyingCars() {
     Shader* vr1 = new Shader();
     Shader* fr1 = new Shader();
     vr1->createShaderFromFile(GL_VERTEX_SHADER, "shaders/vertex_shader_con.glsl");
@@ -513,18 +416,18 @@ bool Scene::prepareTestSceneCv05T3() {
 
     Shader* vr2 = new Shader();
     Shader* fr2 = new Shader();
-    vr2->createShaderFromFile(GL_VERTEX_SHADER, "shaders/vertex_shader_lam.glsl");
+    vr2->createShaderFromFile(GL_VERTEX_SHADER, "shaders/vertex_shader_phlam.glsl");
     fr2->createShaderFromFile(GL_FRAGMENT_SHADER, "shaders/fragment_shader_lam.glsl");
 
     Shader* vr3 = new Shader();
     Shader* fr3 = new Shader();
-    vr3->createShaderFromFile(GL_VERTEX_SHADER, "shaders/vertex_shader_ph.glsl");
+    vr3->createShaderFromFile(GL_VERTEX_SHADER, "shaders/vertex_shader_phlam.glsl");
     fr3->createShaderFromFile(GL_FRAGMENT_SHADER, "shaders/fragment_shader_ph.glsl");
 
 
     Shader* vr4 = new Shader();
     Shader* fr4 = new Shader();
-    vr4->createShaderFromFile(GL_VERTEX_SHADER, "shaders/vertex_shader_ph.glsl");
+    vr4->createShaderFromFile(GL_VERTEX_SHADER, "shaders/vertex_shader_phlam.glsl");
     fr4->createShaderFromFile(GL_FRAGMENT_SHADER, "shaders/fragment_shader_blph.glsl");
 
 
@@ -556,19 +459,18 @@ bool Scene::prepareTestSceneCv05T3() {
     this->camera = this->CreateCamera();
     
    
-   ambientLight* a = new ambientLight(  glm::vec4(0.1, 0.1, 0.1, 1.0));
+   ambientLight* a = new ambientLight();
     
    glm::vec3 lightDirection = glm::vec3(0.0f, -1.0f, 0.0f);
 
   
-   glm::vec4 specularColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f); 
-   glm::vec4 diffuseColor = glm::vec4(0.385, 0.647, 0.812, 1.0); 
+   
 
    
    float intensity = 1.0f;
-   float shininess = 32.0f;
+   
 
-   directLight* l =  new directLight(lightDirection, specularColor, diffuseColor, intensity, shininess);
+   directLight* l =  new directLight(lightDirection,  intensity);
 
     ShaderProgram* shaderProgramCon = new ShaderProgram(vr1, fr1);
     ShaderProgram* shaderProgramAm = new ShaderProgram(vr2, fr2);
@@ -644,13 +546,13 @@ bool Scene::prepareTestSceneCv05T3() {
     
 }
 
-bool Scene::prepareTestSceneCv05T4(){
+bool Scene::prepareForest(){
     
     
     
     Shader* vr = new Shader();
     Shader* fr = new Shader();
-    vr->createShaderFromFile(GL_VERTEX_SHADER, "shaders/vertex_shader_ph.glsl");
+    vr->createShaderFromFile(GL_VERTEX_SHADER, "shaders/vertex_shader_phlam.glsl");
     fr->createShaderFromFile(GL_FRAGMENT_SHADER, "shaders/fragment_shader_blph.glsl");
     
     this->camera = this->CreateCamera();
@@ -675,10 +577,9 @@ bool Scene::prepareTestSceneCv05T4(){
   
     
     pointLight* l1 = new pointLight(sphereModel,shaderProgramBug,glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec4(1.0, 1.0, 1.0, 1.0),
-        glm::vec4(0.8, 0.75, 0.3, 1.0),
+        
         0.6f,
-        32.0f,
+        
         5.0f);
 
     Texture* t1 = new Texture();
@@ -686,25 +587,23 @@ bool Scene::prepareTestSceneCv05T4(){
 
   
     pointLight* l2 = new pointLight(sphereModel, shaderProgramBug,glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec4(1.0, 1.0, 1.0, 1.0),
-        glm::vec4(0.95, 0.55, 0.15, 1.0),
+       
         0.6f,
-        32.0f,
+       
         5.0f);
     Texture* t2 = new Texture();
     l2->AddTexture(t2);
     
 
-    ambientLight* a = new ambientLight( glm::vec4(0.1, 0.1, 0.1, 1.0));
+    ambientLight* a = new ambientLight( );
 
 
     reflectorLightCamera *newReflector = new reflectorLightCamera(
         glm::vec3(0.0f, 0.5f, -2.0f),               
         glm::vec3(0.0f, 0.0f, 0.0f),                   
-        glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),  
-        glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), 
+       
         1.0f,                   
-        32.0f,                
+                      
         0.1f,                
         1.0f                   
     );
@@ -898,12 +797,12 @@ bool Scene::prepareTestSceneCv05T4(){
     return true;
 }
 
-bool Scene::prepareTestSceneCv05T6(){
+bool Scene::prepareCatchGame(){
 
 
     Shader* vr = new Shader();
     Shader* fr = new Shader();
-    vr->createShaderFromFile(GL_VERTEX_SHADER, "shaders/vertex_shader_ph.glsl");
+    vr->createShaderFromFile(GL_VERTEX_SHADER, "shaders/vertex_shader_phlam.glsl");
     fr->createShaderFromFile(GL_FRAGMENT_SHADER, "shaders/fragment_shader_blph.glsl");
 
     this->camera = this->CreateCamera();
@@ -924,21 +823,20 @@ bool Scene::prepareTestSceneCv05T6(){
    
    
 
-    pointLight* l2 = new pointLight(glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec4(1.0, 1.0, 1.0, 1.0),
-        glm::vec4(0.95, 0.55, 0.15, 1.0),
+    pointLight* l2 = new pointLight(glm::vec3(0.0f, 2.0f, 0.0f),
+        
         0.6f,
-        32.0f,
-        0.05f);
+      
+        0.005f);
     
 
 
-    ambientLight* a = new ambientLight(glm::vec4(0.1, 0.1, 0.1, 1.0));
+    ambientLight* a = new ambientLight();
 
 
   
 
-    Texture* skyboxTexture = new Texture("textures/sunset.jpg", "skyTexture");
+    Texture* skyboxTexture = new Texture("textures/blueSky.jpg", "skyTexture");
 
     Model* skyModel = modelManager->GetModelByName("skyDom");
 
@@ -985,7 +883,7 @@ bool Scene::prepareTestSceneCv05T6(){
 
     DrawableObject* bushPlane = CreateDrawableObject(planeModel, shaderProgramColor, "simplePlane");
 
-    Texture* t6 = new Texture("textures/grass.jpg", "texture_test");
+    Texture* t6 = new Texture("textures/dirt.jpg", "texture_test");
     bushPlane->AddTexture(t6);
 
     bushPlane->Resize(12.0f, 12.0f, 12.0f);
@@ -997,36 +895,26 @@ bool Scene::prepareTestSceneCv05T6(){
 
 
     Material* Mat = this->CreateMaterial(
-        glm::vec4(0.1f, 0.1f, 0.1f, 1.0f),   // ambient
-        glm::vec4(0.8f, 0.8f, 0.8f, 1.0f),   // diffuseh
-        glm::vec4(0.0f, 0.0f, 0.0f, 1.0f),  // specular
-        5.0f    // shiness
+        glm::vec4(0.1f, 0.1f, 0.1f, 1.0f),   
+        glm::vec4(0.8f, 0.8f, 0.8f, 1.0f),  
+        glm::vec4(0.0f, 0.0f, 0.0f, 1.0f),  
+        5.0f   
     );
 
-   
 
     int totalCat = 15;
   
-
-
-    int treeRows = 3;
-    int treeCols = 5;
-
-
-
-
-
-    
-
+    int Rows = 3;
+    int Cols = 5;
 
 
     for (int i = 0; i < totalCat; ++i) {
-        DrawableObject* treeObj = CreateDrawableObject(catModel, shaderProgramColor, "cat");
-        treeObj->setColor(glm::vec4(0.9f, 0.6f, 0.0f, 1.0f));
+        DrawableObject* catObj = CreateDrawableObject(catModel, shaderProgramColor, "cat");
+        catObj->setColor(glm::vec4(0.9f, 0.6f, 0.0f, 1.0f));
         Texture* t = new Texture();
-        treeObj->AddTexture(t);
-        int row = i / treeCols;
-        int col = i % treeCols;
+        catObj->AddTexture(t);
+        int row = i / Cols;
+        int col = i % Cols;
 
         float x = -1.0f + col * 0.5f;
         float y = 0.0f;
@@ -1034,11 +922,11 @@ bool Scene::prepareTestSceneCv05T6(){
 
         float r = 0 + (rand() / (float)RAND_MAX) * (359 - 0);
 
-        treeObj->Rotate(glm::radians(r), 0, 1, 0);
-        treeObj->Resize(0.01f, 0.01f, 0.01f);
-        treeObj->MoveTo(x, y, z);
-        treeObj->moveOnLine(0.001f);
-        addDrawableObject(treeObj);
+        catObj->Rotate(glm::radians(r), 0, 1, 0);
+        catObj->Resize(0.01f, 0.01f, 0.01f);
+        catObj->MoveTo(x, y, z);
+        catObj->moveOnLine(0.01f);
+        addDrawableObject(catObj);
     }
 
   
@@ -1053,81 +941,3 @@ bool Scene::prepareTestSceneCv05T6(){
     return true;
 }
 
-void Scene::createModelsForScenes() {
-
-    const int sphereSize = sizeof(sphere) / sizeof(sphere[0]);
-    std::vector<Vertex> sphereV = FromFloat(sphere, sphereSize, false, true);
-  
-    std::vector<std::string> faces = {
-    "skybox/posx.jpg",
-    "skybox/negx.jpg",
-    "skybox/posy.jpg",
-    "skybox/negy.jpg",
-    "skybox/posz.jpg",
-    "skybox/negz.jpg"
-    };
-
-    const int cubeSize = sizeof(skycube) / sizeof(skycube[0]);
-    std::vector<Vertex> sunss = FromFloat(skycube, cubeSize, false, false);
-    modelManager->CreateModel(sunss.data(), sunss.size(), "triangles", "skyCube");
-  
-
-    modelManager->CreateModel(sphereV.data(), sphereV.size(), "triangles", "sphere");
-
-    std::vector<Vertex> form = this->LoadModelFromObjectFile("models/formula1.obj");
-    modelManager->CreateModel(form.data(), form.size(), "triangles", "formule");
-
-    const Vertex planeVertices[] = {
-        // pozice                   normal                     uv
-        {{-2.0f, -0.4f, 0.0f, 1.0f}, {0.0f, 0.5f, 0.0f, 1.0f}, {0.0f, 0.0f}},
-        {{ 2.0f, -0.4f, 0.0f, 1.0f}, {0.0f, 0.5f, 0.0f, 1.0f}, {100.0f, 0.0f}},
-        {{ 2.0f, -0.4f, 2.5f, 1.0f}, {0.0f, 0.5f, 0.0f, 1.0f}, {100.0f, 100.0f}},
-
-        {{ 2.0f, -0.4f, 2.5f, 1.0f}, {0.0f, 0.5f, 0.0f, 1.0f}, {100.0f, 100.0f}},
-        {{-2.0f, -0.4f, 2.5f, 1.0f}, {0.0f, 0.5f, 0.0f, 1.0f}, {0.0f, 100.0f}},
-        {{-2.0f, -0.4f, 0.0f, 1.0f}, {0.0f, 0.5f, 0.0f, 1.0f}, {0.0f, 0.0f}}
-    };
-
-
-    const int treeSize = sizeof(tree) / sizeof(tree[0]);
-    std::vector<Vertex> treeV = FromFloat(tree, treeSize, false, true);
-
-
-    
-
-
-
-    const int bushSize = sizeof(bushes) / sizeof(bushes[0]);
-
-    std::vector<Vertex> bushV = FromFloat(bushes, bushSize, false, true);
-
-    
-
-
-    modelManager->CreateModel(treeV.data(), treeV.size(), "triangles", "tree");
-
-
-    modelManager->CreateModel(bushV.data(), bushV.size(), "triangles", "bush");
-
-    std::vector<Vertex> skydome = this->LoadModelFromObjectFile("models/skydome.obj");
-    modelManager->CreateModel(skydome.data(), skydome.size(), "triangles", "skyDom");
-
-    modelManager->CreateModel(planeVertices, sizeof(planeVertices) / sizeof(Vertex), "triangles", "plane");
-
-    std::vector<Vertex> shrek = this->LoadModelFromObjectFile("models/shrek.obj");
-    modelManager->CreateModel(shrek.data(), shrek.size(), "triangles", "shrek");
-
-    std::vector<Vertex> fiona = this->LoadModelFromObjectFile("models/fiona.obj");
-    modelManager->CreateModel(fiona.data(), fiona.size(), "triangles", "fiona");
-
-
-    std::vector<Vertex> cat = this->LoadModelFromObjectFile("models/fatcat.obj");
-    modelManager->CreateModel(cat.data(), cat.size(), "triangles", "cat");
-
-    std::vector<Vertex> spino = this->LoadModelFromObjectFile("models/spinosaurus.obj");
-    modelManager->CreateModel(spino.data(), spino.size(), "triangles", "spinosaurus");
-
-    std::vector<Vertex> planet = this->LoadModelFromObjectFile("models/planet.obj");
-    modelManager->CreateModel(planet.data(), planet.size(), "triangles", "planet");
-
-}
