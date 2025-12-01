@@ -23,12 +23,8 @@ struct LightData {
     glm::vec3 position;
     glm::vec3 direction;
     float angleReflector;
-  
     float intensity;
-  
     float attenuation;
-   
-
 };
 
 struct ShaderLightSlot {

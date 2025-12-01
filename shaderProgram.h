@@ -21,8 +21,6 @@ private:
     glm::mat4* projection;
     glm::vec3 cameraPos;
    
-
-    //
     //optim. here
     std::vector<ShaderLightSlot> lightsSlots;
 

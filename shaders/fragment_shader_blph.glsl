@@ -1,6 +1,6 @@
 #version 330 core
 
-in vec4 fragColor;
+
 in vec4 worldPosition;
 in vec3 worldNormal;
 in vec2 textCoords;
@@ -72,7 +72,7 @@ void main()
         }
 
      
-        if(lights[i].type == 3){
+        if(lights[i].type == 3){ //spotlight
           
              vec3 worldPos3 = vec3(
                         worldPosition.x / worldPosition.w,
@@ -101,21 +101,21 @@ void main()
             finalColor += diffuse + specular;
         }
 
-        if (lights[i].type == 4) { // spotlight
+        if (lights[i].type == 4) { // refleclor
             vec3 worldPos3 = vec3(
                         worldPosition.x / worldPosition.w,
                         worldPosition.y / worldPosition.w,
                         worldPosition.z / worldPosition.w);
-            vec3 lightDir = normalize(lights[i].lightPosition - worldPos3); // odraz od fragmentu k pozici svetla
-            vec3 spotDir = normalize(-lights[i].direction);                 // smer reflectoru
+            vec3 lightDir = normalize(lights[i].lightPosition - worldPos3); // refleflcet from fragment to light position
+            vec3 spotDir = normalize(-lights[i].direction);                 // direction light
 
-            float theta = dot(lightDir, spotDir);                            // uhel os a kuzele a svetla
-            float epsilon = cos(lights[i].angleReflector);                  // cutoff uhel, polovina refelcotove oblasti
+            float theta = dot(lightDir, spotDir);                            // angle of direction (axis) a and spot light
+            float epsilon = cos(lights[i].angleReflector);                  // cutoff angle, half of reflector area
 
    
 
-            if (theta > epsilon) {  // hodnota cos rostes mensim uhlem
-                float distance = length(lights[i].lightPosition - worldPos3);
+            if (theta > epsilon) {  // value fo cos degreas with higher angle
+                float distance = length(lights[i].lightPosition - worldPos3); //continues with calc as point ligt
                 float attenuation = 1.0 / (1.0 + lights[i].attenuation * distance + lights[i].attenuation * distance * distance);
 
                 vec3 norm = normalize(worldNormal);

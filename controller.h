@@ -7,8 +7,10 @@ class Controller {
 private:
 	bool rightMousePressed;
 	bool movementPressed[4] = { false, false, false, false };
+	bool bezPressed;
 	double lastX; double lastY;
 	Scene* scene;
+	std::vector<glm::vec3> points;
 	
 
 public:

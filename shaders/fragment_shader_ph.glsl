@@ -1,6 +1,6 @@
 #version 330 core
 
-in vec4 fragColor;
+
 in vec4 worldPosition;
 in vec3 worldNormal;
 out vec4 outColor;
@@ -51,7 +51,7 @@ void main()
             vec3 lightDir = normalize(-lights[i].direction); 
             vec3 norm = normalize(worldNormal);
 
-            // nepoužívat smoothstep zde, prostì max(0,dot)
+           
             float dotProduct = max(dot(norm, lightDir), 0.0);
             vec4 diffuse = dotProduct * material.diffuseColor;
 

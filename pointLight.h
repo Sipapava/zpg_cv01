@@ -7,19 +7,8 @@ class pointLight : public Light {
     glm::vec3 positionSend;      
 
 public:
-        pointLight(const glm::vec3& pos,
-        float intensity,
-
-        float atten);
-
-        pointLight(Model* m, ShaderProgram* sp, const glm::vec3& pos,
-            
-            float intensity,
-           
-            float atten);
-
-       
-
+        pointLight(const glm::vec3& pos,float intensity,float atten);
+        pointLight(Model* m, ShaderProgram* sp, const glm::vec3& pos, float intensity,float atten);
         ~pointLight() {};
         LightData getLightData() const override;
         void Update() override;

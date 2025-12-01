@@ -8,12 +8,8 @@ drawableSky::drawableSky(Model* model,ShaderProgram* shader)
 
 void drawableSky::draw() {
     if (!shaderProgram || !model) return;
-
-    
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    
-    //glStencilMask(0x00); // musim zakazat zapis, zustava tam nastevni z posledniho objektu minule smycky a tak se prepisuji
     glStencilFunc(GL_ALWAYS, 0, 0xFF);
     shaderProgram->setShaderProgram();
     shaderProgram->ProjectionApply();
@@ -26,12 +22,8 @@ void drawableSky::draw() {
         shaderProgram->setUniformInt(t->GetSlot(), t->GetType().c_str());
     }
 
-    
     model->Draw();
-
     shaderProgram->resetShaderProgram();
 
-   
-    
     glClear(GL_DEPTH_BUFFER_BIT);
 }

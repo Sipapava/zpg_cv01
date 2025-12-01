@@ -39,7 +39,6 @@ private:
 public:
     Scene(ModelManager* mM,std::string type);
     ~Scene();
-
     void addShaderProgram(ShaderProgram* sp);  
     //void deleteShaderProgram(ShaderProgram* sp);
     
@@ -55,15 +54,13 @@ public:
     bool BuildObject(int x, int y, float depht);
     bool BuildObject(float x, float y, float z);
     void buildSpinosaurus();
+    bool buildBezier(const std::vector<glm::vec3>& points, float speed);
     
 
     DrawableObject* CreateDrawableObject(Model* m, ShaderProgram* sp, std::string type);
     Material* CreateMaterial(const glm::vec4& ambient, const glm::vec4& diffuse, const glm::vec4& specular, const float shin);
     
-    
     Camera* CreateCamera();
-   
-
     //Light* CreateLight(const glm::vec3& position, const glm::vec4& colorSpecular, float intesnity, float shiness, const glm::vec4& colorDiffuse, float attenuation, const glm::vec4& ambientColor);
     bool prepareHomogenusChange(); //move to factory
     bool prepareSolarSystem();
@@ -71,6 +68,4 @@ public:
     bool prepareForest();
     bool prepareCatchGame();
 
-   
-   
 };

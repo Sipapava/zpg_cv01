@@ -126,12 +126,8 @@ void App::run(int sceneId) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         controller->Update();
-
-        
         Scene* scene = scenes[sceneIndex];
-        
         scene->draw();
-
         glfwPollEvents();
         glfwSwapBuffers(window);
     }

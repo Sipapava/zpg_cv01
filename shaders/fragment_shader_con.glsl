@@ -1,6 +1,6 @@
 #version 330 core
 
-in vec4 fragColor; //zbytecne asi
+
 in vec2 textCoords;
 out vec4 outColor;
 

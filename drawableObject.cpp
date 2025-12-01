@@ -12,9 +12,7 @@ DrawableObject::DrawableObject(Model* m, ShaderProgram* sp,std::string type)
     if (model) {
         position = model->ComputeInitialCenter();
     }
-    
     this->color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-   
     this->type = type;
     material = new Material();
 
@@ -36,15 +34,19 @@ void DrawableObject::AddTexture(Texture* t) {
 };
 
 void DrawableObject::SetRotateAnimation(float addAngle, const glm::vec3& axis) {
-
     transformation->Add(new RotationDynamic(0.0f, axis, addAngle));
-
 };
 
 void DrawableObject::SetRandomMoveAnimation(float speed, int maxSteps) {
-
     transformation->Add(new RandomTranslation(speed, maxSteps));
+};
 
+void DrawableObject::moveOnBezier(glm::vec3 controlPoints[4], float speed) {
+    transformation->Add(new Bezier(controlPoints, speed));
+}
+
+void DrawableObject::moveOnCustomeBezier(const std::vector<glm::vec3>& points, float speed) {
+    transformation->Add(new BezierCustom(points, speed));
 };
 
 std::string DrawableObject::GetType() {
@@ -53,21 +55,15 @@ std::string DrawableObject::GetType() {
 
 
 void DrawableObject::Update() {
-    //prazdna
-
+ 
 };
 
 void DrawableObject::draw() {
     if (shaderProgram) { //must be if, cause some lights have models and shaderprograms set tu null
         bool x = shaderProgram->setShaderProgram(); 
-
         
-
-        
-        //glStencilMask(0xFF); //  nastavuje bitovou masku definující, které bity ve stencil bufferu mohou být pøi kreslení pøepsány.
         glStencilFunc(GL_ALWAYS, getId(), 0xFF);
-        
-    
+
     shaderProgram->ProjectionApply();
     shaderProgram->LightApply();
 
@@ -75,29 +71,20 @@ void DrawableObject::draw() {
     glm::mat4 M = transformation->apply(I);
     int ready = shaderProgram->setUniform(M);
 
-    
     shaderProgram->setUniform4(this->color, "color");
     shaderProgram->materialApply(this->material);
         
-
-    
      
     for (auto t : textures) {
         if (!t) continue;
         t->ActiveTexture();
         t->BindTexture();
 
-        
         shaderProgram->setUniformInt(t->GetSlot(), t->GetType().c_str()); //do...update types
     }
 
-    
-    
-
     if (model && ready) { 
         model->Draw(); 
-
-
     }
     shaderProgram->resetShaderProgram();
    }
@@ -131,7 +118,6 @@ void DrawableObject::setCustomTransformation(const glm::mat4x4& matrix) {
 
 //cancel this each object has individual color so shader Must do setUnifrm for eaach
 void DrawableObject::setColor(const glm::vec4& color) {
-    
     this->color = color;
 }
 

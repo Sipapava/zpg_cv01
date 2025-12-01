@@ -23,8 +23,6 @@ protected:
     std::vector<Texture*> textures;
     Material* material;
     
-
-
 public:
     DrawableObject(Model* m, ShaderProgram* sp, std::string type);
     virtual ~DrawableObject();
@@ -35,6 +33,8 @@ public:
     void SetRotateAnimation(float addAngle, const glm::vec3& axis);
     void SetRandomMoveAnimation(float speed, int maxSteps);
     void moveOnLine(float speed);
+    void moveOnBezier (glm::vec3 controlPoints[4],float speed);
+    void moveOnCustomeBezier(const std::vector<glm::vec3>& points, float speed);
 
     void setCustomTransformation(const glm::mat4x4& matrix);
 
@@ -42,7 +42,6 @@ public:
     void setMaterial(Material* m);
     std::string GetType();
    
-
     void AddTexture(Texture* texture);
 
     void Update();

@@ -15,31 +15,7 @@ reflectorLight::reflectorLight(const glm::vec3& pos, const glm::vec3& dir,
 }
 
 void reflectorLight::Update() {
-    /*
-    if (!Mv) return; 
-
-   
-    glm::vec3 forward;
-    forward.x = -(*Mv)[0][2];
-    forward.y = -(*Mv)[1][2];
-    forward.z = -(*Mv)[2][2];
-    forward = glm::normalize(forward);
-
-    glm::vec3 newPosition = positionSend; 
-    glm::vec3 newDirection = forward;     
-
-   
-    bool positionChanged = !glm::all(glm::epsilonEqual(newPosition, positionSend, 0.0005f));
-    bool directionChanged = !glm::all(glm::epsilonEqual(newDirection, direction, 0.0005f));
-
-    if (positionChanged || directionChanged) {
-        positionSend = newPosition;
-        direction = newDirection;
-
-        
-        UpdateLightsShaderPro();
-    }
-    */
+  
 }
 
 

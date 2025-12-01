@@ -73,9 +73,8 @@ bool Scene::DeleteObject(int id) {
 
         if (obj->getId() == id && obj->GetType() != "plane") {
 
-            if (obj->GetType() == "simplePlane") {
-                return true;
-            }
+            
+            
 
             if (obj->GetType() == "zlobr") {
                 ma_engine_play_sound(&this->engine, "sounds/hurt.mp3", NULL);
@@ -118,13 +117,9 @@ bool Scene::DeleteObject(int id) {
 
 
 bool Scene::BuildObject(float x, float y, float z) {
-  
-
     Model* treeModel = modelManager->GetModelByName("tree");
 
     ShaderProgram* shaderProgramColor = shaderPrograms[0];
-
-   
     DrawableObject* treeObj = CreateDrawableObject(treeModel, shaderProgramColor, "normal");
     if (!treeObj) {
    
@@ -133,25 +128,42 @@ bool Scene::BuildObject(float x, float y, float z) {
 
   
     treeObj->setColor(glm::vec4(0.2f, 0.5f, 0.2f, 1.0f));
-
- 
     Texture* t = new Texture();
     treeObj->AddTexture(t);
 
-
     treeObj->Resize(0.1f, 0.1f, 0.1f);
-
- 
     treeObj->MoveTo(x, y , z);
-
-
     addDrawableObject(treeObj);
-
-    
-    
     ma_engine_play_sound(&engine, "sounds/plantSound.mp3", NULL);
 
     return true;
+}
+
+bool Scene::buildBezier(const std::vector<glm::vec3>& points, float speed) {
+
+    Model* treeModel = modelManager->GetModelByName("tree");
+    ShaderProgram* shaderProgramColor = shaderPrograms[0];
+    DrawableObject* treeObj = CreateDrawableObject(treeModel, shaderProgramColor, "normal");
+    
+    if (!treeObj) {
+        return false;
+    }
+    treeObj->setColor(glm::vec4(0.2f, 0.5f, 0.2f, 1.0f));
+
+    Texture* t = new Texture();
+    treeObj->AddTexture(t);
+
+    treeObj->Rotate(glm::radians(-90.0f), 1, 0, 0);
+    treeObj->Resize(0.1f, 0.1f, 0.1f);
+
+    treeObj->moveOnCustomeBezier(points, speed);
+
+    addDrawableObject(treeObj);
+
+    ma_engine_play_sound(&engine, "sounds/plantSound.mp3", NULL);
+
+    return true;
+
 }
 
 void Scene::buildSpinosaurus() {
@@ -227,7 +239,7 @@ void Scene::draw() {
  
     for (auto obj : drawableObjects) {
         if (obj) {
-            obj->Update();
+            //obj->Update(); empty method now
             obj->draw();
         }
     }
@@ -247,18 +259,14 @@ bool Scene::prepareHomogenusChange() {
     ShaderProgram* shaderProgramColor = new ShaderProgram(vr, fr);
     addShaderProgram(shaderProgramColor);
 
-    Model* sphereModel = modelManager->GetModelByName("sphere");
+    Model* sphereModel = modelManager->GetModelByName("login");
     DrawableObject* sun = CreateDrawableObject(sphereModel, shaderProgramColor, "normal");
     Texture* t = new Texture();
     sun->AddTexture(t);
-    sun->SetRotateAnimation(glm::radians(1.0f), glm::vec3(0, 0.5, 0.5));
+
     sun->Resize(0.1f, 0.1f, 0.1f);
-
-    glm::mat4 custom = glm::mat4(1.0f);
-    custom[3][3] = 20.0f;
-
-
-    sun->setCustomTransformation(custom);
+    sun->Rotate(glm::radians(180.0f), 0, 1, 0);
+    
 
     sun->setColor(glm::vec4(0.9f, 0.1f, 0.5f, 1.0f));
     glm::vec3 lightDirection = glm::vec3(0.0f, -1.0f, 0.0f);
@@ -508,9 +516,6 @@ bool Scene::prepareFlyingCars() {
     Model* formula = modelManager->GetModelByName("formule");
     //Model* skyModel = new Model(cubeV.data(), cubeV.size(), "triangles", "cube");
 
-    
-    
-
     int i = 0;
     std::vector<Texture*> vv;
     Texture* t1 = new Texture("textures/wooden_fence.png", "texture_test");
@@ -522,6 +527,24 @@ bool Scene::prepareFlyingCars() {
     vv.push_back(t3);
     vv.push_back(t4);
     
+    glm::vec3 con[4] = {
+    glm::vec3(0, 0, 0),
+    glm::vec3(-2, 2, 0),
+    glm::vec3(-4, 4, 1),
+    glm::vec3(-6, 0, 0)
+    };
+   
+   
+    std::vector<glm::vec3> points = {
+    glm::vec3(0.0f, 0.0f, 2.0f),
+    glm::vec3(1.0f, 2.0f, 0.0f),
+    glm::vec3(2.0f, 5.0f, 1.0f),
+    glm::vec3(-3.0f, 2.0f, 0.0f),
+    glm::vec3(4.0f, 1.0f, -4.0f),
+    glm::vec3(5.0f, 0.0f, 0.0f)
+    };
+
+    
     drawableSky* sky = new drawableSky(skyModel, shaderProgramSky);
     sky->AddTexture(skyboxTexture);
     addDrawableObject(sky);
@@ -531,8 +554,22 @@ bool Scene::prepareFlyingCars() {
         DrawableObject* sun = CreateDrawableObject(formula, this->getShaderProgram(i),"normal");
         
         sun->Resize(0.01f, 0.01f, 0.01f);
+        sun->Rotate(glm::radians(180.0f), 0.0f, 1.0f, 0.0f);
         sun->MoveTo(pos.x, pos.y, pos.z);
-        sun->SetRandomMoveAnimation(0.001f, 100);
+        if (i == 0) {
+            sun->moveOnCustomeBezier(points, 0.001f);
+           
+        }
+        else if (i == 3) {
+            sun->setMaterial(new Material(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f),
+                glm::vec4(0.8f, 0.8f, 0.8f, 1.0f),
+                glm::vec4(0.0f, 0.0f, 0.0f, 1.0f),
+                5.0f));
+        }
+        else {
+            sun->SetRandomMoveAnimation(0.001f, 100);
+        }
+        
         //sun->SetRotateAnimation(glm::radians(1.0f), glm::vec3(0, 0.5, 0.5));
         sun->AddTexture(vv[i]);
         addDrawableObject(sun);

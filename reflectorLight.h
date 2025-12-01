@@ -12,13 +12,7 @@ protected:
   
 
 public:
-    reflectorLight(const glm::vec3& pos, const glm::vec3& dir,
-        
-     
-        float intensity,
-      
-        float atten, float angle);
-
+    reflectorLight(const glm::vec3& pos, const glm::vec3& dir,float intensity,float atten, float angle);
     ~reflectorLight() {};
     LightData getLightData() const override;
     void Update() override;

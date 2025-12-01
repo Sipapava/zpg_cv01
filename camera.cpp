@@ -8,8 +8,7 @@ Camera::Camera() {
     position = glm::vec3(0.0f, 0.5f, -2.0f);
     target = glm::vec3(0.0f, 0.0f, 0.0f);
     up = glm::vec3(0.0f, 1.0f, 0.0f);
-  
-
+ 
     fov = 45.0f;
     aspect = 800.0f / 600.0f;
     nearPlane = 0.1f;
@@ -23,7 +22,6 @@ Camera::Camera() {
 Camera::~Camera() {};
 
 glm::mat4 Camera::getViewMatrix() {
-
     return glm::lookAt(position, target, up);
 }
 glm::mat4 Camera::getProjectionMatrix() {
@@ -34,26 +32,20 @@ void Camera::UpdateMatrix() {
     glm::mat4 Mp = this->getProjectionMatrix();
     glm::mat4 Mv = this->getViewMatrix();
 
-  
     NotifyObservers(NotifyType::CameraPos, &position);
-   
- 
+
     camData = { Mv, Mp };
     NotifyObservers(NotifyType::CameraMatrix, &camData);
-
-    
 }
 
 
 void Camera::setAspect(float aspect) {
     this->aspect = aspect;
     this->UpdateMatrix();
-
 }
 
 void Camera::SetResolutionY(int y) {
-    this->resolutionY = y;
-    
+    this->resolutionY = y;  
 }
 
 

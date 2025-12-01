@@ -11,11 +11,6 @@
 class Light : public subject, public DrawableObject {
 protected:
 	float specularIntesity;
-	
-	
-	
-	
-
 public:
 
 	Light(float intesnity);

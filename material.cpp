@@ -1,10 +1,10 @@
 #include "material.h"
 
 Material::Material()
-    : ambientColor(0.2f, 0.2f, 0.2f, 1.0f),  // ambient nulový
+    : ambientColor(0.2f, 0.2f, 0.2f, 1.0f),  
     diffuseColor(0.6f, 0.6f, 0.6f, 1.0f),  
-    specularColor(1.0f, 1.0f, 1.0f, 1.0f), // žádný lesk
-    shinnines(16.0f)                        // skoro matný
+    specularColor(1.0f, 1.0f, 1.0f, 1.0f), 
+    shinnines(16.0f)                        
 {}
 
 Material::Material(const glm::vec4& ambient,

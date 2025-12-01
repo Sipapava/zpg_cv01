@@ -1,7 +1,8 @@
 #pragma once
 #include "transformation.h"
-#include <cstdlib> // pro rand() a srand()
+#include <cstdlib> 
 #include <ctime>
+#include <vector>
 
 class Translation : public Transformation {
 private:
@@ -75,4 +76,39 @@ private:
 public:
     RandomLine(float speed);
     glm::mat4 apply(const glm::mat4& matrix) override;
+};
+
+
+
+
+class Bezier : public Transformation {
+private:
+    glm::mat4 A;
+    glm::mat4x3 B;
+    float t;
+    float speed;
+    bool finished;
+
+public:
+    Bezier(const glm::vec3 controlPoints[4], float speed);
+    glm::mat4 apply(const glm::mat4& matrix) override;
+    bool isFinished() const { return finished; }
+    void resetFinished() { finished = false; t = 0.0f; }
+    float getT() const  { return t; }
+};
+
+
+
+class BezierCustom : public Transformation {
+private:
+    std::vector<glm::vec3> points;
+    std::vector<Bezier> segments;
+    int currentSegment = 0;
+
+public:
+    BezierCustom(const std::vector<glm::vec3>& points, float speed);
+    glm::mat4 apply(const glm::mat4& matrix) override;
+
+private:
+    bool segmentFinished(const Bezier& b);
 };
